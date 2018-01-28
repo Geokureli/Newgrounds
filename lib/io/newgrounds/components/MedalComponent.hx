@@ -22,14 +22,6 @@ class MedalComponent extends Component {
 		return null;
 	}
 	
-	public function unlockByName(name:String):Call {
-		
-		if (_core.assert(allByName.exists(name), 'Cannot unlock medal, no name matches "$name"'))
-			return allByName.get(name).unlock();
-		
-		return null;
-	}
-	
 	public function getList():Call {
 		
 		return new Call(_core, "Medal.getList")

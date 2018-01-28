@@ -46,23 +46,6 @@ class ScoreBoardComponent extends Component {
 		createBoard(data.data.scoreboard).parseScores(data.data.scores);
 	}
 	
-	public function getScoresByName
-	( name  :String
-	, limit :Int     = 10
-	, period:String  = null
-	, skip  :Int     = 0
-	, social:Bool    = false
-	, tag   :String  = null
-	, user  :Dynamic = null
-	):Call {
-		
-		if (_core.assert(all != null, "Cannot get scores until ScoreBoard.getBoards is called")
-		&&  _core.assert(allByName.exists(name), 'Cannot unlock medal, no name matches "$name"'))
-			return allByName.get(name).getScores(limit, skip, period, social, tag, user);
-		
-		return null;
-	}
-	
 	public function postScore(id:Int, value:Int, tag:String = null):Call {
 		
 		if (all == null)
@@ -88,14 +71,6 @@ class ScoreBoardComponent extends Component {
 		allByName = new StringMap<ScoreBoard>();
 		
 		createBoard(data.data.scoreBoard).parseScores(data.data.scores);
-	}
-	
-	public function postScoreByName(name:String, value:Int):Call {
-		
-		if (_core.assert(all != null && allByName.exists(name), 'no name matches "$name"'))
-			return allByName.get(name).postScore(value);
-		
-		return null;
 	}
 	
 	public function getBoards():Call {
