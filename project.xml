@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<project>
+	
+	<meta title="Newgrounds.io" package="Main" version="1.0.0" company="GeoKureli" />
+	<app main="Main" path="Export" file="Newgrounds" />
+	
+	<window width="400" height="400" fps="30" />
+	
+	<source path="test" />
+	
+	<haxelib name="openfl" />
+	<classpath path="lib" />
+	
+</project>
