@@ -1,7 +1,6 @@
 package;
 
 import io.newgrounds.test.Test;
-import io.newgrounds.test.AppTest;
 import io.newgrounds.NG;
 
 import openfl.display.Sprite;
@@ -16,7 +15,19 @@ class Main extends Sprite {
 		
 		NG.createCore();
 		NG.core.verbose = true;
-
-		new AppTest();
+		
+		NG.core.requestLogin(onLogin);
+	}
+	
+	function onLogin():Void {
+		
+		trace("logged in");
+		
+		NG.core.loadMedals(showMedals);
+	}
+	
+	function showMedals():Void {
+		
+		
 	}
 }

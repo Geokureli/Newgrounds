@@ -14,7 +14,7 @@ class Score extends Object {
 	/** The integer value of the value. */
 	public var value(default, null):Int;
 	
-	public function new(core:NG, data:Dynamic) { super(core, data); }
+	public function new(core:NGLite, data:Dynamic) { super(core, data); }
 
 	override function parse(data:Dynamic):Void {
 		

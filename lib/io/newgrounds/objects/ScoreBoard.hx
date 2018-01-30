@@ -1,6 +1,8 @@
 package io.newgrounds.objects;
 
-import io.newgrounds.NG;
+import io.newgrounds.components.ScoreBoardComponent;
+import io.newgrounds.NGLite;
+
 class ScoreBoard extends Object {
 	
 	public var scores(default, null):Array<Dynamic>;
@@ -11,7 +13,7 @@ class ScoreBoard extends Object {
 	/** The name of the scoreboard. */
 	public var name(default, null):String;
 	
-	public function new(core:NG, data:Dynamic):Void {super(core, data); }
+	public function new(core:NGLite, data:Dynamic):Void {super(core, data); }
 	
 	override function parse(data:Dynamic):Void {
 		
@@ -28,22 +30,11 @@ class ScoreBoard extends Object {
 	, user  :Dynamic = null
 	):Call {
 		
-		return getScoresHelper(_core, id, limit, skip, period, social, tag, user)
-			.addDataHandler(onScoresReceived);
+		return _core.scoreBoard.getScores(id, limit, skip, period, social, tag, user);
 	}
 	
-	function onScoresReceived(data:Dynamic):Void {
-		
-		if (!data.data.success) {
-			
-			_core.logError('${data.component} - #${data.data.error.code}: ${data.data.error.message}');
-			return;
-		}
-		
-		parseScores(cast data.data.scores);
-	}
-	
-	public function parseScores(scores:Array<Dynamic>):Void {
+	@:allow(ScoreBoardComponent)
+	function parseScores(scores:Array<Dynamic>):Void {
 		
 		//TODO: keep old scores and unify new + old?
 		scores = new Array<Score>();
@@ -56,7 +47,7 @@ class ScoreBoard extends Object {
 	
 	public function postScore(value :Int, tag:String = null):Call {
 		
-		return postScoreHelper(_core, id, value, tag);
+		return _core.scoreBoard.postScore(id, value, tag);
 	}
 	
 	public function toString():String {
@@ -64,32 +55,4 @@ class ScoreBoard extends Object {
 		return 'ScoreBoard: $id@$name';
 	}
 	
-	inline static public function getScoresHelper
-	( core  :NG
-	, id    :Int
-	, limit :Int     = 10
-	, skip  :Int     = 0
-	, period:String  = null
-	, social:Bool    = false
-	, tag   :String  = null
-	, user  :Dynamic = null
-	):Call {
-		
-		return new Call(core, "ScoreBoard.getScores")
-			.addComponentParameter("id"    , id    )
-			.addComponentParameter("limit" , limit , 10   )
-			.addComponentParameter("skip"  , skip  , 0    )
-			.addComponentParameter("period", period, null )
-			.addComponentParameter("social", social, false)
-			.addComponentParameter("tag"   , tag   , null )
-			.addComponentParameter("user"  , user  , null );
-	}
-	
-	inline static public function postScoreHelper(core:NG, id:Int, value :Int, tag:String = null):Call {
-		
-		return new Call(core, "ScoreBoard.postScore", true, true)
-			.addComponentParameter("id", id)
-			.addComponentParameter("tag", tag)
-			.addComponentParameter("value", value);
-	}
 }

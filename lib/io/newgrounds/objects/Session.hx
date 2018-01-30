@@ -1,4 +1,5 @@
 package io.newgrounds.objects;
+
 class Session extends Object {
 	
 	/** If true, the session_id is expired. Use App.startSession to get a new one.*/
@@ -19,9 +20,9 @@ class Session extends Object {
 	//TODO:desciption
 	public var status(get, never):SessionStatus;
 	
-	public function new(core:NG, data:Dynamic) { super(core, data); }
+	public function new(core:NGLite, data:Dynamic = null) { super(core, data); }
 	
-	override function parse(data:Dynamic):Void {
+	override public function parse(data:Dynamic):Void {
 		
 		id = data.id;
 		expired = data.expired;
@@ -51,6 +52,8 @@ class Session extends Object {
 	public function expire():Void {
 		
 		expired = true;
+		id = null;
+		user = null;
 	}
 }
 

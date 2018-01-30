@@ -14,7 +14,7 @@ class User extends Object {
 	/**Returns true if the user has a Newgrounds Supporter upgrade. */ 
 	public var supporter(default, null):Bool;
 	
-	public function new(core:NG, data:Dynamic) { super(core, data); }
+	public function new(core:NGLite, data:Dynamic) { super(core, data); }
 
 	override function parse(data:Dynamic):Void {
 		

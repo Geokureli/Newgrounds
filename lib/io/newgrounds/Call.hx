@@ -1,5 +1,6 @@
 package io.newgrounds;
 
+import io.newgrounds.objects.Error;
 import haxe.ds.StringMap;
 import haxe.Json;
 import haxe.Http;
@@ -8,7 +9,7 @@ class Call {
 	
 	inline static var PATH:String = "https://newgrounds.io/gateway_v3.php";
 	
-	var _core:NG;
+	var _core:NGLite;
 	
 	var _component:String;
 	var _properties:StringMap<Dynamic>;
@@ -19,10 +20,10 @@ class Call {
 	// --- BASICALLY SIGNALS
 	var _dataHandlers:Array<Dynamic->Void>;
 	var _successHandlers:Array<Void->Void>;
-	var _errorHandlers:Array<String->Void>;
+	var _httpErrorHandlers:Array<String->Void>;
 	var _statusHandlers:Array<Int->Void>;
 	
-	public function new (core:NG, component:String, requireSession:Bool = false, isSecure:Bool = false) {
+	public function new (core:NGLite, component:String, requireSession:Bool = false, isSecure:Bool = false) {
 		
 		_core = core;
 		_component = component;
@@ -78,10 +79,10 @@ class Call {
 	/** Handy callback setter for chained call modifiers. Called when ng.io does not reply for any reason */
 	public function addErrorHandler(handler:String->Void):Call {
 		
-		if (_errorHandlers == null)
-			_errorHandlers = new Array<String->Void>();
+		if (_httpErrorHandlers == null)
+			_httpErrorHandlers = new Array<String->Void>();
 		
-		_errorHandlers.push(handler);
+		_httpErrorHandlers.push(handler);
 		return this;
 	}
 	
@@ -106,9 +107,10 @@ class Call {
 		data.call = {};
 		data.call.component  = _component;
 		
-		if (_requireSession) {
-			if (_core.assert(_core.sessionId != null, 'cannot send "$_component" call without a sessionId'))
-				data.session_id = _core.sessionId;
+		if (_requireSession && !_properties.exists("session_id")) {
+			
+			if (_core.assert(Std.is(_core, NG) && cast (_core, NG).sessionId != null, 'cannot send "$_component" call without a sessionId'))
+				addProperty("session_id", cast(_core, NG).sessionId);
 			else
 				return;
 		}
@@ -141,7 +143,7 @@ class Call {
 		var http = new Http(PATH);
 		http.setParameter("input", Json.stringify(data));
 		http.onData   = onData;
-		http.onError  = onError;
+		http.onError  = onHttpError;
 		http.onStatus = onStatus;
 		http.request(true);
 	}
@@ -156,7 +158,7 @@ class Call {
 		
 		_core.logVerbose('Reply - $reply');
 		
-		if (_dataHandlers == null || _successHandlers == null)
+		if (_dataHandlers == null && _successHandlers == null)
 			return;
 		
 		var data = Json.parse(reply);
@@ -164,7 +166,7 @@ class Call {
 		if (!data.success) {
 			
 			_core.logError('Call unseccessful, error: ${data.error}');
-			onError(Json.stringify(data.error));
+			onHttpError(Json.stringify(data.error));
 			return;
 		}
 		
@@ -183,18 +185,18 @@ class Call {
 		destroy();
 	}
 	
-	function onError(msg:String):Void {
+	function onHttpError(msg:String):Void {
 		
 		_core.logError(msg);
 		
-		//TODO: general error handling
-		
-		if (_errorHandlers == null)
+		if (_httpErrorHandlers == null)
 			return;
 		
-		for (callback in _errorHandlers)
+		for (callback in _httpErrorHandlers)
 			callback(msg);
 	}
+	
+	//function onError()
 	
 	function onStatus(status:Int):Void {
 		
@@ -214,7 +216,7 @@ class Call {
 		
 		_dataHandlers = null;
 		_successHandlers = null;
-		_errorHandlers = null;
+		_httpErrorHandlers = null;
 		_statusHandlers = null;
 	}
 }

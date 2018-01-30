@@ -1,12 +1,12 @@
 package io.newgrounds.objects;
 
-import io.newgrounds.NG;
+import io.newgrounds.NGLite;
 
 class Object {
 	
-	var _core:NG;
+	var _core:NGLite;
 	
-	public function new(core:NG, data:Dynamic = null) {
+	public function new(core:NGLite, data:Dynamic = null) {
 		
 		this._core = core; 
 		
@@ -14,6 +14,7 @@ class Object {
 			parse(data);
 	}
 	
+	@:allow(io.newgrounds.NGLite)
 	function parse(data:Dynamic):Void { }
 	
 	public function destroy():Void {

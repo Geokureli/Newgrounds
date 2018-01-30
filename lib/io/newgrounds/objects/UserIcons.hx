@@ -11,7 +11,7 @@ class UserIcons extends Object{
 	/** The URL of the user's small icon. */
 	public var small(default, null):String;
 	
-	public function new(core:NG, data:Dynamic) { super(core, data); }
+	public function new(core:NGLite, data:Dynamic) { super(core, data); }
 	
 	override function parse(data:Dynamic):Void {
 		

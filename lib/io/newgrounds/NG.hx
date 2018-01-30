@@ -1,14 +1,17 @@
 package io.newgrounds;
 
-import io.newgrounds.components.GatewayComponent;
-import io.newgrounds.components.LoaderComponent;
-import io.newgrounds.components.ScoreBoardComponent;
-import io.newgrounds.components.EventComponent;
-import io.newgrounds.components.AppComponent;
-import io.newgrounds.components.MedalComponent;
-import haxe.PosInfos;
-import haxe.Json;
-import haxe.Log;
+import io.newgrounds.objects.User;
+import haxe.ds.IntMap;
+
+//TODO: Remove openfl dependancies 
+import openfl.events.TimerEvent;
+import openfl.Lib;
+import openfl.net.URLRequest;
+import openfl.utils.Timer;
+
+import io.newgrounds.objects.Medal;
+import io.newgrounds.objects.Session;
+import io.newgrounds.objects.ScoreBoard;
 
 /**
  * The Newgrounds API for Haxe.
@@ -16,30 +19,37 @@ import haxe.Log;
  *   - https://github.com/MSGhero/NG.hx
  * @author GeoKureli
  */
-class NG {
+class NG extends NGLite {
 	
 	static public var core(default, null):NG;
 	
-	/** Enables verbose logging */
-	public var verbose:Bool;
-	/** The unique ID of your app as found in the 'API Tools' tab of your Newgrounds.com project. */
-	public var appId(default, null):String;
 	/** A unique session id used to identify the active user. */
 	public var sessionId(get, never):String;
-	/**
-	 * Converts an object to an encrypted string that can be decrypted by the server.
-	 * Set your preffered encrypter here,
-	 * or just call setDefaultEcryptionHandler with your app's encryption settings
-	**/
-	public var encryptionHandler:Dynamic->String;
+	public function get_sessionId():String {
+		
+		if (_session == null)
+			return null;
+		
+		return _session.id;
+	}
+
+	/** The logged in user */
+	public var user(get, never):User;
+	public function get_user():User {
+		
+		if (_session == null)
+			return null;
+		
+		return _session.user;
+	}
 	
-	// --- COMPONENTS
-	public var medal     : MedalComponent;
-	public var app       : AppComponent;
-	public var event     : EventComponent;
-	public var scoreBoard: ScoreBoardComponent;
-	public var loader    : LoaderComponent;
-	public var gateway   : GatewayComponent;
+	
+	var _waitingForLogin:Bool;
+	var _loginCancelled:Bool;
+	
+	var _session:Session;
+	var _medals:IntMap<Medal>;
+	var _scoreBoards:IntMap<ScoreBoard>;
 	
 	/** 
 	 * Iniitializes the API, call before utilizing any other component
@@ -47,53 +57,13 @@ class NG {
 	 * @param sessionId A unique session id used to identify the active user.
 	**/
 	public function new(appId:String = "test") {
+		super(appId);
 		
-		this.appId = appId;
-		
-		medal = new MedalComponent(this);
-		app = new AppComponent(this);
-		event = new EventComponent(this);
-		scoreBoard = new ScoreBoardComponent(this);
-		loader = new LoaderComponent(this);
-		gateway = new GatewayComponent(this);
-	}
-	
-	/** Called internally, set this to your preferred logging method */
-	dynamic public function log(any:Dynamic, ?pos:PosInfos):Void {//TODO: limit access via @:allow
-		
-		haxe.Log.trace('[Newgrounds API] :: ${any}', pos);
-		
-		// ExternalInterface call to the NG Project Preview Debug Window
-	}
-	
-	/** used internally, logs if verbose is true */
-	inline public function logVerbose(any:Dynamic, ?pos:PosInfos):Void {//TODO: limit access via @:allow
-		
-		if (verbose)
-			log(any, pos);
-	}
-	
-	/** Used internally. Logs by default, set this to your preferred error handling method */
-	dynamic public function logError(any:Dynamic, ?pos:PosInfos):Void {//TODO: limit access via @:allow
-		
-		log('Error: $any', pos);
-	}
-	
-	/** used internally, calls log error if the condition is false. EX: if (assert(data != null, "null data")) */ 
-	inline public function assert(condition:Bool, msg:Dynamic, ?pos:PosInfos):Bool {//TODO: limit access via @:allow
-		if (!condition)
-			logError(msg, pos);
-		
-		return condition;
-	}
-	
-	public function queueCall(call:Call):Void {
-		
-		throw "not implemented";
+		_session = new Session(this);
 	}
 	
 	/**
-	 * Creates NG.core, the heart and sould of the API. This is not the only way to create an instance,
+	 * Creates NG.core, the heart and soul of the API. This is not the only way to create an instance,
 	 * nor is NG a forced singleton, but it's the only way to set the static NG.core.
 	**/
 	static public function createCore(appId:String = "test"):Void {
@@ -101,48 +71,201 @@ class NG {
 		core = new NG(appId);
 	}
 	
-	public function get_sessionId():String {
+	// -------------------------------------------------------------------------------------------
+	//                                         CALLS
+	// -------------------------------------------------------------------------------------------
+	
+	inline function isCallSuccessful(data:Dynamic):Bool {
 		
-		return app.sessionId;
+		if (!data.data.success)
+			logError('${data.component} - #${data.data.error.code}: ${data.data.error.message}');
+		
+		return data.data.success;
 	}
 	
-	/** Sets */
-	public function setDefaultEncryptionHandler
-	( key   :String
-	, cipher:EncryptionCipher = EncryptionCipher.AES_128
-	, format:EncryptionFormat = EncryptionFormat.BASE_64
+	// -------------------------------------------------------------------------------------------
+	//                                         APP
+	// -------------------------------------------------------------------------------------------
+	
+	public function requestLogin
+	( onLogin :Void->Void = null
+	, onFail  :Void->Void = null
+	, onCancel:Void->Void = null
 	):Void {
 		
-		if (cipher == EncryptionCipher.NONE)
-			encryptionHandler = null;
+		if (_waitingForLogin) {
+			
+			logError("cannot request another login until");
+			return;
+		}
 		
-		throw "not yet implemented";
+		_waitingForLogin = true;
+		_loginCancelled = false;
 		
-		encryptionHandler = cipher == EncryptionCipher.AES_128
-			? encryptAes128.bind(key, format) 
-			: encryptRc4   .bind(key, format);
+		var call = app.startSession(true);
+		
+		call.addErrorHandler(
+			function (_):Void {
+				_waitingForLogin = false;
+				onFail();
+			}
+		);
+		
+		call.addDataHandler(
+			function (data:Dynamic):Void {
+				
+				if (!isCallSuccessful(data)) {
+					
+					_waitingForLogin = false;
+					
+					if (onFail != null)
+						onFail();
+					
+					return;
+				}
+				
+				_session.parse(data.data.session);
+				
+				logVerbose('session started - status: ${_session.status}');
+				
+				if (_session.status == SessionStatus.REQUEST_LOGIN) {
+					
+					logVerbose('loading passport: ${_session.passportUrl}');
+					// TODO: Remove openFL dependancy
+					Lib.getURL(new URLRequest(_session.passportUrl));
+					checkSession(null, onLogin, onCancel);
+				}
+			}
+		);
+		
+		call.send();
 	}
 	
-	static function encryptAes128(key:String, format:EncryptionFormat, data:Dynamic):String {
-		//TODO
-		return Json.stringify(data);
+	function checkSession(data:Dynamic, onLogin:Void->Void, onCancel:Void->Void):Void {
+		
+		if (data != null) {
+			
+			if (!isCallSuccessful(data)) {
+				// The user cancelled the passport
+				
+				endLoginAndCall(onCancel);
+				return;
+			}
+			_session.parse(data.data.session);
+		}
+		
+		if (_session.status == SessionStatus.USER_LOADED) {
+			
+			endLoginAndCall(onLogin);
+			
+		} else if (_session.status == SessionStatus.REQUEST_LOGIN){
+			
+			var call = app.checkSession()
+				.addDataHandler(checkSession.bind(_, onLogin, onCancel));
+			
+			// Wait 3 seconds and try again
+			timer(3.0,
+				function():Void {
+					
+					// Check if cancelLoginRequest was called
+					if (!_loginCancelled)
+						call.send();
+					else
+						endLoginAndCall(onCancel);
+				}
+			);
+			
+		} else
+			// The user cancelled the passport
+			endLoginAndCall(onCancel);
 	}
 	
-	static function encryptRc4(key:String, format:EncryptionFormat, data:Dynamic):String {
-		//TODO
-		return Json.stringify(data);
+	public function cancelLoginRequest():Void {
+		
+		if (_waitingForLogin)
+			_loginCancelled = true;
 	}
-}
-
-@:enum
-abstract EncryptionCipher(Int) {
-	var NONE    = 0;
-	var AES_128 = 1;
-	var RC4     = 2;
-}
-
-@:enum
-abstract EncryptionFormat(Int) to Int{
-	var BASE_64 = 64;
-	var HEX     = 16;
+	
+	function endLoginAndCall(callback:Void->Void):Void {
+		
+		_waitingForLogin = false;
+		_loginCancelled = false;
+		
+		if (callback != null)
+			callback();
+	}
+	
+	public function logOut():Void {
+		
+		app.endSession()
+			.addSuccessHandler(onLogOutSuccessful)
+			.send();
+	}
+	
+	function onLogOutSuccessful():Void {
+		
+		_session.expire();
+	}
+	
+	// -------------------------------------------------------------------------------------------
+	//                                       ENCRYPTION
+	// -------------------------------------------------------------------------------------------
+	
+	public function loadMedals(onSuccess:Void->Void = null, onFail:Void->Void = null):Void {
+		
+		var call = medal.getList()
+			.addDataHandler(onListReceived);
+		
+		if (onSuccess != null)
+			call.addSuccessHandler(onSuccess);
+		
+		if (onFail != null)
+			call.addErrorHandler(function(_):Void { onFail(); });
+		
+		call.send();
+	}
+	
+	function onListReceived(data:Dynamic):Void {
+		
+		if (!isCallSuccessful(data))
+			return;
+		
+		if (_medals == null) {
+			
+			_medals = new IntMap<Medal>();
+			
+			for (medalData in cast(data.data.medals, Array<Dynamic>)) {
+				
+				var medal = new Medal(this, medalData);
+				_medals.set(medal.id, medal);
+			}
+		} else {
+			
+			for (medalData in cast(data.data.medals, Array<Dynamic>)) {
+				
+				_medals.get(medalData.id).parse(medalData);
+			}
+		}
+		
+		logVerbose('${data.data.medals.length} Medals received');
+	}
+	
+	// -------------------------------------------------------------------------------------------
+	//                                       HELPERS
+	// -------------------------------------------------------------------------------------------
+	
+	function timer(delay:Float, callback:Void->Void):Void {
+		//TODO: remove openFL dependancy
+		
+		var timer = new Timer(delay * 1000.0, 1);
+		
+		function func(e:TimerEvent):Void {
+			
+			timer.removeEventListener(TimerEvent.TIMER_COMPLETE, func);
+			callback();
+		}
+		
+		timer.addEventListener(TimerEvent.TIMER_COMPLETE, func);
+		timer.start();
+	}
 }

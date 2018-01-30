@@ -1,10 +1,10 @@
 package io.newgrounds.components;
 
-import io.newgrounds.NG;
+import io.newgrounds.NGLite;
 
 class LoaderComponent extends Component {
 	
-	public function new (core:NG){ super(core); }
+	public function new (core:NGLite){ super(core); }
 	
 	public function loadAuthorUrl(host:String, redirect:Bool = true):Call { 
 		

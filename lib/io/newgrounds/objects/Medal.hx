@@ -1,7 +1,7 @@
 package io.newgrounds.objects;
 
 import io.newgrounds.Call;
-import io.newgrounds.NG;
+import io.newgrounds.NGLite;
 
 class Medal extends Object {
 	
@@ -30,8 +30,9 @@ class Medal extends Object {
 	// --- HELPERS
 	public var difficultyName(get, never):String;
 	
-	public function new(core:NG, data:Dynamic):Void { super(core, data); }
-	
+	public function new(core:NGLite, data:Dynamic = null):Void { super(core, data); }
+
+	@:allow(io.newgrounds.NG)
 	override function parse(data:Dynamic):Void {
 		
 		id          = data.id;
@@ -46,11 +47,10 @@ class Medal extends Object {
 	
 	public function unlock():Call {
 		
-		return new Call(_core, "Medal.unlock", true, true)
-			.addDataHandler(onUnlock);
+		return _core.medal.unlock(id);
 	}
 	
-	function onUnlock(reply:String):Void {
+	function onUnlock():Void {
 		
 		unlocked = true;
 	}

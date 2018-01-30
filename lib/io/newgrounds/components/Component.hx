@@ -1,12 +1,12 @@
 package io.newgrounds.components;
 
-import io.newgrounds.NG;
+import io.newgrounds.NGLite;
 
 class Component {
 	
-	var _core:NG;
+	var _core:NGLite;
 	
-	public function new(core:NG) {
+	public function new(core:NGLite) {
 		
 		this._core = core;
 	}
