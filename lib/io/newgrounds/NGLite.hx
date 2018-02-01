@@ -1,5 +1,6 @@
 package io.newgrounds;
 
+import io.newgrounds.objects.events.Result.ResultBase;
 import haxe.PosInfos;
 import haxe.Json;
 
@@ -21,12 +22,14 @@ import io.newgrounds.components.MedalComponent;
  */
 class NGLite {
 	
-	static public var core(default, null):NG;
+	static public var core(default, null):NGLite;
 	
 	/** Enables verbose logging */
 	public var verbose:Bool;
 	/** The unique ID of your app as found in the 'API Tools' tab of your Newgrounds.com project. */
 	public var appId(default, null):String;
+	/** The name of the host the game is being played on */
+	public var host:String;
 	
 	/**
 	 * Converts an object to an encrypted string that can be decrypted by the server.
@@ -45,8 +48,8 @@ class NGLite {
 	
 	/** 
 	 * Iniitializes the API, call before utilizing any other component
-	 * @param appId     The unique ID of your app as found in the 'API Tools' tab of your Newgrounds.com project.
-	 * @param sessionId A unique session id used to identify the active user.
+	 * @param appId  The unique ID of your app as found in the 'API Tools' tab of your Newgrounds.com project.
+	 * @param host   The name of the host the game is being played on.
 	**/
 	public function new(appId:String = "test") {
 		
@@ -60,8 +63,18 @@ class NGLite {
 		gateway    = new GatewayComponent   (this);
 	}
 	
+	/**
+	 * Creates NG.core, the heart and soul of the API. This is not the only way to create an instance,
+	 * nor is NG a forced singleton, but it's the only way to set the static NG.core.
+	**/
+	static public function createCore(appId:String = "test"):Void {
+		
+		core = new NGLite(appId);
+	}
+	
 	@:allow(io.newgrounds.Call)
-	function queueCall(call:Call):Void {
+	@:generic
+	function queueCall<T:ResultBase>(call:Call<T>):Void {
 		
 		throw "not implemented";//TODO
 	}
@@ -74,8 +87,6 @@ class NGLite {
 	dynamic public function log(any:Dynamic, ?pos:PosInfos):Void {//TODO: limit access via @:allow
 		
 		haxe.Log.trace('[Newgrounds API] :: ${any}', pos);
-		
-		// ExternalInterface call to the NG Project Preview Debug Window
 	}
 	
 	/** used internally, logs if verbose is true */

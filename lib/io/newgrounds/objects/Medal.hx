@@ -1,5 +1,6 @@
 package io.newgrounds.objects;
 
+import io.newgrounds.objects.events.Result;
 import io.newgrounds.Call;
 import io.newgrounds.NGLite;
 
@@ -45,7 +46,7 @@ class Medal extends Object {
 		unlocked    = data.unlocked;
 	}
 	
-	public function unlock():Call {
+	public function unlock():Call<MedalUnlockResult> {
 		
 		return _core.medal.unlock(id);
 	}

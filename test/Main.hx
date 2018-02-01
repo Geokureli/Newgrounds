@@ -1,19 +1,17 @@
 package;
 
-import io.newgrounds.test.Test;
 import io.newgrounds.NG;
 
 import openfl.display.Sprite;
 
 class Main extends Sprite {
 	
-	var _currentTest:Test;
-	
 	public function new () {
 		
 		super ();
 		
-		NG.createCore();
+		NG.createCore("47215:Ip8uDj9v");
+		NG.core.host = "localHost";
 		NG.core.verbose = true;
 		
 		NG.core.requestLogin(onLogin);
@@ -23,11 +21,8 @@ class Main extends Sprite {
 		
 		trace("logged in");
 		
-		NG.core.loadMedals(showMedals);
-	}
-	
-	function showMedals():Void {
-		
-		
+		NG.core.gateway.getDatetime()
+			.addDataHandler(function(_):Void {})
+			.send();
 	}
 }

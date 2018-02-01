@@ -1,5 +1,7 @@
 package io.newgrounds.objects;
 
+import io.newgrounds.objects.events.Result;
+import io.newgrounds.objects.events.Result.ScoreResult;
 import io.newgrounds.components.ScoreBoardComponent;
 import io.newgrounds.NGLite;
 
@@ -28,7 +30,7 @@ class ScoreBoard extends Object {
 	, social:Bool    = false
 	, tag   :String  = null
 	, user  :Dynamic = null
-	):Call {
+	):Call<ScoreResult> {
 		
 		return _core.scoreBoard.getScores(id, limit, skip, period, social, tag, user);
 	}
@@ -45,7 +47,7 @@ class ScoreBoard extends Object {
 		_core.log('created ${scores.length} scores');
 	}
 	
-	public function postScore(value :Int, tag:String = null):Call {
+	public function postScore(value :Int, tag:String = null):Call<ResultBase> {
 		
 		return _core.scoreBoard.postScore(id, value, tag);
 	}

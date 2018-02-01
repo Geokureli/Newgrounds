@@ -1,5 +1,9 @@
 package io.newgrounds;
 
+import io.newgrounds.objects.Error;
+import io.newgrounds.objects.events.Result.SessionResult;
+import io.newgrounds.objects.events.Result.MedalListResult;
+import io.newgrounds.objects.events.Response;
 import io.newgrounds.objects.User;
 import haxe.ds.IntMap;
 
@@ -72,24 +76,12 @@ class NG extends NGLite {
 	}
 	
 	// -------------------------------------------------------------------------------------------
-	//                                         CALLS
-	// -------------------------------------------------------------------------------------------
-	
-	inline function isCallSuccessful(data:Dynamic):Bool {
-		
-		if (!data.data.success)
-			logError('${data.component} - #${data.data.error.code}: ${data.data.error.message}');
-		
-		return data.data.success;
-	}
-	
-	// -------------------------------------------------------------------------------------------
 	//                                         APP
 	// -------------------------------------------------------------------------------------------
 	
 	public function requestLogin
 	( onLogin :Void->Void = null
-	, onFail  :Void->Void = null
+	, onFail  :Error->Void = null
 	, onCancel:Void->Void = null
 	):Void {
 		
@@ -102,29 +94,20 @@ class NG extends NGLite {
 		_waitingForLogin = true;
 		_loginCancelled = false;
 		
-		var call = app.startSession(true);
-		
-		call.addErrorHandler(
-			function (_):Void {
-				_waitingForLogin = false;
-				onFail();
-			}
-		);
-		
-		call.addDataHandler(
-			function (data:Dynamic):Void {
+		var call = app.startSession(true)
+			.addDataHandler(
+			function (response:Response<SessionResult>):Void {
 				
-				if (!isCallSuccessful(data)) {
-					
-					_waitingForLogin = false;
+				if (!response.success || !response.result.success) {
 					
 					if (onFail != null)
-						onFail();
+						onFail(!response.success ? response.error : response.result.error);
 					
+					endLoginAndCall(null);
 					return;
 				}
 				
-				_session.parse(data.data.session);
+				_session.parse(response.result.data.session);
 				
 				logVerbose('session started - status: ${_session.status}');
 				
@@ -138,20 +121,24 @@ class NG extends NGLite {
 			}
 		);
 		
+		if (onFail != null)
+			call.addErrorHandler(onFail);
+		
 		call.send();
 	}
 	
-	function checkSession(data:Dynamic, onLogin:Void->Void, onCancel:Void->Void):Void {
+	function checkSession(response:Response<SessionResult>, onLogin:Void->Void, onCancel:Void->Void):Void {
 		
-		if (data != null) {
+		if (response != null) {
 			
-			if (!isCallSuccessful(data)) {
+			if (!response.success || !response.result.success) {
 				// The user cancelled the passport
 				
 				endLoginAndCall(onCancel);
 				return;
 			}
-			_session.parse(data.data.session);
+			
+			_session.parse(response.result.data.session);
 		}
 		
 		if (_session.status == SessionStatus.USER_LOADED) {
@@ -211,43 +198,43 @@ class NG extends NGLite {
 	//                                       ENCRYPTION
 	// -------------------------------------------------------------------------------------------
 	
-	public function loadMedals(onSuccess:Void->Void = null, onFail:Void->Void = null):Void {
+	public function requestMedals(onSuccess:Void->Void = null, onFail:Error->Void = null):Void {
 		
 		var call = medal.getList()
-			.addDataHandler(onListReceived);
+			.addDataHandler(onMedalsReceived);
 		
 		if (onSuccess != null)
 			call.addSuccessHandler(onSuccess);
 		
 		if (onFail != null)
-			call.addErrorHandler(function(_):Void { onFail(); });
+			call.addErrorHandler(onFail);
 		
 		call.send();
 	}
 	
-	function onListReceived(data:Dynamic):Void {
+	function onMedalsReceived(response:Response<MedalListResult>):Void {
 		
-		if (!isCallSuccessful(data))
+		if (!response.success || !response.result.success)
 			return;
 		
 		if (_medals == null) {
 			
 			_medals = new IntMap<Medal>();
 			
-			for (medalData in cast(data.data.medals, Array<Dynamic>)) {
+			for (medalData in response.result.data.medals) {
 				
 				var medal = new Medal(this, medalData);
 				_medals.set(medal.id, medal);
 			}
 		} else {
 			
-			for (medalData in cast(data.data.medals, Array<Dynamic>)) {
+			for (medalData in response.result.data.medals) {
 				
 				_medals.get(medalData.id).parse(medalData);
 			}
 		}
 		
-		logVerbose('${data.data.medals.length} Medals received');
+		logVerbose('${response.result.data.medals.length} Medals received');
 	}
 	
 	// -------------------------------------------------------------------------------------------

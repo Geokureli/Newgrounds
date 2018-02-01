@@ -1,11 +1,15 @@
 package io.newgrounds;
 
 import io.newgrounds.objects.Error;
+import io.newgrounds.objects.events.Result;
+import io.newgrounds.objects.events.Result.ResultBase;
+import io.newgrounds.objects.events.Response;
+
 import haxe.ds.StringMap;
 import haxe.Json;
 import haxe.Http;
 
-class Call {
+class Call<T:ResultBase> {
 	
 	inline static var PATH:String = "https://newgrounds.io/gateway_v3.php";
 	
@@ -18,9 +22,9 @@ class Call {
 	var _isSecure:Bool;
 	
 	// --- BASICALLY SIGNALS
-	var _dataHandlers:Array<Dynamic->Void>;
+	var _dataHandlers:Array<Response<T>->Void>;
 	var _successHandlers:Array<Void->Void>;
-	var _httpErrorHandlers:Array<String->Void>;
+	var _httpErrorHandlers:Array<Error->Void>;
 	var _statusHandlers:Array<Int->Void>;
 	
 	public function new (core:NGLite, component:String, requireSession:Bool = false, isSecure:Bool = false) {
@@ -32,7 +36,7 @@ class Call {
 	}
 	
 	/** adds a property to the input's object. **/
-	public function addProperty(name:String, value:Dynamic):Call {
+	public function addProperty(name:String, value:Dynamic):Call<T> {
 		
 		if (_properties == null)
 			_properties = new StringMap<Dynamic>();
@@ -43,7 +47,7 @@ class Call {
 	}
 	
 	/** adds a parameter to the call's component object. **/
-	public function addComponentParameter(name:String, value:Dynamic, defaultValue:Dynamic = null):Call {
+	public function addComponentParameter(name:String, value:Dynamic, defaultValue:Dynamic = null):Call<T> {
 		
 		if (value == defaultValue)//TODO allow sending null value
 			return this;
@@ -57,17 +61,17 @@ class Call {
 	}
 	
 	/** Handy callback setter for chained call modifiers. Called when ng.io replies successfully */
-	public function addDataHandler(handler:Dynamic->Void):Call {
+	public function addDataHandler(handler:Response<T>->Void):Call<T> {
 		
 		if (_dataHandlers == null)
-			_dataHandlers = new Array<Dynamic->Void>();
+			_dataHandlers = new Array<Response<T>->Void>();
 		
 		_dataHandlers.push(handler);
 		return this;
 	}
 	
 	/** Handy callback setter for chained call modifiers. Called when ng.io replies successfully */
-	public function addSuccessHandler(handler:Void->Void):Call {
+	public function addSuccessHandler(handler:Void->Void):Call<T> {
 		
 		if (_successHandlers == null)
 			_successHandlers = new Array<Void->Void>();
@@ -77,17 +81,17 @@ class Call {
 	}
 	
 	/** Handy callback setter for chained call modifiers. Called when ng.io does not reply for any reason */
-	public function addErrorHandler(handler:String->Void):Call {
+	public function addErrorHandler(handler:Error->Void):Call<T> {
 		
 		if (_httpErrorHandlers == null)
-			_httpErrorHandlers = new Array<String->Void>();
+			_httpErrorHandlers = new Array<Error->Void>();
 		
 		_httpErrorHandlers.push(handler);
 		return this;
 	}
 	
 	/** Handy callback setter for chained call modifiers. No idea when this is called; */
-	public function addStatusHandler(handler:Int->Void):Call {//TODO:learn what this is for
+	public function addStatusHandler(handler:Int->Void):Call<T> {//TODO:learn what this is for
 		
 		if (_statusHandlers == null)
 			_statusHandlers = new Array<Int->Void>();
@@ -107,7 +111,7 @@ class Call {
 		data.call = {};
 		data.call.component  = _component;
 		
-		if (_requireSession && !_properties.exists("session_id")) {
+		if (_requireSession && (_properties == null || !_properties.exists("session_id"))) {
 			
 			if (_core.assert(Std.is(_core, NG) && cast (_core, NG).sessionId != null, 'cannot send "$_component" call without a sessionId'))
 				addProperty("session_id", cast(_core, NG).sessionId);
@@ -161,22 +165,15 @@ class Call {
 		if (_dataHandlers == null && _successHandlers == null)
 			return;
 		
-		var data = Json.parse(reply);
-		
-		if (!data.success) {
-			
-			_core.logError('Call unseccessful, error: ${data.error}');
-			onHttpError(Json.stringify(data.error));
-			return;
-		}
+		var response = new Response<T>(_core, reply);
 		
 		if (_dataHandlers != null) {
 			
 			for (callback in _dataHandlers)
-				callback(data.result);
+				callback(response);
 		}
 		
-		if (data.result.data.success && _successHandlers != null) {
+		if (response.success && response.result.success && _successHandlers != null) {
 			
 			for (callback in _successHandlers)
 				callback();
@@ -185,18 +182,16 @@ class Call {
 		destroy();
 	}
 	
-	function onHttpError(msg:String):Void {
+	function onHttpError(message:String):Void {
 		
-		_core.logError(msg);
+		_core.logError(message);
 		
 		if (_httpErrorHandlers == null)
 			return;
 		
 		for (callback in _httpErrorHandlers)
-			callback(msg);
+			callback(new Error(message));
 	}
-	
-	//function onError()
 	
 	function onStatus(status:Int):Void {
 		
