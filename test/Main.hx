@@ -21,7 +21,7 @@ class Main extends Sprite {
 		
 		trace("logged in");
 		
-		NG.core.gateway.getDatetime()
+		NG.core.calls.gateway.getDatetime()
 			.addDataHandler(function(_):Void {})
 			.send();
 	}

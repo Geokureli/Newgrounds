@@ -1,5 +1,6 @@
 package io.newgrounds;
 
+import io.newgrounds.components.ComponentList;
 import io.newgrounds.objects.events.Result.ResultBase;
 import haxe.PosInfos;
 import haxe.Json;
@@ -31,20 +32,15 @@ class NGLite {
 	/** The name of the host the game is being played on */
 	public var host:String;
 	
+	/** Components used to call the NG server directly */
+	public var calls(default, null):ComponentList;
+	
 	/**
 	 * Converts an object to an encrypted string that can be decrypted by the server.
 	 * Set your preffered encrypter here,
 	 * or just call setDefaultEcryptionHandler with your app's encryption settings
 	**/
 	public var encryptionHandler:Dynamic->String;
-	
-	// --- COMPONENTS
-	public var medal     : MedalComponent;
-	public var app       : AppComponent;
-	public var event     : EventComponent;
-	public var scoreBoard: ScoreBoardComponent;
-	public var loader    : LoaderComponent;
-	public var gateway   : GatewayComponent;
 	
 	/** 
 	 * Iniitializes the API, call before utilizing any other component
@@ -55,12 +51,7 @@ class NGLite {
 		
 		this.appId = appId;
 		
-		medal      = new MedalComponent     (this);
-		app        = new AppComponent       (this);
-		event      = new EventComponent     (this);
-		scoreBoard = new ScoreBoardComponent(this);
-		loader     = new LoaderComponent    (this);
-		gateway    = new GatewayComponent   (this);
+		calls = new ComponentList(this);
 	}
 	
 	/**

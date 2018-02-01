@@ -48,7 +48,7 @@ class Medal extends Object {
 	
 	public function unlock():Call<MedalUnlockResult> {
 		
-		return _core.medal.unlock(id);
+		return _core.calls.medal.unlock(id);
 	}
 	
 	function onUnlock():Void {

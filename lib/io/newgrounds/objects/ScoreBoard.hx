@@ -32,7 +32,7 @@ class ScoreBoard extends Object {
 	, user  :Dynamic = null
 	):Call<ScoreResult> {
 		
-		return _core.scoreBoard.getScores(id, limit, skip, period, social, tag, user);
+		return _core.calls.scoreBoard.getScores(id, limit, skip, period, social, tag, user);
 	}
 	
 	@:allow(ScoreBoardComponent)
@@ -49,7 +49,7 @@ class ScoreBoard extends Object {
 	
 	public function postScore(value :Int, tag:String = null):Call<ResultBase> {
 		
-		return _core.scoreBoard.postScore(id, value, tag);
+		return _core.calls.scoreBoard.postScore(id, value, tag);
 	}
 	
 	public function toString():String {

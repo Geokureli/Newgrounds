@@ -1,5 +1,6 @@
 package io.newgrounds;
 
+import io.newgrounds.components.ComponentList;
 import io.newgrounds.objects.Error;
 import io.newgrounds.objects.events.Result.SessionResult;
 import io.newgrounds.objects.events.Result.MedalListResult;
@@ -94,7 +95,7 @@ class NG extends NGLite {
 		_waitingForLogin = true;
 		_loginCancelled = false;
 		
-		var call = app.startSession(true)
+		var call = calls.app.startSession(true)
 			.addDataHandler(
 			function (response:Response<SessionResult>):Void {
 				
@@ -147,7 +148,7 @@ class NG extends NGLite {
 			
 		} else if (_session.status == SessionStatus.REQUEST_LOGIN){
 			
-			var call = app.checkSession()
+			var call = calls.app.checkSession()
 				.addDataHandler(checkSession.bind(_, onLogin, onCancel));
 			
 			// Wait 3 seconds and try again
@@ -184,7 +185,7 @@ class NG extends NGLite {
 	
 	public function logOut():Void {
 		
-		app.endSession()
+		calls.app.endSession()
 			.addSuccessHandler(onLogOutSuccessful)
 			.send();
 	}
@@ -200,7 +201,7 @@ class NG extends NGLite {
 	
 	public function requestMedals(onSuccess:Void->Void = null, onFail:Error->Void = null):Void {
 		
-		var call = medal.getList()
+		var call = calls.medal.getList()
 			.addDataHandler(onMedalsReceived);
 		
 		if (onSuccess != null)
