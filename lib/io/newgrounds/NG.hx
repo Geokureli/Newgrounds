@@ -193,6 +193,7 @@ class NG extends NGLite {
 	function onLogOutSuccessful():Void {
 		
 		_session.expire();
+		sessionId = null;
 	}
 	
 	// -------------------------------------------------------------------------------------------
