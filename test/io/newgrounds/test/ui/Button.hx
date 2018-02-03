@@ -27,7 +27,7 @@ class Button {
 	var _over:Bool;
 	var _foundLabels:Array<String>;
 	
-	public function new(target:MovieClip, onClick:Void->Void, onOver:Void->Void = null, onOut:Void->Void = null) {
+	public function new(target:MovieClip, onClick:Void->Void = null, onOver:Void->Void = null, onOut:Void->Void = null) {
 		
 		_target = target;
 		this.onClick = onClick;

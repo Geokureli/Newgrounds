@@ -1,6 +1,6 @@
 package io.newgrounds.test.ui;
 
-import io.newgrounds.components.Component;
+import io.newgrounds.test.art.MainScreenSwf;
 import openfl.events.Event;
 import haxe.PosInfos;
 import openfl.text.TextField;
@@ -10,11 +10,9 @@ import openfl.display.MovieClip;
 
 import io.newgrounds.test.ui.Button;
 import io.newgrounds.test.ui.Page;
-import io.newgrounds.test.utils.SwfUtils;
 import io.newgrounds.NG;
 
 import openfl.display.Sprite;
-import openfl.utils.Assets;
 
 class MainScreen extends Sprite {
 	
@@ -28,7 +26,7 @@ class MainScreen extends Sprite {
 	
 	static var _pageWrappers:StringMap<Class<Dynamic>>;
 	
-	var _layout:MovieClip;
+	var _layout:MainScreenSwf;
 	var _tabs:StringMap<Button>;
 	var _pages:StringMap<MovieClip>;
 	var _currentPage:String;
@@ -50,9 +48,9 @@ class MainScreen extends Sprite {
 		
 		NG.core.log = logOutput;
 		
-		_layout = Assets.getMovieClip("layout:MainScreen");
+		_layout = new MainScreenSwf();
 		addChild(_layout);
-		_output = SwfUtils.get(_layout, "output");
+		_output = _layout.output;
 		_output.text = "";
 		
 		addEventListener(Event.ADDED_TO_STAGE, onAdded);
@@ -66,8 +64,8 @@ class MainScreen extends Sprite {
 		
 		for (name in _pageWrappers.keys()) {
 			
-			_tabs.set(name, new Button(SwfUtils.get(_layout, name + "Tab"), onTabClick.bind(name)));
-			_pages.set(name, SwfUtils.get(_layout, name));
+			_tabs.set(name, new Button(cast _layout.getChildByName(name + "Tab"), onTabClick.bind(name)));
+			_pages.set(name, cast _layout.getChildByName(name));
 			_pages.get(name).visible = false;
 			Type.createInstance(_pageWrappers.get(name), [_pages.get(name)]);
 		}

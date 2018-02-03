@@ -20,6 +20,7 @@ class NGLite {
 	
 	/** Enables verbose logging */
 	public var verbose:Bool;
+	public var debug:Bool;
 	/** The unique ID of your app as found in the 'API Tools' tab of your Newgrounds.com project. */
 	public var appId(default, null):String;
 	/** The name of the host the game is being played on */

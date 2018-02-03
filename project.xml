@@ -12,7 +12,7 @@
 	<haxelib name="swf" />
 	<classpath path="lib" />
 	
-	<library path="assets/Test Layout.swf" id="layout" type="swflite" generate="true" preload="true" embed="true" />
+	<library path="assets/Test Layout.swf" id="layout" type="swflite" generate="true" preload="true" />
 	<!--<assets path="assets" exclude="openfl.svg|*.swf" embed="true" />-->
 	
 </project>
