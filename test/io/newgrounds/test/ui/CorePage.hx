@@ -36,7 +36,8 @@ class CorePage extends Page<Component> {
 		_loginLabel.mouseEnabled = false;
 		_logout = new Button(target.logout, NG.core.logOut.bind(onLogout));
 		_logout.enabled = false;
-		_host = new Input(target.host, onHostChange);
+		_host = new Input(target.host, onHostChange, Input.trimEndWhitespace);
+		onHostChange(_host.text);
 		_sessionId = new Input(target.sessionId, onSessionIdChange);
 		
 		_loadMedals = new Button(target.loadMedals, loadMedals);
