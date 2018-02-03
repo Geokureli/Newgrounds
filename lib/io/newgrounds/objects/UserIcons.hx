@@ -16,6 +16,8 @@ class UserIcons extends Object{
 	override function parse(data:Dynamic):Void {
 		
 		//TODO
+		
+		super.parse(data);
 	}
 }
 

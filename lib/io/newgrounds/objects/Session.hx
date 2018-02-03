@@ -36,6 +36,8 @@ class Session extends Object {
 			else
 				user = new User(_core, data.user);
 		}
+		
+		super.parse(data);
 	}
 	
 	public function get_status():SessionStatus {

@@ -1,5 +1,6 @@
 package io.newgrounds;
 
+import io.newgrounds.test.utils.Dispatcher;
 import io.newgrounds.objects.Error;
 import io.newgrounds.objects.events.Result;
 import io.newgrounds.objects.events.Result.ResultBase;
@@ -22,10 +23,10 @@ class Call<T:ResultBase> {
 	var _isSecure:Bool;
 	
 	// --- BASICALLY SIGNALS
-	var _dataHandlers:Array<Response<T>->Void>;
-	var _successHandlers:Array<Void->Void>;
-	var _httpErrorHandlers:Array<Error->Void>;
-	var _statusHandlers:Array<Int->Void>;
+	var _dataHandlers:TypedDispatcher<Response<T>>;
+	var _successHandlers:Dispatcher;
+	var _httpErrorHandlers:TypedDispatcher<Error>;
+	var _statusHandlers:TypedDispatcher<Int>;
 	
 	public function new (core:NGLite, component:String, requireSession:Bool = false, isSecure:Bool = false) {
 		
@@ -64,9 +65,9 @@ class Call<T:ResultBase> {
 	public function addDataHandler(handler:Response<T>->Void):Call<T> {
 		
 		if (_dataHandlers == null)
-			_dataHandlers = new Array<Response<T>->Void>();
+			_dataHandlers = new TypedDispatcher<Response<T>>();
 		
-		_dataHandlers.push(handler);
+		_dataHandlers.add(handler);
 		return this;
 	}
 	
@@ -74,9 +75,9 @@ class Call<T:ResultBase> {
 	public function addSuccessHandler(handler:Void->Void):Call<T> {
 		
 		if (_successHandlers == null)
-			_successHandlers = new Array<Void->Void>();
+			_successHandlers = new Dispatcher();
 		
-		_successHandlers.push(handler);
+		_successHandlers.add(handler);
 		return this;
 	}
 	
@@ -84,9 +85,9 @@ class Call<T:ResultBase> {
 	public function addErrorHandler(handler:Error->Void):Call<T> {
 		
 		if (_httpErrorHandlers == null)
-			_httpErrorHandlers = new Array<Error->Void>();
+			_httpErrorHandlers = new TypedDispatcher<Error>();
 		
-		_httpErrorHandlers.push(handler);
+		_httpErrorHandlers.add(handler);
 		return this;
 	}
 	
@@ -94,9 +95,9 @@ class Call<T:ResultBase> {
 	public function addStatusHandler(handler:Int->Void):Call<T> {//TODO:learn what this is for
 		
 		if (_statusHandlers == null)
-			_statusHandlers = new Array<Int->Void>();
+			_statusHandlers = new TypedDispatcher<Int>();
 		
-		_statusHandlers.push(handler);
+		_statusHandlers.add(handler);
 		return this;
 	}
 
@@ -113,8 +114,8 @@ class Call<T:ResultBase> {
 		
 		if (_requireSession && (_properties == null || !_properties.exists("session_id"))) {
 			
-			if (_core.assert(Std.is(_core, NG) && cast (_core, NG).sessionId != null, 'cannot send "$_component" call without a sessionId'))
-				addProperty("session_id", cast(_core, NG).sessionId);
+			if (_core.assert(_core.sessionId != null, 'cannot send "$_component" call without a sessionId'))
+				addProperty("session_id", _core.sessionId);
 			else
 				return;
 		}
@@ -167,17 +168,11 @@ class Call<T:ResultBase> {
 		
 		var response = new Response<T>(_core, reply);
 		
-		if (_dataHandlers != null) {
-			
-			for (callback in _dataHandlers)
-				callback(response);
-		}
+		if (_dataHandlers != null)
+			_dataHandlers.dispatch(response);
 		
-		if (response.success && response.result.success && _successHandlers != null) {
-			
-			for (callback in _successHandlers)
-				callback();
-		}
+		if (response.success && response.result.success && _successHandlers != null)
+			_successHandlers.dispatch();
 		
 		destroy();
 	}
@@ -189,8 +184,8 @@ class Call<T:ResultBase> {
 		if (_httpErrorHandlers == null)
 			return;
 		
-		for (callback in _httpErrorHandlers)
-			callback(new Error(message));
+		var error = new Error(message);
+		_httpErrorHandlers.dispatch(error);
 	}
 	
 	function onStatus(status:Int):Void {
@@ -198,8 +193,7 @@ class Call<T:ResultBase> {
 		if (_statusHandlers == null)
 			return;
 		
-		for (callback in _statusHandlers)
-			callback(status);
+		_statusHandlers.dispatch(status);
 	}
 	
 	public function destroy():Void {

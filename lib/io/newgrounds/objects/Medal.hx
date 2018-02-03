@@ -1,5 +1,6 @@
 package io.newgrounds.objects;
 
+import io.newgrounds.test.utils.Dispatcher;
 import io.newgrounds.objects.events.Result;
 import io.newgrounds.Call;
 import io.newgrounds.NGLite;
@@ -31,7 +32,13 @@ class Medal extends Object {
 	// --- HELPERS
 	public var difficultyName(get, never):String;
 	
-	public function new(core:NGLite, data:Dynamic = null):Void { super(core, data); }
+	public var onUnlock:Dispatcher;
+	
+	public function new(core:NGLite, data:Dynamic = null):Void {
+		super(core, data);
+		
+		onUnlock = new Dispatcher();
+	}
 
 	@:allow(io.newgrounds.NG)
 	override function parse(data:Dynamic):Void {
@@ -44,16 +51,16 @@ class Medal extends Object {
 		difficulty  = data.difficulty;
 		secret      = data.secret == 1;
 		unlocked    = data.unlocked;
+		
+		super.parse(data);
+		
+		if (!unlocked && data.unlocked)
+			onUnlock.dispatch();
 	}
 	
 	public function unlock():Call<MedalUnlockResult> {
 		
 		return _core.calls.medal.unlock(id);
-	}
-	
-	function onUnlock():Void {
-		
-		unlocked = true;
 	}
 	
 	public function get_difficultyName():String {

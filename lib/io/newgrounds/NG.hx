@@ -1,6 +1,7 @@
 package io.newgrounds;
-
-import io.newgrounds.components.ComponentList;
+#if ng_lite
+typedef NG = NGLite;
+#else
 import io.newgrounds.objects.Error;
 import io.newgrounds.objects.events.Result.SessionResult;
 import io.newgrounds.objects.events.Result.MedalListResult;
@@ -28,16 +29,7 @@ class NG extends NGLite {
 	
 	static public var core(default, null):NG;
 	
-	/** A unique session id used to identify the active user. */
-	public var sessionId(get, never):String;
-	public function get_sessionId():String {
-		
-		if (_session == null)
-			return null;
-		
-		return _session.id;
-	}
-
+	
 	/** The logged in user */
 	public var user(get, never):User;
 	public function get_user():User {
@@ -47,13 +39,12 @@ class NG extends NGLite {
 		
 		return _session.user;
 	}
-	
+	public var medals(default, null):IntMap<Medal>;
 	
 	var _waitingForLogin:Bool;
 	var _loginCancelled:Bool;
 	
 	var _session:Session;
-	var _medals:IntMap<Medal>;
 	var _scoreBoards:IntMap<ScoreBoard>;
 	
 	/** 
@@ -109,6 +100,7 @@ class NG extends NGLite {
 				}
 				
 				_session.parse(response.result.data.session);
+				sessionId = _session.id;
 				
 				logVerbose('session started - status: ${_session.status}');
 				
@@ -133,7 +125,8 @@ class NG extends NGLite {
 		if (response != null) {
 			
 			if (!response.success || !response.result.success) {
-				// The user cancelled the passport
+				
+				log("login cancelled via passport");
 				
 				endLoginAndCall(onCancel);
 				return;
@@ -158,8 +151,11 @@ class NG extends NGLite {
 					// Check if cancelLoginRequest was called
 					if (!_loginCancelled)
 						call.send();
-					else
+					else {
+						
+						log("login cancelled via cancelLoginRequest");
 						endLoginAndCall(onCancel);
+					}
 				}
 			);
 			
@@ -183,11 +179,15 @@ class NG extends NGLite {
 			callback();
 	}
 	
-	public function logOut():Void {
+	public function logOut(onLogOut:Void->Void):Void {
 		
-		calls.app.endSession()
-			.addSuccessHandler(onLogOutSuccessful)
-			.send();
+		var call = calls.app.endSession()
+			.addSuccessHandler(onLogOutSuccessful);
+		
+		if (onLogOut != null)
+			call.addSuccessHandler(onLogOut);
+		
+		call.send();
 	}
 	
 	function onLogOutSuccessful():Void {
@@ -196,7 +196,7 @@ class NG extends NGLite {
 	}
 	
 	// -------------------------------------------------------------------------------------------
-	//                                       ENCRYPTION
+	//                                       MEDALS
 	// -------------------------------------------------------------------------------------------
 	
 	public function requestMedals(onSuccess:Void->Void = null, onFail:Error->Void = null):Void {
@@ -218,20 +218,20 @@ class NG extends NGLite {
 		if (!response.success || !response.result.success)
 			return;
 		
-		if (_medals == null) {
+		if (medals == null) {
 			
-			_medals = new IntMap<Medal>();
+			medals = new IntMap<Medal>();
 			
 			for (medalData in response.result.data.medals) {
 				
 				var medal = new Medal(this, medalData);
-				_medals.set(medal.id, medal);
+				medals.set(medal.id, medal);
 			}
 		} else {
 			
 			for (medalData in response.result.data.medals) {
 				
-				_medals.get(medalData.id).parse(medalData);
+				medals.get(medalData.id).parse(medalData);
 			}
 		}
 		
@@ -257,3 +257,4 @@ class NG extends NGLite {
 		timer.start();
 	}
 }
+#end

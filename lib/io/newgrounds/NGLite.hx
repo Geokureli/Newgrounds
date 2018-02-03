@@ -5,13 +5,6 @@ import io.newgrounds.objects.events.Result.ResultBase;
 import haxe.PosInfos;
 import haxe.Json;
 
-import io.newgrounds.components.GatewayComponent;
-import io.newgrounds.components.LoaderComponent;
-import io.newgrounds.components.ScoreBoardComponent;
-import io.newgrounds.components.EventComponent;
-import io.newgrounds.components.AppComponent;
-import io.newgrounds.components.MedalComponent;
-
 /**
  * The barebones NG.io API. Allows API calls with code completion
  * and retrieves server data via strongly typed Objects
@@ -31,6 +24,7 @@ class NGLite {
 	public var appId(default, null):String;
 	/** The name of the host the game is being played on */
 	public var host:String;
+	public var sessionId:String;
 	
 	/** Components used to call the NG server directly */
 	public var calls(default, null):ComponentList;

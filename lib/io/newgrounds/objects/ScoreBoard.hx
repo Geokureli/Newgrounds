@@ -21,6 +21,8 @@ class ScoreBoard extends Object {
 		
 		id   = data.id;
 		name = data.name;
+		
+		super.parse(data);
 	}
 	
 	public function getScores

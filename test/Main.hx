@@ -1,28 +1,30 @@
 package;
 
-import io.newgrounds.NG;
+import io.newgrounds.test.ui.MainScreen;
+import io.newgrounds.test.ui.Page.IntroPage;
 
+import openfl.Assets;
+import openfl.display.MovieClip;
 import openfl.display.Sprite;
 
 class Main extends Sprite {
 	
-	public function new () {
+	var _layout:MovieClip;
+	
+	public function new() {
+		super();
 		
-		super ();
+		_layout = Assets.getMovieClip("layout:IntroScreen");
+		addChild(_layout);
 		
-		NG.createCore("47215:Ip8uDj9v");
-		NG.core.host = "localHost";
-		NG.core.verbose = true;
-		
-		NG.core.requestLogin(onLogin);
+		new IntroPage(_layout, onStart);
 	}
 	
-	function onLogin():Void {
+	function onStart():Void {
 		
-		trace("logged in");
+		removeChild(_layout);
+		_layout = null;
 		
-		NG.core.calls.gateway.getDatetime()
-			.addDataHandler(function(_):Void {})
-			.send();
+		addChild(new MainScreen());
 	}
 }

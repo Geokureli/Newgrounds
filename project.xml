@@ -4,11 +4,15 @@
 	<meta title="Newgrounds.io" package="Main" version="1.0.0" company="GeoKureli" />
 	<app main="Main" path="Export" file="Newgrounds" />
 	
-	<window width="400" height="400" fps="30" />
+	<window width="800" height="800" fps="30" background="#CCCCCC" />
 	
 	<source path="test" />
 	
 	<haxelib name="openfl" />
+	<haxelib name="swf" />
 	<classpath path="lib" />
+	
+	<library path="assets/Test Layout.swf" id="layout" type="swflite" generate="true" preload="true" embed="true" />
+	<!--<assets path="assets" exclude="openfl.svg|*.swf" embed="true" />-->
 	
 </project>

@@ -29,5 +29,7 @@ class User extends Object {
 			else
 				icons = new UserIcons(_core, data.icons);
 		}
+		
+		super.parse(data);
 	}
 }
