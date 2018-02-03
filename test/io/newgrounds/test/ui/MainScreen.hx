@@ -1,5 +1,6 @@
 package io.newgrounds.test.ui;
 
+import io.newgrounds.components.Component;
 import openfl.events.Event;
 import haxe.PosInfos;
 import openfl.text.TextField;
@@ -25,7 +26,7 @@ class MainScreen extends Sprite {
 	static inline var MEDAL     :String = "medal";
 	static inline var SCOREBOARD:String = "scoreboard";
 	
-	static var _pageWrappers:StringMap<Class<Page>>;
+	static var _pageWrappers:StringMap<Class<Dynamic>>;
 	
 	var _layout:MovieClip;
 	var _tabs:StringMap<Button>;

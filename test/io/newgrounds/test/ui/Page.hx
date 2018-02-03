@@ -1,5 +1,12 @@
 package io.newgrounds.test.ui;
 
+import io.newgrounds.components.EventComponent;
+import io.newgrounds.components.ScoreBoardComponent;
+import io.newgrounds.components.MedalComponent;
+import io.newgrounds.components.LoaderComponent;
+import io.newgrounds.components.GatewayComponent;
+import io.newgrounds.components.AppComponent;
+import io.newgrounds.components.Component;
 import io.newgrounds.objects.Error;
 import io.newgrounds.components.ComponentList;
 import io.newgrounds.test.utils.SwfUtils;
@@ -13,17 +20,14 @@ import openfl.Assets;
 import openfl.text.TextField;
 import openfl.display.MovieClip;
 
-class Page {
+class Page<T:Component> {
 	
 	var _target:MovieClip;
-	var _calls:ComponentList;
+	var _calls:T;
 	
-	public function new(target:MovieClip) {
+	public function new(target:MovieClip, component:T) {
 		
 		_target = target;
-		
-		if (NG.core != null)
-			_calls = NG.core.calls;
 	}
 	
 	
@@ -37,19 +41,33 @@ class Page {
 		return SwfUtils.getField(_target, path);
 	}
 	
+	inline function getButton(path:String, onClick:Void->Void = null, onOver:Void->Void = null, onOut:Void->Void = null):Button {
+		
+		return new Button(SwfUtils.get(_target, path), onClick, onOver, onOut);
+	}
+	
+	inline function getCheckBox(path:String, onToggle:Void->Void = null, onOver:Void->Void = null, onOut:Void->Void = null):CheckBox {
+		
+		return new CheckBox(SwfUtils.get(_target, path), onToggle);
+	}
+	
+	inline function getInput(path:String, onChange:String->Void = null):Input {
+		
+		return new Input(SwfUtils.get(_target, path), onChange);
+	}
 }
 
-class IntroPage extends Page {
+class IntroPage extends Page<Component> {
 	
 	var _appId:TextField;
 	var _start:Button;
 	var _onStart:Void->Void;
 	
 	public function new (target:MovieClip, onStart:Void->Void):Void {
-		super(target);
+		super(target, null);
 		
 		_appId = getField("appId");
-		_start = new Button(getMc("start"), onStartClick);
+		_start = getButton("start", onStartClick);
 		
 		_onStart = onStart;
 	}
@@ -63,7 +81,7 @@ class IntroPage extends Page {
 	}
 }
 
-class CorePage extends Page {
+class CorePage extends Page<Component> {
 	
 	inline static var DEFAULT_MEDAL_INFO:String = "Roll over a medal for more info, click to unlock.";
 	
@@ -82,17 +100,17 @@ class CorePage extends Page {
 	var _loadBoards:Button;
 	
 	public function new (target:MovieClip) {
-		super(target);
+		super(target, null);
 		
-		_login = new Button(getMc("login"), onLoginClick);
+		_login = getButton("login", onLoginClick);
 		_loginLabel = getField("loginLabel");
 		_loginLabel.mouseEnabled = false;
-		_logout = new Button(getMc("logout"), NG.core.logOut.bind(onLogout));
+		_logout = getButton("logout", NG.core.logOut.bind(onLogout));
 		_logout.enabled = false;
-		_host = new Input(getField("host"), onHostChange);
-		_sessionId = new Input(getField("sessionId"), onSessionIdChange);
+		_host = getInput("host", onHostChange);
+		_sessionId = getInput("sessionId", onSessionIdChange);
 		
-		_loadMedals = new Button(getMc("loadMedals"), loadMedals);
+		_loadMedals = getButton("loadMedals", loadMedals);
 		_medalList = getMc("medalList");
 		_medalList.visible = false;
 		_medalInfo = getField("medalList.info");
@@ -100,7 +118,7 @@ class CorePage extends Page {
 		_medalLoading = getField("medalList.loading");
 		_displayMedals = new Array<MovieClip>();
 		
-		_loadBoards = new Button(getMc("loadBoards"), null);//TODO
+		_loadBoards = getButton("loadBoards");//TODO
 	}
 	function onLoginFail(error:Error):Void {
 		
@@ -239,52 +257,60 @@ class CorePage extends Page {
 	}
 }
 
-class AppPage extends Page {
+class AppPage extends Page<AppComponent> {
 	
 	var _startSession:Button;
 	var _force:CheckBox;
 	var _checkSession:Button;
 	var _endSession:Button;
+	var _getHostLicense:Button;
+	var _getCurrentVersion:Button;
+	var _version:TextField;
+	var _logView:Button;
 	
 	public function new (target:MovieClip) {
-		super(target);
+		super(target, NG.core.calls.app);
 		
-		_startSession = new Button(getMc("startSession"), function() { _calls.app.startSession(_force.on).send(); } );
-		_force = new CheckBox(getMc("force"));
-		_checkSession = new Button(getMc("checkSession"), function() { _calls.app.checkSession().send(); });
-		_endSession = new Button(getMc("endSession"), function() { _calls.app.endSession().send(); });
+		_force = getCheckBox("force");
+		_version = getField("version");
+		_startSession      = getButton("startSession"     , function() { _calls.startSession     (_force.on    ).send(); } );
+		_checkSession      = getButton("checkSession"     , function() { _calls.checkSession     (             ).send(); } );
+		_endSession        = getButton("endSession"       , function() { _calls.endSession       (             ).send(); } );
+		_getHostLicense    = getButton("getHostLicense"   , function() { _calls.getHostLicense   (             ).send(); } );
+		_getCurrentVersion = getButton("getCurrentVersion", function() { _calls.getCurrentVersion(_version.text).send(); } );
+		_logView           = getButton("logView"          , function() { _calls.logView          (             ).send(); } );
 	}
 }
 
-class EventPage extends Page {
+class EventPage extends Page<EventComponent> {
 	
 	var _logEvent:Button;
 	var _event:TextField;
 	
 	public function new (target:MovieClip) {
-		super(target);
+		super(target, NG.core.calls.event);
 		
-		_logEvent = new Button(getMc("logEvent"), function () { _calls.event.logEvent(_event.text).send(); });
+		_logEvent = getButton("logEvent", function () { _calls.logEvent(_event.text).send(); });
 		_event = getField("event");
 	}
 }
 
-class GatewayPage extends Page {
+class GatewayPage extends Page<GatewayComponent> {
 	
 	var _getDatetime:Button;
 	var _getVersion:Button;
 	var _ping:Button;
 	
 	public function new (target:MovieClip) {
-		super(target);
+		super(target, NG.core.calls.gateway);
 		
-		_getDatetime = new Button(getMc("getDatetime"), function () { _calls.gateway.getDatetime().send(); });
-		_getVersion = new Button(getMc("getVersionBtn"), function () { _calls.gateway.getVersion().send(); });
-		_ping = new Button(getMc("ping"), _calls.gateway.ping);
+		_getDatetime = getButton("getDatetime"  , function () { _calls.getDatetime().send(); } );
+		_getVersion  = getButton("getVersionBtn", function () { _calls.getVersion ().send(); } );
+		_ping        = getButton("ping"         , function () { _calls.ping       ().send(); } );
 	}
 }
 
-class LoaderPage extends Page {
+class LoaderPage extends Page<LoaderComponent> {
 	
 	var _loadAuthorUrl:Button;
 	var _loadMoreGames:Button;
@@ -294,34 +320,34 @@ class LoaderPage extends Page {
 	var _redirect:CheckBox;
 	
 	public function new (target:MovieClip) {
-		super(target);
+		super(target, NG.core.calls.loader);
 		
-		_loadAuthorUrl   = new Button(getMc("loadAuthorUrl"  ), function () { _calls.loader.loadAuthorUrl  (_redirect.on).send(); } );
-		_loadMoreGames   = new Button(getMc("loadMoreGames"  ), function () { _calls.loader.loadMoreGames  (_redirect.on).send(); } );
-		_loadNewgrounds  = new Button(getMc("loadNewgrounds" ), function () { _calls.loader.loadNewgrounds (_redirect.on).send(); } );
-		_loadOfficialUrl = new Button(getMc("loadOfficialUrl"), function () { _calls.loader.loadOfficialUrl(_redirect.on).send(); } );
-		_loadReferral    = new Button(getMc("loadReferral"   ), function () { _calls.loader.loadReferral   (_redirect.on).send(); } );
-		_redirect = new CheckBox(getMc("redirect"));
+		_loadAuthorUrl   = getButton("loadAuthorUrl"  , function () { _calls.loadAuthorUrl  (_redirect.on).send(); } );
+		_loadMoreGames   = getButton("loadMoreGames"  , function () { _calls.loadMoreGames  (_redirect.on).send(); } );
+		_loadNewgrounds  = getButton("loadNewgrounds" , function () { _calls.loadNewgrounds (_redirect.on).send(); } );
+		_loadOfficialUrl = getButton("loadOfficialUrl", function () { _calls.loadOfficialUrl(_redirect.on).send(); } );
+		_loadReferral    = getButton("loadReferral"   , function () { _calls.loadReferral   (_redirect.on).send(); } );
+		_redirect = getCheckBox("redirect");
 	}
 }
 
-class MedalPage extends Page {
+class MedalPage extends Page<MedalComponent> {
 	
 	var _getList:Button;
 	var _unlock:Button;
 	var _id:TextField;
 	
 	public function new (target:MovieClip) {
-		super(target);
+		super(target, NG.core.calls.medal);
 		
 		
-		_getList = new Button(getMc("getList"), _calls.medal.getList);
-		_unlock = new Button(getMc("unlock"), function () { _calls.medal.unlock(Std.parseInt(_id.text)).send(); } );
+		_getList = getButton("getList", function () { _calls.getList().send(); } );
+		_unlock  = getButton("unlock" , function () { _calls.unlock(Std.parseInt(_id.text)).send(); } );
 		_id = getField("id");
 	}
 }
 
-class ScoreboardPage extends Page {
+class ScoreboardPage extends Page<ScoreBoardComponent> {
 	
 	var _getBoards:Button;
 	var _getScores:Button;
@@ -336,22 +362,23 @@ class ScoreboardPage extends Page {
 	var _value:TextField;
 	
 	public function new (target:MovieClip) {
-		super(target);
+		super(target, NG.core.calls.scoreBoard);
 		
-		_limit = getField("limit");
-		_skip = getField("skip");
+		_limit  = getField("limit");
+		_skip   = getField("skip");
 		_period = getField("period");
-		_user = getField("user");
-		_id = getField("id");
-		_tag = getField("tag");
-		_value = getField("value");
-		_social = new CheckBox(getMc("social"));
+		_user   = getField("user");
+		_id     = getField("id");
+		_tag    = getField("tag");
+		_value  = getField("value");
 		
-		_getBoards = new Button(getMc("getBoards"), function () { _calls.scoreBoard.getBoards().send(); });
-		_getScores = new Button(getMc("getScores"),
-			function getScores():Void {
+		_social = getCheckBox("social");
+		
+		_getBoards = getButton("getBoards", function () { _calls.getBoards().send(); });
+		_getScores = getButton("getScores",
+			function ():Void {
 				
-				_calls.scoreBoard.getScores
+				_calls.getScores
 					( Std.parseInt(_id.text)
 					, Std.parseInt(_limit.text)
 					, Std.parseInt(_skip.text)
@@ -363,10 +390,10 @@ class ScoreboardPage extends Page {
 					.send();
 			}
 		);
-		_postScore = new Button(getMc("postScore"),
+		_postScore = getButton("postScore",
 			function () {
 				
-				_calls.scoreBoard.postScore(Std.parseInt(_id.text), Std.parseInt(_value.text), _tag.text)
+				_calls.postScore(Std.parseInt(_id.text), Std.parseInt(_value.text), _tag.text)
 					.send();
 			}
 		);
