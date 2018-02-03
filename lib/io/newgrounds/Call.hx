@@ -112,12 +112,22 @@ class Call<T:ResultBase> {
 		data.call = {};
 		data.call.component  = _component;
 		
-		if (_requireSession && (_properties == null || !_properties.exists("session_id"))) {
+		if (_core.debug)
+			addProperty("debug", true);
+		
+		if (_properties == null || !_properties.exists("session_id")) {
+			// --- HAS NO SESSION ID
 			
-			if (_core.assert(_core.sessionId != null, 'cannot send "$_component" call without a sessionId'))
+			if (_core.sessionId != null) {
+				// --- AUTO ADD SESSION ID
+				
 				addProperty("session_id", _core.sessionId);
-			else
+				
+			} else if (_requireSession){
+				
+				_core.logError(new Error('cannot send "$_component" call without a sessionId'));
 				return;
+			}
 		}
 		
 		if (_properties != null) {
