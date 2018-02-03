@@ -1,7 +1,7 @@
 package io.newgrounds.test.utils;
 
 /**
- * Basically signals, but I didn't want to  
+ * Basically shitty signals, but I didn't want to have external references.
 **/
 class Dispatcher {
 	
