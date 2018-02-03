@@ -11,34 +11,34 @@ class LoaderComponent extends Component {
 		
 		return new Call<ResultBase>(_core, "Loader.loadAuthorUrl")
 			.addComponentParameter("host", _core.host)
-			.addComponentParameter("redirect", redirect);
+			.addComponentParameter("redirect", redirect, true);
 	}
 	
 	public function loadMoreGames(redirect:Bool = true):Call<ResultBase> {
 		
 		return new Call<ResultBase>(_core, "Loader.loadMoreGames")
 			.addComponentParameter("host", _core.host)
-			.addComponentParameter("redirect", redirect);
+			.addComponentParameter("redirect", redirect, true);
 	}
 	
 	public function loadNewgrounds(redirect:Bool = true):Call<ResultBase> {
 		
 		return new Call<ResultBase>(_core, "Loader.loadNewgrounds")
 			.addComponentParameter("host", _core.host)
-			.addComponentParameter("redirect", redirect);
+			.addComponentParameter("redirect", redirect, true);
 	}
 	
 	public function loadOfficialUrl(redirect:Bool = true):Call<ResultBase> {
 		
 		return new Call<ResultBase>(_core, "Loader.loadOfficialUrl")
 			.addComponentParameter("host", _core.host)
-			.addComponentParameter("redirect", redirect);
+			.addComponentParameter("redirect", redirect, true);
 	}
 	
 	public function loadReferral(redirect:Bool = true):Call<ResultBase> {
 		
 		return new Call<ResultBase>(_core, "Loader.loadReferral")
 			.addComponentParameter("host", _core.host)
-			.addComponentParameter("redirect", redirect);
+			.addComponentParameter("redirect", redirect, true);
 	}
 }
