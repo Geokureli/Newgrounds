@@ -2,6 +2,7 @@ package io.newgrounds;
 #if ng_lite
 typedef NG = NGLite;
 #else
+import openfl.display.Stage;
 import io.newgrounds.objects.Error;
 import io.newgrounds.objects.events.Result.SessionResult;
 import io.newgrounds.objects.events.Result.MedalListResult;
@@ -29,7 +30,6 @@ class NG extends NGLite {
 	
 	static public var core(default, null):NG;
 	
-	
 	/** The logged in user */
 	public var user(get, never):User;
 	public function get_user():User {
@@ -52,8 +52,8 @@ class NG extends NGLite {
 	 * @param appId     The unique ID of your app as found in the 'API Tools' tab of your Newgrounds.com project.
 	 * @param sessionId A unique session id used to identify the active user.
 	**/
-	public function new(appId:String = "test") {
-		super(appId);
+	public function new(appId:String = "test", sessionId:String = null) {
+		super(appId, sessionId);
 		
 		_session = new Session(this);
 	}
@@ -62,14 +62,19 @@ class NG extends NGLite {
 	 * Creates NG.core, the heart and soul of the API. This is not the only way to create an instance,
 	 * nor is NG a forced singleton, but it's the only way to set the static NG.core.
 	**/
-	static public function createCore(appId:String = "test"):Void {
+	static public function createCore(appId:String = "test", sessionId:String = null):Void {
 		
-		core = new NG(appId);
+		core = new NG(appId, sessionId);
 	}
 	
 	// -------------------------------------------------------------------------------------------
 	//                                         APP
 	// -------------------------------------------------------------------------------------------
+	
+	override function checkInitialSession(response:Response<SessionResult>):Void {
+		
+		onSessionReceive(response);
+	}
 	
 	public function requestLogin
 	( onLogin :Void->Void = null
@@ -87,37 +92,43 @@ class NG extends NGLite {
 		_loginCancelled = false;
 		
 		var call = calls.app.startSession(true)
-			.addDataHandler(
-			function (response:Response<SessionResult>):Void {
-				
-				if (!response.success || !response.result.success) {
-					
-					if (onFail != null)
-						onFail(!response.success ? response.error : response.result.error);
-					
-					endLoginAndCall(null);
-					return;
-				}
-				
-				_session.parse(response.result.data.session);
-				sessionId = _session.id;
-				
-				logVerbose('session started - status: ${_session.status}');
-				
-				if (_session.status == SessionStatus.REQUEST_LOGIN) {
-					
-					logVerbose('loading passport: ${_session.passportUrl}');
-					// TODO: Remove openFL dependancy
-					Lib.getURL(new URLRequest(_session.passportUrl));
-					checkSession(null, onLogin, onCancel);
-				}
-			}
-		);
+			.addDataHandler(onSessionReceive.bind(_, onLogin, onFail, onCancel));
 		
 		if (onFail != null)
 			call.addErrorHandler(onFail);
 		
 		call.send();
+	}
+	
+	function onSessionReceive
+	( response:Response<SessionResult>
+	, onLogin :Void->Void = null
+	, onFail  :Error->Void = null
+	, onCancel:Void->Void = null
+	):Void {
+		
+		if (!response.success || !response.result.success) {
+			
+			if (onFail != null)
+				onFail(!response.success ? response.error : response.result.error);
+			
+			endLoginAndCall(null);
+			return;
+		}
+		
+		_session.parse(response.result.data.session);
+		sessionId = _session.id;
+		
+		logVerbose('session started - status: ${_session.status}');
+		
+		if (_session.status == SessionStatus.REQUEST_LOGIN) {
+			
+			logVerbose('loading passport: ${_session.passportUrl}');
+			// TODO: Remove openFL dependancy
+			Lib.getURL(new URLRequest(_session.passportUrl));
+		}
+		
+		checkSession(null, onLogin, onCancel);
 	}
 	
 	function checkSession(response:Response<SessionResult>, onLogin:Void->Void, onCancel:Void->Void):Void {
@@ -255,6 +266,28 @@ class NG extends NGLite {
 		
 		timer.addEventListener(TimerEvent.TIMER_COMPLETE, func);
 		timer.start();
+	}
+	
+	static public function getSessionId(stage:Stage):String {
+		
+		for (paramName in Reflect.fields(stage.loaderInfo.parameters)) {
+			
+			trace('$paramName : ${Reflect.field(stage.loaderInfo.parameters, paramName)}');
+				//return stage.loaderInfo.parameters[paramName];
+		}
+		
+		return ""; 
+		
+		// --- EXAMPLE LOADER PARAMS
+		//{ "1517703669"                : ""
+		//, "ng_username"               : "GeoKureli"
+		//, "NewgroundsAPI_SessionID"   : "F1LusbG6P8Qf91w7zeUE37c1752563f366688ac6153996d12eeb111a2f60w2xn"
+		//, "NewgroundsAPI_PublisherID" : 1
+		//, "NewgroundsAPI_UserID"      : 488329
+		//, "NewgroundsAPI_SandboxID"   : "5a76520e4ae1e"
+		//, "ngio_session_id"           : "0c6c4e02567a5116734ba1a0cd841dac28a42e79302290"
+		//, "NewgroundsAPI_UserName"    : "GeoKureli"
+		//}
 	}
 }
 #end
