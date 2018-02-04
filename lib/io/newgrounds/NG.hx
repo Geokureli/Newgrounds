@@ -272,8 +272,8 @@ class NG extends NGLite {
 		
 		for (paramName in Reflect.fields(stage.loaderInfo.parameters)) {
 			
-			trace('$paramName : ${Reflect.field(stage.loaderInfo.parameters, paramName)}');
-				//return stage.loaderInfo.parameters[paramName];
+			if (paramName == "ngio_session_id")
+				return Reflect.field(stage.loaderInfo.parameters, paramName);
 		}
 		
 		return ""; 
