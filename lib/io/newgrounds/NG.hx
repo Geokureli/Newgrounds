@@ -2,6 +2,7 @@ package io.newgrounds;
 #if ng_lite
 typedef NG = NGLite;
 #else
+import io.newgrounds.test.utils.Dispatcher;
 import openfl.display.Stage;
 import io.newgrounds.objects.Error;
 import io.newgrounds.objects.events.Result.SessionResult;
@@ -30,6 +31,8 @@ class NG extends NGLite {
 	
 	static public var core(default, null):NG;
 	
+	// --- DATA
+	
 	/** The logged in user */
 	public var user(get, never):User;
 	public function get_user():User {
@@ -40,6 +43,15 @@ class NG extends NGLite {
 		return _session.user;
 	}
 	public var medals(default, null):IntMap<Medal>;
+	
+	// --- EVENTS
+	
+	public var onLogin(default, null):Dispatcher;
+	public var onLogOut(default, null):Dispatcher;
+	
+	// --- MISC
+	
+	public var loggedIn(default, null):Bool;
 	
 	var _waitingForLogin:Bool;
 	var _loginCancelled:Bool;
@@ -53,9 +65,12 @@ class NG extends NGLite {
 	 * @param sessionId A unique session id used to identify the active user.
 	**/
 	public function new(appId:String = "test", sessionId:String = null) {
-		super(appId, sessionId);
 		
 		_session = new Session(this);
+		onLogin = new Dispatcher();
+		onLogOut = new Dispatcher();
+		
+		super(appId, sessionId);
 	}
 	
 	/**
@@ -77,9 +92,9 @@ class NG extends NGLite {
 	}
 	
 	public function requestLogin
-	( onLogin :Void->Void = null
-	, onFail  :Error->Void = null
-	, onCancel:Void->Void = null
+	( onSuccess:Void->Void = null
+	, onFail   :Error->Void = null
+	, onCancel :Void->Void = null
 	):Void {
 		
 		if (_waitingForLogin) {
@@ -92,7 +107,7 @@ class NG extends NGLite {
 		_loginCancelled = false;
 		
 		var call = calls.app.startSession(true)
-			.addDataHandler(onSessionReceive.bind(_, onLogin, onFail, onCancel));
+			.addDataHandler(onSessionReceive.bind(_, onSuccess, onFail, onCancel));
 		
 		if (onFail != null)
 			call.addErrorHandler(onFail);
@@ -101,10 +116,10 @@ class NG extends NGLite {
 	}
 	
 	function onSessionReceive
-	( response:Response<SessionResult>
-	, onLogin :Void->Void = null
-	, onFail  :Error->Void = null
-	, onCancel:Void->Void = null
+	( response :Response<SessionResult>
+	, onSuccess:Void->Void = null
+	, onFail   :Error->Void = null
+	, onCancel :Void->Void = null
 	):Void {
 		
 		if (!response.success || !response.result.success) {
@@ -128,10 +143,10 @@ class NG extends NGLite {
 			Lib.getURL(new URLRequest(_session.passportUrl));
 		}
 		
-		checkSession(null, onLogin, onCancel);
+		checkSession(null, onSuccess, onCancel);
 	}
 	
-	function checkSession(response:Response<SessionResult>, onLogin:Void->Void, onCancel:Void->Void):Void {
+	function checkSession(response:Response<SessionResult>, onSucceess:Void->Void, onCancel:Void->Void):Void {
 		
 		if (response != null) {
 			
@@ -148,12 +163,13 @@ class NG extends NGLite {
 		
 		if (_session.status == SessionStatus.USER_LOADED) {
 			
-			endLoginAndCall(onLogin);
+			endLoginAndCall(onSucceess);
+			onLogin.dispatch();
 			
 		} else if (_session.status == SessionStatus.REQUEST_LOGIN){
 			
 			var call = calls.app.checkSession()
-				.addDataHandler(checkSession.bind(_, onLogin, onCancel));
+				.addDataHandler(checkSession.bind(_, onSucceess, onCancel));
 			
 			// Wait 3 seconds and try again
 			timer(3.0,
@@ -190,15 +206,16 @@ class NG extends NGLite {
 			callback();
 	}
 	
-	public function logOut(onLogOut:Void->Void):Void {
+	public function logOut(onComplete:Void->Void):Void {
 		
 		var call = calls.app.endSession()
 			.addSuccessHandler(onLogOutSuccessful);
 		
-		if (onLogOut != null)
-			call.addSuccessHandler(onLogOut);
+		if (onComplete != null)
+			call.addSuccessHandler(onComplete);
 		
-		call.send();
+		call.addSuccessHandler(onLogOut.dispatch)
+			.send();
 	}
 	
 	function onLogOutSuccessful():Void {
