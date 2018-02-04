@@ -1,7 +1,10 @@
 package io.newgrounds;
 
+import io.newgrounds.objects.events.Response;
 import io.newgrounds.components.ComponentList;
 import io.newgrounds.objects.events.Result.ResultBase;
+import io.newgrounds.objects.events.Result.SessionResult;
+
 import haxe.PosInfos;
 import haxe.Json;
 
@@ -25,7 +28,13 @@ class NGLite {
 	public var appId(default, null):String;
 	/** The name of the host the game is being played on */
 	public var host:String;
-	public var sessionId:String;
+	
+	@:isVar
+	public var sessionId(default, set):String;
+	function set_sessionId(value:String):String {
+		
+		return this.sessionId = value == "" ? null : value;
+	}
 	
 	/** Components used to call the NG server directly */
 	public var calls(default, null):ComponentList;
@@ -42,20 +51,34 @@ class NGLite {
 	 * @param appId  The unique ID of your app as found in the 'API Tools' tab of your Newgrounds.com project.
 	 * @param host   The name of the host the game is being played on.
 	**/
-	public function new(appId:String = "test") {
+	public function new(appId:String = "test", sessionId:String = null) {
 		
 		this.appId = appId;
+		this.sessionId = sessionId;
 		
 		calls = new ComponentList(this);
+		
+		if (this.sessionId != null) {
+			
+			calls.app.checkSession()
+				.addDataHandler(checkInitialSession)
+				.send();
+		}
+	}
+	
+	function checkInitialSession(response:Response<SessionResult>):Void {
+		
+		if (!response.success || response.result.success || response.result.data.session.expired)
+			sessionId = null;
 	}
 	
 	/**
 	 * Creates NG.core, the heart and soul of the API. This is not the only way to create an instance,
 	 * nor is NG a forced singleton, but it's the only way to set the static NG.core.
 	**/
-	static public function createCore(appId:String = "test"):Void {
+	static public function create(appId:String = "test", sessionId:String = null):Void {
 		
-		core = new NGLite(appId);
+		core = new NGLite(appId, sessionId);
 	}
 	
 	@:allow(io.newgrounds.Call)

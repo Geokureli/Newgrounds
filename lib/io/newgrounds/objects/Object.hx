@@ -7,7 +7,7 @@ class Object {
 	
 	var _core:NGLite;
 	
-	public var onUpdate:Dispatcher;
+	public var onUpdate(default, null):Dispatcher;
 	
 	public function new(core:NGLite, data:Dynamic = null) {
 		

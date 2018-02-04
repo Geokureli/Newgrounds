@@ -1,5 +1,9 @@
 package;
 
+import flash.text.TextFieldType;
+import io.newgrounds.test.ui.CheckBox;
+import openfl.display.Stage;
+import openfl.events.Event;
 import io.newgrounds.test.art.IntroScreenSwf;
 import io.newgrounds.test.ui.MainScreen;
 import io.newgrounds.test.ui.Page;
@@ -13,21 +17,19 @@ import openfl.text.TextField;
 
 class Main extends Sprite {
 	
-	var _layout:IntroScreenSwf;
-	
 	public function new() {
 		super();
 		
-		_layout = new IntroScreenSwf();
-		addChild(_layout);
+		var page = new IntroScreenSwf();
+		addChild(page);
 		
-		new IntroPage(_layout, onStart);
+		new IntroPage(page, onStart.bind(page));
 	}
 	
-	function onStart():Void {
+	function onStart(page:IntroScreenSwf):Void {
 		
-		removeChild(_layout);
-		_layout = null;
+		removeChild(page);
+		page = null;
 		
 		addChild(new MainScreen());
 	}
@@ -35,22 +37,57 @@ class Main extends Sprite {
 
 class IntroPage extends Page<Component> {
 	
-	var _appId:TextField;
-	var _start:Button;
 	var _onStart:Void->Void;
+	
+	var _appId:TextField;
+	var _sessionId:TextField;
+	var _start:Button;
+	var _autoConnect:CheckBox;
+	var _stage:Stage;
 	
 	public function new (target:IntroScreenSwf, onStart:Void->Void):Void {
 		super();
+		_onStart = onStart;
 		
 		_appId = target.appId;
+		_sessionId = target.sessionId;
 		_start = new Button(target.start, onStartClick);
+		_autoConnect = new CheckBox(target.autoConnect, onAutoConnectToggle);
 		
-		_onStart = onStart;
+		if (target.stage != null)
+			_stage = target.stage
+		else
+			target.addEventListener(Event.ADDED_TO_STAGE, onAdded);
+	}
+	
+	function onAdded(e:Event = null):Void {
+		
+		_stage = e.currentTarget;
+	}
+	
+	function onAutoConnectToggle():Void {
+		
+		if (_autoConnect.on) {
+			
+			_sessionId.type = TextFieldType.DYNAMIC;
+			_sessionId.selectable = false;
+			_sessionId.backgroundColor = 0xAAAAAA;
+		
+		} else {
+			
+			_sessionId.type = TextFieldType.INPUT;
+			_sessionId.selectable = true;
+			_sessionId.backgroundColor = 0xFFFFFF;
+		}
 	}
 	
 	function onStartClick():Void {
 		
-		NG.createCore(_appId.text);
+		if (_autoConnect.on)
+			NG.createAndConnect(_stage, _appId.text);
+		else
+			NG.create(_appId.text, _sessionId.text);
+		
 		NG.core.verbose = true;
 		
 		_onStart();
