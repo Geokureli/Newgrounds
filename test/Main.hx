@@ -1,5 +1,7 @@
 package;
 
+import flash.text.TextFieldType;
+import io.newgrounds.test.ui.CheckBox;
 import openfl.display.Stage;
 import openfl.events.Event;
 import io.newgrounds.test.art.IntroScreenSwf;
@@ -40,6 +42,8 @@ class IntroPage extends Page<Component> {
 	var _appId:TextField;
 	var _sessionId:TextField;
 	var _start:Button;
+	var _autoConnect:CheckBox;
+	var _stage:Stage;
 	
 	public function new (target:IntroScreenSwf, onStart:Void->Void):Void {
 		super();
@@ -48,28 +52,42 @@ class IntroPage extends Page<Component> {
 		_appId = target.appId;
 		_sessionId = target.sessionId;
 		_start = new Button(target.start, onStartClick);
+		_autoConnect = new CheckBox(target.autoConnect, onAutoConnectToggle);
 		
 		if (target.stage != null)
-			init(target.stage);
+			_stage = target.stage
 		else
 			target.addEventListener(Event.ADDED_TO_STAGE, onAdded);
 	}
 	
 	function onAdded(e:Event = null):Void {
 		
-		init(cast(e.currentTarget, IntroScreenSwf).stage);
+		_stage = e.currentTarget;
 	}
 	
-	function init(stage:Stage):Void {
+	function onAutoConnectToggle():Void {
 		
-		var id = NG.getSessionId(stage);
+		if (_autoConnect.on) {
+			
+			_sessionId.type = TextFieldType.DYNAMIC;
+			_sessionId.selectable = false;
+			_sessionId.backgroundColor = 0xAAAAAA;
 		
-		_sessionId.text = id != null ? id : "";
+		} else {
+			
+			_sessionId.type = TextFieldType.INPUT;
+			_sessionId.selectable = true;
+			_sessionId.backgroundColor = 0xFFFFFF;
+		}
 	}
 	
 	function onStartClick():Void {
 		
-		NG.create(_appId.text, _sessionId.text);
+		if (_autoConnect.on)
+			NG.createAndConnect(_stage, _appId.text);
+		else
+			NG.create(_appId.text, _sessionId.text);
+		
 		NG.core.verbose = true;
 		
 		_onStart();

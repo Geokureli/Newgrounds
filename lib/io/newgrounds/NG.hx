@@ -52,8 +52,8 @@ class NG extends NGLite {
 	// --- MISC
 	
 	public var loggedIn(default, null):Bool;
+	public var attemptingLogin(default, null):Bool;
 	
-	var _waitingForLogin:Bool;
 	var _loginCancelled:Bool;
 	
 	var _session:Session;
@@ -93,6 +93,8 @@ class NG extends NGLite {
 		
 		if (sessionId == null)
 			core.requestLogin();
+		else
+			core.attemptingLogin = true;
 	}
 	
 	// -------------------------------------------------------------------------------------------
@@ -110,13 +112,19 @@ class NG extends NGLite {
 	, onCancel :Void->Void  = null
 	):Void {
 		
-		if (_waitingForLogin) {
+		if (attemptingLogin) {
 			
-			logError("cannot request another login until");
+			logError("cannot request another login until the previous attempt is complete");
 			return;
 		}
 		
-		_waitingForLogin = true;
+		if (loggedIn) {
+			
+			logError("cannot log in, already logged in");
+			return;
+		}
+		
+		attemptingLogin = true;
 		_loginCancelled = false;
 		
 		var call = calls.app.startSession(true)
@@ -206,20 +214,20 @@ class NG extends NGLite {
 	
 	public function cancelLoginRequest():Void {
 		
-		if (_waitingForLogin)
+		if (attemptingLogin)
 			_loginCancelled = true;
 	}
 	
 	function endLoginAndCall(callback:Void->Void):Void {
 		
-		_waitingForLogin = false;
+		attemptingLogin = false;
 		_loginCancelled = false;
 		
 		if (callback != null)
 			callback();
 	}
 	
-	public function logOut(onComplete:Void->Void):Void {
+	public function logOut(onComplete:Void->Void = null):Void {
 		
 		var call = calls.app.endSession()
 			.addSuccessHandler(onLogOutSuccessful);

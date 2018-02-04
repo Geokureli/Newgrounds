@@ -20,6 +20,7 @@ class CheckBox extends Button {
 	
 	public function new(target:MovieClip, onToggle:Void->Void = null, onOver:Void->Void = null, onOut:Void->Void = null) {
 		
+		this.onToggle = onToggle;
 		_check = cast target.getChildByName("check");
 		
 		super(target, handleClick, onOver, onOut);

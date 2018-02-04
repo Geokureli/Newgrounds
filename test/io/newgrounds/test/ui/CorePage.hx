@@ -34,7 +34,7 @@ class CorePage extends Page<Component> {
 		_login = new Button(target.login, onLoginClick);
 		_loginLabel = target.loginLabel;
 		_loginLabel.mouseEnabled = false;
-		_logout = new Button(target.logout, NG.core.logOut.bind(onLogout));
+		_logout = new Button(target.logout, function() { NG.core.logOut; });
 		_logout.enabled = false;
 		_host = new Input(target.host, onHostChange, Input.trimEndWhitespace);
 		onHostChange(_host.text);
@@ -46,6 +46,15 @@ class CorePage extends Page<Component> {
 		_medalList.info.text = DEFAULT_MEDAL_INFO;
 		
 		_loadBoards = new Button(target.loadBoards);//TODO
+		
+		NG.core.onLogin.add(onLogin);
+		NG.core.onLogOut.add(onLogOut);
+		
+		if (NG.core.attemptingLogin) {
+			
+			_loginLabel.text = "cancel";
+			_login.onClick = onCancelClick;
+		}
 	}
 	function onLoginFail(error:Error):Void {
 		
@@ -54,7 +63,7 @@ class CorePage extends Page<Component> {
 	
 	function onLoginClick():Void {
 		
-		NG.core.requestLogin(onLogin, onLoginFail, onLoginCancel);
+		NG.core.requestLogin(onLoginFail, onLoginCancel);
 		
 		_loginLabel.text = "cancel";
 		_login.onClick = onCancelClick;
@@ -84,7 +93,7 @@ class CorePage extends Page<Component> {
 		_sessionId.text = NG.core.sessionId;
 	}
 	
-	function onLogout():Void {
+	function onLogOut():Void {
 		
 		_login.enabled = true;
 		_logout.enabled = false;
