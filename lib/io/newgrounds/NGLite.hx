@@ -1,5 +1,6 @@
 package io.newgrounds;
 
+import io.newgrounds.Call.ICallable;
 import io.newgrounds.objects.events.Response;
 import io.newgrounds.components.ComponentList;
 import io.newgrounds.objects.events.Result.ResultBase;
@@ -81,11 +82,41 @@ class NGLite {
 		core = new NGLite(appId, sessionId);
 	}
 	
+	// -------------------------------------------------------------------------------------------
+	//                                   CALLS
+	// -------------------------------------------------------------------------------------------
+	
+	var _queuedCalls:Array<ICallable> = new Array<ICallable>();
+	var _pendingCalls:Array<ICallable> = new Array<ICallable>();
+	
 	@:allow(io.newgrounds.Call)
 	@:generic
 	function queueCall<T:ResultBase>(call:Call<T>):Void {
 		
-		throw "not implemented";//TODO
+		_queuedCalls.push(call);
+		checkQueue();
+	}
+	
+	@:allow(io.newgrounds.Call)
+	@:generic
+	function markCallPending<T:ResultBase>(call:Call<T>):Void {
+		
+		_pendingCalls.push(call);
+		
+		call.addDataHandler(function (_):Void { onCallComplete(call); });
+		call.addErrorHandler(function (_):Void { onCallComplete(call); });
+	}
+	
+	function onCallComplete(call:ICallable):Void {
+		
+		_pendingCalls.remove(call);
+		checkQueue();
+	}
+	
+	function checkQueue():Void {
+		
+		if (_pendingCalls.length == 0 && _queuedCalls.length > 0)
+			_queuedCalls.shift().send();
 	}
 	
 	// -------------------------------------------------------------------------------------------
@@ -159,7 +190,7 @@ abstract EncryptionCipher(Int) {
 }
 
 @:enum
-abstract EncryptionFormat(Int) to Int{
+abstract EncryptionFormat(Int) to Int {
 	var BASE_64 = 64;
 	var HEX     = 16;
 }

@@ -10,7 +10,16 @@ import haxe.ds.StringMap;
 import haxe.Json;
 import haxe.Http;
 
-class Call<T:ResultBase> {
+/** A generic way to handle calls agnostic to their type */
+interface ICallable {
+	
+	public function send():Void;
+	public function queue():Void;
+	public function destroy():Void;
+}
+
+class Call<T:ResultBase>
+	implements ICallable {
 	
 	inline static var PATH:String = "https://newgrounds.io/gateway_v3.php";
 	
@@ -154,6 +163,8 @@ class Call<T:ResultBase> {
 			
 			_core.logVerbose('    secure - $secureData');
 		}
+		
+		_core.markCallPending(this);
 		
 		var http = new Http(PATH);
 		http.setParameter("input", Json.stringify(data));
