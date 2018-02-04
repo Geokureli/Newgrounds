@@ -2,6 +2,7 @@ package io.newgrounds;
 #if ng_lite
 typedef NG = NGLite;
 #else
+import openfl.net.URLLoader;
 import io.newgrounds.test.utils.Dispatcher;
 import openfl.display.Stage;
 import io.newgrounds.objects.Error;
@@ -90,6 +91,8 @@ class NG extends NGLite {
 		
 		var sessionId = getSessionId(stage);
 		create(appId, sessionId);
+		
+		core.host = getHost(stage);
 		
 		if (sessionId == null)
 			core.requestLogin();
@@ -327,6 +330,25 @@ class NG extends NGLite {
 		//, "ngio_session_id"           : "0c6c4e02567a5116734ba1a0cd841dac28a42e79302290"
 		//, "NewgroundsAPI_UserName"    : "GeoKureli"
 		//}
+	}
+	
+	
+	static var urlParser:EReg = ~/^(?:http[s]?:\/\/)?([^:\/\s]+)(:[0-9]+)?((?:\/\w+)*\/)([\w\-\.]+[^#?\s]+)([^#\s]*)?(#[\w\-]+)?$/i;//TODO:trim
+	/** Used to get the current web host of your game. */
+	static public function getHost(stage:Stage):String {
+		
+		var url = stage.loaderInfo.url;
+		
+		if (url == null || url == "")
+			return "<AppView>";
+		
+		if (url.indexOf("file") == 0)
+			return "<LocalHost>";
+		
+		if (urlParser.match(url))
+			return urlParser.matched(1);
+		
+		return "<Unknown>";
 	}
 }
 #end

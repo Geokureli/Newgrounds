@@ -71,13 +71,15 @@ class IntroPage extends Page<Component> {
 			
 			_sessionId.type = TextFieldType.DYNAMIC;
 			_sessionId.selectable = false;
-			_sessionId.backgroundColor = 0xAAAAAA;
+			_sessionId.backgroundColor = 0xE8E8E8;
+			_sessionId.textColor = 0x666666;
 		
 		} else {
 			
 			_sessionId.type = TextFieldType.INPUT;
 			_sessionId.selectable = true;
 			_sessionId.backgroundColor = 0xFFFFFF;
+			_sessionId.textColor = 0x000000;
 		}
 	}
 	
