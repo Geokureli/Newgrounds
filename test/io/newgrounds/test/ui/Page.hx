@@ -1,11 +1,13 @@
 package io.newgrounds.test.ui;
 
+import io.newgrounds.Call.ICallable;
 import io.newgrounds.test.art.AppPageSwf;
 import io.newgrounds.test.art.ScoreboardPageSwf;
 import io.newgrounds.test.art.MedalPageSwf;
 import io.newgrounds.test.art.LoaderPageSwf;
 import io.newgrounds.test.art.GatewayPageSwf;
 import io.newgrounds.test.art.EventPageSwf;
+
 import io.newgrounds.components.EventComponent;
 import io.newgrounds.components.ScoreBoardComponent;
 import io.newgrounds.components.MedalComponent;
@@ -15,15 +17,24 @@ import io.newgrounds.components.AppComponent;
 import io.newgrounds.components.Component;
 
 import openfl.text.TextField;
-import openfl.display.MovieClip;
 
 class Page<T:Component> {
+	
+	static public var queueCalls:Bool = false;
 	
 	var _calls:T;
 	
 	public function new(component:T = null) {
 		
 		_calls = component;
+	}
+	
+	function send(call:ICallable):Void {
+		
+		if (queueCalls)
+			call.queue();
+		else
+			call.send();
 	}
 }
 
@@ -43,12 +54,12 @@ class AppPage extends Page<AppComponent> {
 		
 		_force = new CheckBox(target.force);
 		_version = target.version;
-		_startSession      = new Button(target.startSession     , function() { _calls.startSession     (_force.on    ).send(); } );
-		_checkSession      = new Button(target.checkSession     , function() { _calls.checkSession     (             ).send(); } );
-		_endSession        = new Button(target.endSession       , function() { _calls.endSession       (             ).send(); } );
-		_getHostLicense    = new Button(target.getHostLicense   , function() { _calls.getHostLicense   (             ).send(); } );
-		_getCurrentVersion = new Button(target.getCurrentVersion, function() { _calls.getCurrentVersion(_version.text).send(); } );
-		_logView           = new Button(target.logView          , function() { _calls.logView          (             ).send(); } );
+		_startSession      = new Button(target.startSession     , function() { send(_calls.startSession(_force.on)); } );
+		_checkSession      = new Button(target.checkSession     , function() { send(_calls.checkSession()); } );
+		_endSession        = new Button(target.endSession       , function() { send(_calls.endSession()); } );
+		_getHostLicense    = new Button(target.getHostLicense   , function() { send(_calls.getHostLicense()); } );
+		_getCurrentVersion = new Button(target.getCurrentVersion, function() { send(_calls.getCurrentVersion(_version.text)); } );
+		_logView           = new Button(target.logView          , function() { send(_calls.logView()); } );
 	}
 }
 
@@ -60,7 +71,7 @@ class EventPage extends Page<EventComponent> {
 	public function new (target:EventPageSwf) {
 		super(NG.core.calls.event);
 		
-		_logEvent = new Button(target.logEvent, function () { _calls.logEvent(_event.text).send(); });
+		_logEvent = new Button(target.logEvent, function () { send(_calls.logEvent(_event.text)); });
 		_event = target.event;
 	}
 }
@@ -74,9 +85,9 @@ class GatewayPage extends Page<GatewayComponent> {
 	public function new (target:GatewayPageSwf) {
 		super(NG.core.calls.gateway);
 		
-		_getDatetime = new Button(target.getDatetime  , function () { _calls.getDatetime().send(); } );
-		_getVersion  = new Button(target.getVersionBtn, function () { _calls.getVersion ().send(); } );
-		_ping        = new Button(target.ping         , function () { _calls.ping       ().send(); } );
+		_getDatetime = new Button(target.getDatetime  , function () { send(_calls.getDatetime()); } );
+		_getVersion  = new Button(target.getVersionBtn, function () { send(_calls.getVersion ()); } );
+		_ping        = new Button(target.ping         , function () { send(_calls.ping       ()); } );
 	}
 }
 
@@ -92,11 +103,11 @@ class LoaderPage extends Page<LoaderComponent> {
 	public function new (target:LoaderPageSwf) {
 		super(NG.core.calls.loader);
 		
-		_loadAuthorUrl   = new Button(target.loadAuthorUrl  , function () { _calls.loadAuthorUrl  (_redirect.on).send(); } );
-		_loadMoreGames   = new Button(target.loadMoreGames  , function () { _calls.loadMoreGames  (_redirect.on).send(); } );
-		_loadNewgrounds  = new Button(target.loadNewgrounds , function () { _calls.loadNewgrounds (_redirect.on).send(); } );
-		_loadOfficialUrl = new Button(target.loadOfficialUrl, function () { _calls.loadOfficialUrl(_redirect.on).send(); } );
-		_loadReferral    = new Button(target.loadReferral   , function () { _calls.loadReferral   (_redirect.on).send(); } );
+		_loadAuthorUrl   = new Button(target.loadAuthorUrl  , function () { send(_calls.loadAuthorUrl  (_redirect.on)); } );
+		_loadMoreGames   = new Button(target.loadMoreGames  , function () { send(_calls.loadMoreGames  (_redirect.on)); } );
+		_loadNewgrounds  = new Button(target.loadNewgrounds , function () { send(_calls.loadNewgrounds (_redirect.on)); } );
+		_loadOfficialUrl = new Button(target.loadOfficialUrl, function () { send(_calls.loadOfficialUrl(_redirect.on)); } );
+		_loadReferral    = new Button(target.loadReferral   , function () { send(_calls.loadReferral   (_redirect.on)); } );
 		_redirect = new CheckBox(target.redirect);
 	}
 }
@@ -110,8 +121,8 @@ class MedalPage extends Page<MedalComponent> {
 	public function new (target:MedalPageSwf) {
 		super(NG.core.calls.medal);
 		
-		_getList = new Button(target.getList, function () { _calls.getList().send(); } );
-		_unlock  = new Button(target.unlock , function () { _calls.unlock(Std.parseInt(_id.text)).send(); } );
+		_getList = new Button(target.getList, function () { send(_calls.getList()); } );
+		_unlock  = new Button(target.unlock , function () { send(_calls.unlock(Std.parseInt(_id.text))); } );
 		_id = target.id;
 	}
 }
@@ -143,11 +154,12 @@ class ScoreboardPage extends Page<ScoreBoardComponent> {
 		
 		_social = new CheckBox(target.social);
 		
-		_getBoards = new Button(target.getBoards, function () { _calls.getBoards().send(); });
+		_getBoards = new Button(target.getBoards, function () { send(_calls.getBoards()); });
 		_getScores = new Button(target.getScores,
 			function ():Void {
 				
-				_calls.getScores
+				send
+				( _calls.getScores
 					( Std.parseInt(_id.text)
 					, Std.parseInt(_limit.text)
 					, Std.parseInt(_skip.text)
@@ -156,15 +168,11 @@ class ScoreboardPage extends Page<ScoreBoardComponent> {
 					, _tag.text
 					, _user.text
 					)
-					.send();
+				);
 			}
 		);
 		_postScore = new Button(target.postScore,
-			function () {
-				
-				_calls.postScore(Std.parseInt(_id.text), Std.parseInt(_value.text), _tag.text)
-					.send();
-			}
+			function () { send(_calls.postScore(Std.parseInt(_id.text), Std.parseInt(_value.text), _tag.text)); }
 		);
 	
 	}

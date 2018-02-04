@@ -31,6 +31,8 @@ class MainScreen extends Sprite {
 	var _pages:StringMap<MovieClip>;
 	var _currentPage:String;
 	var _output:TextField;
+	var _clear:Button;
+	var _queue:CheckBox;
 	
 	public function new () {
 		
@@ -58,6 +60,9 @@ class MainScreen extends Sprite {
 	
 	function onAdded(event:Event):Void {
 		_currentPage = null;
+		
+		_clear = new Button(_layout.clear, function ():Void { _output.text = ""; });
+		_queue = new CheckBox(_layout.queue, function ():Void { Page.queueCalls = _queue.on; });
 		
 		_tabs = new StringMap<Button>();
 		_pages = new StringMap<MovieClip>();
