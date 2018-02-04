@@ -93,6 +93,8 @@ class NGLite {
 	@:generic
 	function queueCall<T:ResultBase>(call:Call<T>):Void {
 		
+		logVerbose("queued - ${call.component}");
+		
 		_queuedCalls.push(call);
 		checkQueue();
 	}

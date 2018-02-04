@@ -92,7 +92,10 @@ class NG extends NGLite {
 		var sessionId = getSessionId(stage);
 		create(appId, sessionId);
 		
+		//TODO: call out additional auto-features in method name
 		core.host = getHost(stage);
+		
+		//TODO: auto get medals and scoreboards?
 		
 		if (sessionId == null)
 			core.requestLogin();
