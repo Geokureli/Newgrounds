@@ -37,7 +37,7 @@ class CorePage extends Page<Component> {
 		_logout = new Button(target.logout, function() { NG.core.logOut; });
 		_logout.enabled = false;
 		_host = new Input(target.host, onHostChange, Input.trimEndWhitespace);
-		onHostChange(_host.text);
+		_host.text = NG.core.host != null ? NG.core.host : "newgrounds.com";
 		_sessionId = new Input(target.sessionId, onSessionIdChange);
 		
 		_loadMedals = new Button(target.loadMedals, loadMedals);
