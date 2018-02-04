@@ -69,7 +69,7 @@ class IntroPage extends Page<Component> {
 	
 	function onStartClick():Void {
 		
-		NG.createCore(_appId.text, _sessionId.text);
+		NG.create(_appId.text, _sessionId.text);
 		NG.core.verbose = true;
 		
 		_onStart();

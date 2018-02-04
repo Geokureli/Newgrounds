@@ -4,6 +4,7 @@ import io.newgrounds.objects.events.Response;
 import io.newgrounds.components.ComponentList;
 import io.newgrounds.objects.events.Result.ResultBase;
 import io.newgrounds.objects.events.Result.SessionResult;
+
 import haxe.PosInfos;
 import haxe.Json;
 
@@ -75,9 +76,9 @@ class NGLite {
 	 * Creates NG.core, the heart and soul of the API. This is not the only way to create an instance,
 	 * nor is NG a forced singleton, but it's the only way to set the static NG.core.
 	**/
-	static public function createCore(appId:String = "test"):Void {
+	static public function create(appId:String = "test", sessionId:String = null):Void {
 		
-		core = new NGLite(appId);
+		core = new NGLite(appId, sessionId);
 	}
 	
 	@:allow(io.newgrounds.Call)

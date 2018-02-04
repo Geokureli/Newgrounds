@@ -77,9 +77,22 @@ class NG extends NGLite {
 	 * Creates NG.core, the heart and soul of the API. This is not the only way to create an instance,
 	 * nor is NG a forced singleton, but it's the only way to set the static NG.core.
 	**/
-	static public function createCore(appId:String = "test", sessionId:String = null):Void {
+	static public function create(appId:String = "test", sessionId:String = null):Void {
 		
 		core = new NG(appId, sessionId);
+	}
+	
+	/**
+	 * Creates NG.core, and tries to create a session. This is not the only way to create an instance,
+	 * nor is NG a forced singleton, but it's the only way to set the static NG.core.
+	**/
+	static public function createAndConnect(stage:Stage, appId:String = "test"):Void {
+		
+		var sessionId = getSessionId(stage);
+		create(appId, sessionId);
+		
+		if (sessionId == null)
+			core.requestLogin();
 	}
 	
 	// -------------------------------------------------------------------------------------------
@@ -92,9 +105,9 @@ class NG extends NGLite {
 	}
 	
 	public function requestLogin
-	( onSuccess:Void->Void = null
+	( onSuccess:Void->Void  = null
 	, onFail   :Error->Void = null
-	, onCancel :Void->Void = null
+	, onCancel :Void->Void  = null
 	):Void {
 		
 		if (_waitingForLogin) {
@@ -293,7 +306,7 @@ class NG extends NGLite {
 				return Reflect.field(stage.loaderInfo.parameters, paramName);
 		}
 		
-		return ""; 
+		return null; 
 		
 		// --- EXAMPLE LOADER PARAMS
 		//{ "1517703669"                : ""
