@@ -4,11 +4,17 @@ import io.newgrounds.objects.events.Result.ResultBase;
 import haxe.Json;
 import io.newgrounds.objects.Error;
 
+typedef DebugResponse = {
+	
+	var exec_time:Int;
+	var input:Dynamic;
+}
+
 class Response<T:ResultBase> {
 	
 	public var success(default, null):Bool;
 	public var error(default, null):Error;
-	public var debug(default, null):Dynamic;//TODO:type
+	public var debug(default, null):DebugResponse;
 	public var result(default, null):Result<T>;
 	
 	public function new (core:NGLite, reply:String) {
