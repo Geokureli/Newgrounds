@@ -1,8 +1,7 @@
 package io.newgrounds;
 #if ng_lite
-typedef NG = NGLite;
+typedef NG = NGLite; //TODO: test and make lite UI
 #else
-import openfl.net.URLLoader;
 import io.newgrounds.test.utils.Dispatcher;
 import openfl.display.Stage;
 import io.newgrounds.objects.Error;
@@ -12,7 +11,6 @@ import io.newgrounds.objects.events.Response;
 import io.newgrounds.objects.User;
 import haxe.ds.IntMap;
 
-//TODO: Remove openfl dependancies 
 import openfl.events.TimerEvent;
 import openfl.Lib;
 import openfl.net.URLRequest;
@@ -299,7 +297,6 @@ class NG extends NGLite {
 	// -------------------------------------------------------------------------------------------
 	
 	function timer(delay:Float, callback:Void->Void):Void {
-		//TODO: remove openFL dependancy
 		
 		var timer = new Timer(delay * 1000.0, 1);
 		

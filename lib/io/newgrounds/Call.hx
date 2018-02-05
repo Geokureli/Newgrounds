@@ -61,7 +61,7 @@ class Call<T:ResultBase>
 	/** adds a parameter to the call's component object. **/
 	public function addComponentParameter(name:String, value:Dynamic, defaultValue:Dynamic = null):Call<T> {
 		
-		if (value == defaultValue)//TODO allow sending null value
+		if (value == defaultValue)//TODO?: allow sending null value
 			return this;
 		
 		if (_parameters == null)

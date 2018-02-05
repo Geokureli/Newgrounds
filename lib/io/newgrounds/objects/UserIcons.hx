@@ -1,23 +1,14 @@
 package io.newgrounds.objects;
 
-class UserIcons extends Object{
-
+typedef UserIcons = {
+	
 	/**The URL of the user's large icon. */
-	public var large(default, null):String;
+	var large:String;
 	
 	/** The URL of the user's medium icon. */
-	public var medium(default, null):String;
+	var medium:String;
 	
 	/** The URL of the user's small icon. */
-	public var small(default, null):String;
-	
-	public function new(core:NGLite, data:Dynamic) { super(core, data); }
-	
-	override function parse(data:Dynamic):Void {
-		
-		//TODO
-		
-		super.parse(data);
-	}
+	var small:String;
 }
 
