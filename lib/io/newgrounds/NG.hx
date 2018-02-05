@@ -164,8 +164,7 @@ class NG extends NGLite {
 		if (_session.status == SessionStatus.REQUEST_LOGIN) {
 			
 			logVerbose('loading passport: ${_session.passportUrl}');
-			// TODO: Remove openFL dependancy
-			Lib.getURL(new URLRequest(_session.passportUrl));
+			Lib.getURL(new URLRequest(_session.passportUrl));//TODO: pop non fullscreen web page
 		}
 		
 		checkSession(null, onSuccess, onCancel);
