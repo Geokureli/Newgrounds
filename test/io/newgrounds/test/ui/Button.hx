@@ -15,6 +15,9 @@ class Button {
 			updateState(); 
 		}
 		
+		_target.useHandCursor = value;
+		_target.buttonMode = value;
+		
 		return value;
 	}
 	
@@ -44,8 +47,6 @@ class Button {
 		_target.addEventListener(MouseEvent.MOUSE_DOWN, mouseHandler);
 		_target.addEventListener(MouseEvent.CLICK, mouseHandler);
 		
-		_target.useHandCursor = true;
-		_target.buttonMode = true;
 		_target.stop();
 		
 		enabled = true;
