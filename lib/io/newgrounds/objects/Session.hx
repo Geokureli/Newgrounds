@@ -29,13 +29,10 @@ class Session extends Object {
 		passportUrl = data.passport_url;
 		remember = data.remember;
 		
-		if (data.user != null) {
-			
-			if (user != null)
-				user.parse(data.user);
-			else
-				user = new User(_core, data.user);
-		}
+		// --- KEEP THE SAME INSTANCE
+		if (user == null)
+			user = data.user;
+		// TODO?: update original user instance with new data. (probly not) 
 		
 		super.parse(data);
 	}

@@ -40,7 +40,6 @@ class ScoreBoard extends Object {
 	@:allow(ScoreBoardComponent)
 	function parseScores(scores:Array<Dynamic>):Void {
 		
-		//TODO: keep old scores and unify new + old?
 		scores = new Array<Score>();
 		
 		for (boardData in scores)

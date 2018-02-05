@@ -1,25 +1,17 @@
 package io.newgrounds.objects;
 
-class Score extends Object {
+/** We don't want to serialize scores since there's a bajillion of them. */
+typedef Score = {
 	
 	/** The value value in the format selected in your scoreboard settings. */
-	public var formattedValue(default, null):String;
+	var formatted_value:String;
 	
 	/** The tag attached to this value (if any). */
-	public var tag(default, null):String;
+	var tag:String;
 	
 	/** The user who earned value. If this property is absent, the value belongs to the active user. */
-	public var user(default, null):Dynamic;
+	var user:Dynamic;
 	
 	/** The integer value of the value. */
-	public var value(default, null):Int;
-	
-	public function new(core:NGLite, data:Dynamic) { super(core, data); }
-
-	override function parse(data:Dynamic):Void {
-		
-		//TODO
-		
-		super.parse(data);
-	}
+	var value:Int;
 }
