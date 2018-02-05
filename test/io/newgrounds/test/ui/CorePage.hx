@@ -1,5 +1,7 @@
 package io.newgrounds.test.ui;
 
+import flash.Lib;
+import io.newgrounds.test.art.ProfileSwf;
 import io.newgrounds.test.art.MedalListSwf;
 import io.newgrounds.test.art.CorePageSwf;
 import io.newgrounds.test.art.MedalSwf;
@@ -21,6 +23,9 @@ class CorePage extends Page<Component> {
 	var _logout:Button;
 	var _host:Input;
 	var _sessionId:Input;
+	var _user:TextField;
+	var _profile:ProfileSwf;
+	var _profileButton:Button;
 	
 	var _loadMedals:Button;
 	var _medalList:MedalListSwf;
@@ -34,8 +39,15 @@ class CorePage extends Page<Component> {
 		_login = new Button(target.login, onLoginClick);
 		_loginLabel = target.loginLabel;
 		_loginLabel.mouseEnabled = false;
-		_logout = new Button(target.logout, function() { NG.core.logOut; });
+		_logout = new Button(target.logout, function() { NG.core.logOut(); });
 		_logout.enabled = false;
+		
+		_user = target.user;
+		_profile = cast target.profile;
+		_profile.supporter.visible = false;
+		_profileButton = new Button(_profile, onProfileClick);
+		_profileButton.enabled = false;
+		
 		_sessionId = new Input(target.sessionId, onSessionIdChange);
 		_host = new Input(target.host, onHostChange, Input.trimEndWhitespace);
 		if (NG.core.host == null)
@@ -92,6 +104,17 @@ class CorePage extends Page<Component> {
 		_logout.enabled = true;
 		
 		_sessionId.text = NG.core.sessionId;
+		
+		var user = NG.core.user;
+		if (user != null){
+			
+			_user.text = '${user.name} (${user.id})';
+			var loader:Loader = new Loader();
+			loader.load(new URLRequest(user.icons.large));
+			_profile.addChild(loader);
+			_profile.supporter.visible = user.supporter;
+			_profileButton.enabled = true;
+		}
 	}
 	
 	function onLogOut():Void {
@@ -100,6 +123,31 @@ class CorePage extends Page<Component> {
 		_logout.enabled = false;
 		
 		_sessionId.text = "";
+		_user.text = "";
+		
+		_profile.supporter.visible = false;
+		_profileButton.enabled = false;
+		for (i in 0 ... _profile.numChildren) {
+			
+			if (Std.is(_profile.getChildAt(i), Loader)) {
+				
+				_profile.removeChildAt(i);
+				break;
+			}
+		}
+	}
+	
+	function onProfileClick():Void {
+		
+		if (NG.core.user != null) {
+			
+			var url = NG.core.user.url;
+			// --- FIX TEMP URL SERVER ISSUE
+			if (url.indexOf("//") == 0)
+				url = "http:" + url;
+			
+			Lib.getURL(new URLRequest(url));
+		}
 	}
 	
 	function onHostChange(value:String):Void {
