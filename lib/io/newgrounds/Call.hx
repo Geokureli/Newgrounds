@@ -10,13 +10,24 @@ import haxe.ds.StringMap;
 import haxe.Json;
 import haxe.Http;
 
-class Call<T:ResultBase> {
+/** A generic way to handle calls agnostic to their type */
+interface ICallable {
+	
+	public var component(default, null):String;
+	
+	public function send():Void;
+	public function queue():Void;
+	public function destroy():Void;
+}
+
+class Call<T:ResultBase>
+	implements ICallable {
 	
 	inline static var PATH:String = "https://newgrounds.io/gateway_v3.php";
 	
-	var _core:NGLite;
+	public var component(default, null):String;
 	
-	var _component:String;
+	var _core:NGLite;
 	var _properties:StringMap<Dynamic>;
 	var _parameters:StringMap<Dynamic>;
 	var _requireSession:Bool;
@@ -31,7 +42,7 @@ class Call<T:ResultBase> {
 	public function new (core:NGLite, component:String, requireSession:Bool = false, isSecure:Bool = false) {
 		
 		_core = core;
-		_component = component;
+		this.component = component;
 		_requireSession = requireSession;
 		_isSecure = isSecure && core.encryptionHandler != null;
 	}
@@ -110,7 +121,7 @@ class Call<T:ResultBase> {
 		var data:Dynamic = {};
 		data.app_id = _core.appId;
 		data.call = {};
-		data.call.component  = _component;
+		data.call.component  = component;
 		
 		if (_core.debug)
 			addProperty("debug", true);
@@ -125,7 +136,7 @@ class Call<T:ResultBase> {
 				
 			} else if (_requireSession){
 				
-				_core.logError(new Error('cannot send "$_component" call without a sessionId'));
+				_core.logError(new Error('cannot send "$component" call without a sessionId'));
 				return;
 			}
 		}
@@ -154,6 +165,8 @@ class Call<T:ResultBase> {
 			
 			_core.logVerbose('    secure - $secureData');
 		}
+		
+		_core.markCallPending(this);
 		
 		var http = new Http(PATH);
 		http.setParameter("input", Json.stringify(data));
