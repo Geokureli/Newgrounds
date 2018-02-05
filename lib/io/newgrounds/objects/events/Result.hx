@@ -7,7 +7,7 @@ class Result<T:ResultBase> {
 	
 	public var data(default, null):T;
 	public var success(default, null):Bool;
-	public var debug(default, null):Dynamic;
+	public var debug(default, null):Bool;
 	public var error(default, null):Error;
 	
 	public function new(core:NGLite, data:Dynamic) {
