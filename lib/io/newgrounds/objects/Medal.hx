@@ -58,9 +58,14 @@ class Medal extends Object {
 			onUnlock.dispatch();
 	}
 	
-	public function unlock():Call<MedalUnlockResult> {
+	public function sendUnlock(onSuccess:Void->Void = null):Void {
 		
-		return _core.calls.medal.unlock(id);
+		var call = _core.calls.medal.unlock(id);
+		
+		if (onSuccess != null)
+			call.addSuccessHandler(onSuccess);
+		
+		call.send();
 	}
 	
 	public function get_difficultyName():String {

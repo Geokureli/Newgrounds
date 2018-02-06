@@ -194,7 +194,7 @@ class CorePage extends Page<Component> {
 			
 			_displayMedals.set(medal, medalData);
 			
-			new Button(medal, medalData.unlock().send, showMedalInfo.bind(medalData), hideMedalInfo);
+			new Button(medal, function () { medalData.sendUnlock(); }, showMedalInfo.bind(medalData), hideMedalInfo);
 			medalData.onUnlock.add(updateDisplayMedal.bind(medal));
 			
 			updateDisplayMedal(medal);

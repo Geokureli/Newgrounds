@@ -1,5 +1,6 @@
 package io.newgrounds;
 
+import io.newgrounds.crypto.NgRc4;
 import io.newgrounds.Call.ICallable;
 import io.newgrounds.objects.events.Response;
 import io.newgrounds.components.ComponentList;
@@ -45,7 +46,7 @@ class NGLite {
 	 * Set your preffered encrypter here,
 	 * or just call setDefaultEcryptionHandler with your app's encryption settings
 	**/
-	public var encryptionHandler:Dynamic->String;
+	public var encryptionHandler:String->String;
 	
 	/** 
 	 * Iniitializes the API, call before utilizing any other component
@@ -159,40 +160,35 @@ class NGLite {
 	/** Sets */
 	public function setDefaultEncryptionHandler
 	( key   :String
-	, cipher:EncryptionCipher = EncryptionCipher.AES_128
+	, cipher:EncryptionCipher = EncryptionCipher.RC4
 	, format:EncryptionFormat = EncryptionFormat.BASE_64
 	):Void {
 		
-		if (cipher == EncryptionCipher.NONE)
+		if (cipher == EncryptionCipher.NONE) {
+			
 			encryptionHandler = null;
-		
-		throw "not yet implemented";
-		
-		encryptionHandler = cipher == EncryptionCipher.AES_128
-			? encryptAes128.bind(key, format)
-			: encryptRc4   .bind(key, format);
-	}
-	
-	static function encryptAes128(key:String, format:EncryptionFormat, data:Dynamic):String {
-		//TODO
-		return Json.stringify(data);
-	}
-	
-	static function encryptRc4(key:String, format:EncryptionFormat, data:Dynamic):String {
-		//TODO
-		return Json.stringify(data);
+			return;
+			
+		} else if (cipher == EncryptionCipher.RC4) {
+			
+			encryptionHandler = new NgRc4(key, format).encrypt;
+			
+		} else {
+			
+			throw "aes not yet implemented";
+		}
 	}
 }
 
 @:enum
-abstract EncryptionCipher(Int) {
-	var NONE    = 0;
-	var AES_128 = 1;
-	var RC4     = 2;
+abstract EncryptionCipher(String) to String{
+	var NONE    = "none";
+	var AES_128 = "aes128";
+	var RC4     = "rc4";
 }
 
 @:enum
-abstract EncryptionFormat(Int) to Int {
-	var BASE_64 = 64;
-	var HEX     = 16;
+abstract EncryptionFormat(String) to String {
+	var BASE_64 = "base64";
+	var HEX     = "hex";
 }
