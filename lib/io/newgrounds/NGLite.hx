@@ -160,7 +160,7 @@ class NGLite {
 	/** Sets */
 	public function setDefaultEncryptionHandler
 	( key   :String
-	, cipher:EncryptionCipher = EncryptionCipher.AES_128
+	, cipher:EncryptionCipher = EncryptionCipher.RC4
 	, format:EncryptionFormat = EncryptionFormat.BASE_64
 	):Void {
 		
@@ -175,14 +175,8 @@ class NGLite {
 			
 		} else {
 			
-			throw "not yet implemented";
-			encryptionHandler = encryptAes128.bind(key, format);
+			throw "aes not yet implemented";
 		}
-	}
-	
-	static function encryptAes128(key:String, format:EncryptionFormat, data:Dynamic):String {
-		//TODO
-		return Json.stringify(data);
 	}
 }
 
