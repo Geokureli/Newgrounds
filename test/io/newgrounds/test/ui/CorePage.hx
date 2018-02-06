@@ -48,6 +48,7 @@ class CorePage extends Page<Component> {
 		_profileButton = new Button(_profile, onProfileClick);
 		_profileButton.enabled = false;
 		
+		target.sessionId.text = "";
 		_sessionId = new Input(target.sessionId, onSessionIdChange);
 		_host = new Input(target.host, onHostChange, Input.trimEndWhitespace);
 		if (NG.core.host == null)

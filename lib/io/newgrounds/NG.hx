@@ -2,23 +2,23 @@ package io.newgrounds;
 #if ng_lite
 typedef NG = NGLite; //TODO: test and make lite UI
 #else
-import io.newgrounds.test.utils.Dispatcher;
-import openfl.display.Stage;
+import io.newgrounds.utils.Dispatcher;
 import io.newgrounds.objects.Error;
 import io.newgrounds.objects.events.Result.SessionResult;
 import io.newgrounds.objects.events.Result.MedalListResult;
 import io.newgrounds.objects.events.Response;
 import io.newgrounds.objects.User;
+import io.newgrounds.objects.Medal;
+import io.newgrounds.objects.Session;
+import io.newgrounds.objects.ScoreBoard;
+
 import haxe.ds.IntMap;
 
+import openfl.display.Stage;
 import openfl.events.TimerEvent;
 import openfl.Lib;
 import openfl.net.URLRequest;
 import openfl.utils.Timer;
-
-import io.newgrounds.objects.Medal;
-import io.newgrounds.objects.Session;
-import io.newgrounds.objects.ScoreBoard;
 
 /**
  * The Newgrounds API for Haxe.
@@ -85,19 +85,13 @@ class NG extends NGLite {
 	 * Creates NG.core, and tries to create a session. This is not the only way to create an instance,
 	 * nor is NG a forced singleton, but it's the only way to set the static NG.core.
 	**/
-	static public function createAndConnect(stage:Stage, appId:String = "test"):Void {
+	static public function createAndCheckLoaderVars(stage:Stage, appId:String = "test"):Void {
 		
 		var sessionId = getSessionId(stage);
 		create(appId, sessionId);
 		
-		//TODO: call out additional auto-features in method name
 		core.host = getHost(stage);
-		
-		//TODO: auto get medals and scoreboards?
-		
-		if (sessionId == null)
-			core.requestLogin();
-		else
+		if (sessionId != null)
 			core.attemptingLogin = true;
 	}
 	
@@ -309,15 +303,12 @@ class NG extends NGLite {
 		timer.start();
 	}
 	
-	static public function getSessionId(stage:Stage):String {
+	inline static public function getLoaderVar(stage:Stage, name:String):String {
 		
-		for (paramName in Reflect.fields(stage.loaderInfo.parameters)) {
-			
-			if (paramName == "ngio_session_id")
-				return Reflect.field(stage.loaderInfo.parameters, paramName);
-		}
+		if (Reflect.hasField(stage.loaderInfo.parameters, name))
+			return Reflect.field(stage.loaderInfo.parameters, name);
 		
-		return null; 
+		return null;
 		
 		// --- EXAMPLE LOADER PARAMS
 		//{ "1517703669"                : ""
@@ -329,6 +320,11 @@ class NG extends NGLite {
 		//, "ngio_session_id"           : "0c6c4e02567a5116734ba1a0cd841dac28a42e79302290"
 		//, "NewgroundsAPI_UserName"    : "GeoKureli"
 		//}
+	}
+	
+	static public function getSessionId(stage:Stage):String {
+		
+		return getLoaderVar(stage, "ngio_session_id");
 	}
 	
 	

@@ -14,7 +14,7 @@ class ComponentList {
 	public function new(core:NGLite) {
 		
 		_core = core;
-        
+		
 		medal      = new MedalComponent     (_core);
 		app        = new AppComponent       (_core);
 		event      = new EventComponent     (_core);

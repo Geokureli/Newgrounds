@@ -1,4 +1,4 @@
-package io.newgrounds.test.utils;
+package io.newgrounds.utils;
 
 /**
  * Basically shitty signals, but I didn't want to have external references.

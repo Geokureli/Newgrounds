@@ -1,8 +1,6 @@
 package io.newgrounds.objects;
 
-import io.newgrounds.test.utils.Dispatcher;
-import io.newgrounds.objects.events.Result;
-import io.newgrounds.Call;
+import io.newgrounds.utils.Dispatcher;
 import io.newgrounds.NGLite;
 
 class Medal extends Object {

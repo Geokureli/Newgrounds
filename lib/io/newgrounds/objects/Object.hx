@@ -1,6 +1,6 @@
 package io.newgrounds.objects;
 
-import io.newgrounds.test.utils.Dispatcher;
+import io.newgrounds.utils.Dispatcher;
 import io.newgrounds.NGLite;
 
 class Object {
