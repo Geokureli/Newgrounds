@@ -159,7 +159,7 @@ class Call<T:ResultBase>
 		
 		if (_isSecure) {
 			
-			var secureData = _core.encryptionHandler(data.call);
+			var secureData = _core.encryptionHandler(Json.stringify(data.call));
 			data.call = {};
 			data.call.secure = secureData;
 			
