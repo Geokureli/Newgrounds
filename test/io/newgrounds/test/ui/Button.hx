@@ -5,18 +5,16 @@ import openfl.display.MovieClip;
 
 class Button {
 	
-	@:isVar
-	public var enabled(default, set):Bool;
+	var _enabled:Bool;
+	public var enabled(get, set):Bool;
+	function get_enabled():Bool { return _enabled; }
 	function set_enabled(value:Bool):Bool {
 		
-		if (value != this.enabled) {
+		if (value != _enabled) {
 			
-			this.enabled = value;
-			updateState(); 
+			_enabled = value;
+			updateEnabled();
 		}
-		
-		_target.useHandCursor = value;
-		_target.buttonMode = value;
 		
 		return value;
 	}
@@ -86,21 +84,33 @@ class Button {
 		updateState();
 	}
 	
+	function updateEnabled():Void {
+		
+		updateState();
+		
+		_target.useHandCursor = enabled;
+		_target.buttonMode = enabled;
+	}
+	
 	function updateState():Void {
 		
-		var state:String;
-		if (enabled) {
-			
-			if (_over)
-				state = _down ? "down" : "over";
-			else
-				state = "up";
-			
-		} else
-			state = "disabled";
+		var state = determineState();
 		
 		if (_target.currentLabel != state && _foundLabels.indexOf(state) != -1)
 			_target.gotoAndStop(state);
+	}
+	
+	function determineState():String {
+		
+		if (enabled) {
+			
+			if (_over)
+				return _down ? "down" : "over";
+			
+			return "up";
+			
+		}
+		return "disabled";
 	}
 	
 	public function destroy():Void {
