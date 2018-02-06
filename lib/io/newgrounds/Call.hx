@@ -1,6 +1,6 @@
 package io.newgrounds;
 
-import io.newgrounds.test.utils.Dispatcher;
+import io.newgrounds.utils.Dispatcher;
 import io.newgrounds.objects.Error;
 import io.newgrounds.objects.events.Result;
 import io.newgrounds.objects.events.Result.ResultBase;
