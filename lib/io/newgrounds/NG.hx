@@ -85,13 +85,14 @@ class NG extends NGLite {
 	 * Creates NG.core, and tries to create a session. This is not the only way to create an instance,
 	 * nor is NG a forced singleton, but it's the only way to set the static NG.core.
 	**/
-	static public function createAndConnect(stage:Stage, appId:String = "test"):Void {
+	static public function createAndCheckLoaderVars(stage:Stage, appId:String = "test"):Void {
 		
 		var sessionId = getSessionId(stage);
 		create(appId, sessionId);
 		
 		core.host = getHost(stage);
-		core.attemptingLogin = true;
+		if (sessionId != null)
+			core.attemptingLogin = true;
 	}
 	
 	// -------------------------------------------------------------------------------------------

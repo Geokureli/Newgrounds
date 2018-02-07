@@ -107,7 +107,7 @@ class IntroPage extends Page<Component> {
 	function onStartClick():Void {
 		
 		if (_autoConnect.on)
-			NG.createAndConnect(_stage, _appId.text);
+			NG.createAndCheckLoaderVars(_stage, _appId.text);
 		else
 			NG.create(_appId.text, _sessionId.text);
 		
