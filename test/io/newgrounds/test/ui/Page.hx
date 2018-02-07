@@ -71,7 +71,7 @@ class EventPage extends Page<EventComponent> {
 	public function new (target:EventPageSwf) {
 		super(NG.core.calls.event);
 		
-		_logEvent = new Button(target.logEvent, function () { send(_calls.logEvent(_event.text)); });
+		_logEvent = new Button(target.logEvent, function () { send(_calls.logEvent(Input.trimEndWhitespace(_event.text))); });
 		_event = target.event;
 	}
 }
