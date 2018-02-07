@@ -53,12 +53,27 @@ class IntroPage extends Page<Component> {
 	public function new (target:IntroScreenSwf, onStart:Void->Void):Void {
 		super();
 		
+		_stage = target.stage;
+		
 		_onStart = onStart;
 		
 		_appId = target.appId;
 		_sessionId = target.sessionId;
 		_start = new Button(target.start, onStartClick);
+		
+		
+		
+		#if ng_lite
+		target.autoConnect.gotoAndStop("disabled");
+		target.autoConnect.getChildByName("check").visible = false;
+		//TODO: fix _autoConnect.enabled = false;
+		
+		var autoSession:String = getLoaderVar(_stage, "ngio_session_id");
+		if (autoSession != null)
+			_sessionId.text = autoSession;
+		#else
 		_autoConnect = new CheckBox(target.autoConnect, onAutoConnectToggle);
+		#end
 		
 		_encryptionKey = target.encryptionKey;
 		
@@ -70,15 +85,6 @@ class IntroPage extends Page<Component> {
 		_cipher.selected = EncryptionCipher.RC4;
 		_cipher.disableChoice(EncryptionCipher.AES_128);
 		
-		if (target.stage != null)
-			_stage = target.stage
-		else
-			target.addEventListener(Event.ADDED_TO_STAGE, onAdded);
-	}
-	
-	function onAdded(e:Event = null):Void {
-		
-		_stage = e.currentTarget;
 	}
 	
 	function onAutoConnectToggle():Void {
@@ -106,11 +112,15 @@ class IntroPage extends Page<Component> {
 	
 	function onStartClick():Void {
 		
+		#if ng_lite
+		NG.create(_appId.text, _sessionId.text);
+		NG.core.host = getHost(_stage);
+		#else
 		if (_autoConnect.on)
 			NG.createAndCheckLoaderVars(_stage, _appId.text);
 		else
 			NG.create(_appId.text, _sessionId.text);
-		
+		#end
 		if (_cipher.selected != EncryptionCipher.NONE)
 			NG.core.setDefaultEncryptionHandler(_encryptionKey.text, cast _cipher.selected,cast _format.selected);
 		
@@ -118,4 +128,36 @@ class IntroPage extends Page<Component> {
 		
 		_onStart();
 	}
+	
+	#if ng_lite
+	/** HELPERS
+	 * copiedNG.hx's helpers which is not available in ng_lite
+	 */
+	inline static public function getLoaderVar(stage:Stage, name:String):String {
+		
+		if (Reflect.hasField(stage.loaderInfo.parameters, name))
+			return Reflect.field(stage.loaderInfo.parameters, name);
+		
+		return null;
+	}
+	
+	
+	static var urlParser:EReg = ~/^(?:http[s]?:\/\/)?([^:\/\s]+)(:[0-9]+)?((?:\/\w+)*\/)([\w\-\.]+[^#?\s]+)([^#\s]*)?(#[\w\-]+)?$/i;//TODO:trim
+	/** Used to get the current web host of your game. */
+	static public function getHost(stage:Stage):String {
+		
+		var url = stage.loaderInfo.url;
+		
+		if (url == null || url == "")
+			return "<AppView>";
+		
+		if (url.indexOf("file") == 0)
+			return "<LocalHost>";
+		
+		if (urlParser.match(url))
+			return urlParser.matched(1);
+		
+		return "<Unknown>";
+	}
+	#end
 }

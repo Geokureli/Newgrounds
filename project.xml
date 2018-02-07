@@ -12,6 +12,8 @@
 	<haxelib name="swf" />
 	<classpath path="lib" />
 	
+	<!--<haxedef name="ng_lite" />-->
+	
 	<library path="assets/Test Layout.swf" id="layout" type="swflite" generate="true" preload="true" />
 	<!--<assets path="assets" exclude="openfl.svg|*.swf" embed="true" />-->
 	

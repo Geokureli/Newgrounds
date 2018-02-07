@@ -14,52 +14,17 @@ import openfl.display.Loader;
 import openfl.geom.Point;
 import openfl.text.TextField;
 
-class CorePage extends Page<Component> {
-	
-	inline static var DEFAULT_MEDAL_INFO:String = "Roll over a medal for more info, click to unlock.";
-	
-	var _login:Button;
-	var _loginLabel:TextField;
-	var _logout:Button;
-	var _host:Input;
-	var _sessionId:Input;
-	var _user:TextField;
-	var _profile:ProfileSwf;
-	var _profileButton:Button;
-	
-	var _loadMedals:Button;
-	var _medalList:MedalListSwf;
-	var _displayMedals:Map<MedalSwf, Medal>;
-	
-	var _loadBoards:Button;
+#if ng_lite
+typedef CorePage = CorePageLite;
+#else
+class CorePage extends CorePageLite {
 	
 	public function new (target:CorePageSwf) {
-		super(null);
+		super(target);
 		
-		_login = new Button(target.login, onLoginClick);
-		_loginLabel = target.loginLabel;
-		_loginLabel.mouseEnabled = false;
-		_logout = new Button(target.logout, function() { NG.core.logOut(); });
-		_logout.enabled = false;
-		
-		_user = target.user;
-		_profile = cast target.profile;
-		_profile.supporter.visible = false;
-		_profileButton = new Button(_profile, onProfileClick);
-		_profileButton.enabled = false;
-		
-		target.sessionId.text = "";
-		_sessionId = new Input(target.sessionId, onSessionIdChange);
-		_host = new Input(target.host, onHostChange, Input.trimEndWhitespace);
-		if (NG.core.host == null)
-			NG.core.host = _host.text;
-		
-		_loadMedals = new Button(target.loadMedals, loadMedals);
-		_medalList = cast target.medalList;
-		_medalList.visible = false;
-		_medalList.info.text = DEFAULT_MEDAL_INFO;
-		
-		_loadBoards = new Button(target.loadBoards);//TODO
+		_login.onClick = onLoginClick;
+		_logout.onClick = function() { NG.core.logOut(); };
+		_profileButton.onClick = onProfileClick;
 		
 		NG.core.onLogin.add(onLogin);
 		NG.core.onLogOut.add(onLogOut);
@@ -69,7 +34,15 @@ class CorePage extends Page<Component> {
 			_loginLabel.text = "cancel";
 			_login.onClick = onCancelClick;
 		}
+		_loadMedals.onClick = loadMedals;
+		
+		//_loadBoards.onClick = loadBoards();//TODO
 	}
+	
+	// -------------------------------------------------------------------------------------------
+	//                                       LOG IN/OUT
+	// -------------------------------------------------------------------------------------------
+	
 	function onLoginFail(error:Error):Void {
 		
 		onLoginCancel();
@@ -151,15 +124,9 @@ class CorePage extends Page<Component> {
 		}
 	}
 	
-	function onHostChange(value:String):Void {
-		
-		NG.core.host = value;
-	}
-	
-	function onSessionIdChange(value:String):Void {
-		
-		NG.core.sessionId = value;
-	}
+	// -------------------------------------------------------------------------------------------
+	//                                       MEDALS
+	// -------------------------------------------------------------------------------------------
 	
 	function loadMedals():Void {
 		
@@ -227,10 +194,81 @@ class CorePage extends Page<Component> {
 		_medalList.info.text = DEFAULT_MEDAL_INFO;
 	}
 	
-	/////////////////////////////
+	// -------------------------------------------------------------------------------------------
+	//                                       SCOREBOARDS
+	// -------------------------------------------------------------------------------------------
 	
 	function onBoardsLoaded():Void {
 		
+		//TODO
+	}
+}
+#end
+	
+class CorePageLite extends Page<Component> {
+	
+	inline static var DEFAULT_MEDAL_INFO:String = "Roll over a medal for more info, click to unlock.";
+	
+	var _login:Button;
+	var _loginLabel:TextField;
+	var _logout:Button;
+	var _host:Input;
+	var _sessionId:Input;
+	var _user:TextField;
+	var _profile:ProfileSwf;
+	var _profileButton:Button;
+	
+	var _loadMedals:Button;
+	var _medalList:MedalListSwf;
+	var _displayMedals:Map<MedalSwf, Medal>;
+	
+	var _loadBoards:Button;
+	
+	public function new (target:CorePageSwf) {
+		super(null);
 		
+		_login = new Button(target.login);
+		_loginLabel = target.loginLabel;
+		_loginLabel.mouseEnabled = false;
+		_logout = new Button(target.logout);
+		_logout.enabled = false;
+		
+		_user = target.user;
+		_profile = cast target.profile;
+		_profile.supporter.visible = false;
+		_profileButton = new Button(_profile);
+		_profileButton.enabled = false;
+		
+		target.sessionId.text = "";
+		_sessionId = new Input(target.sessionId, onSessionIdChange);
+		_host = new Input(target.host, onHostChange, Input.trimEndWhitespace);
+		if (NG.core.host == null)
+			NG.core.host = _host.text;
+		
+		_loadMedals = new Button(target.loadMedals);
+		_medalList = cast target.medalList;
+		_medalList.visible = false;
+		_medalList.info.text = DEFAULT_MEDAL_INFO;
+		
+		_loadBoards = new Button(target.loadBoards);
+		
+		#if ng_lite
+		_login.enabled = false;
+		_logout.enabled = false;
+		_loadMedals.enabled = false;
+		_loadBoards.enabled = false;
+		_user.backgroundColor = 0xCCCCCC;
+		_user.text = "Note: this page is mostly deactivated but you're using ng_lite";
+		#end
+	}
+	
+	function onHostChange(value:String):Void {
+		
+		NG.core.host = value;
+	}
+	
+	function onSessionIdChange(value:String):Void {
+		
+		NG.core.sessionId = value;
 	}
 }
