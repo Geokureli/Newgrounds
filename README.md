@@ -5,6 +5,7 @@ TODO
  - Hex encoding
  - Better scoreboard handling
  - flash ads?
+ - kill all humans
  - flash API assets
      - auto connecter
      - score board
@@ -12,4 +13,4 @@ TODO
      - preloader
      - ad viewer
  - better handling of auto login  on non-ng hosts
- - ng_lite testing
+ - fix checkbox disabled state
