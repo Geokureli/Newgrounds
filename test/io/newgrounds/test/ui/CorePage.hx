@@ -1,5 +1,6 @@
 package io.newgrounds.test.ui;
 
+import io.newgrounds.components.ScoreBoardComponent.Period;
 import haxe.xml.Check;
 import haxe.ds.StringMap;
 import haxe.ds.IntMap;
@@ -228,6 +229,7 @@ class CorePage extends CorePageLite {
 	var _refresh:Button;
 	var _tag:TextField;
 	var _social:CheckBox;
+	var _period:DropDown;
 	
 	inline function initBoards():Void {
 		
@@ -241,6 +243,13 @@ class CorePage extends CorePageLite {
 		_refresh.enabled = false;
 		_social = new CheckBox(_scoreBoardList.social);
 		_tag = _scoreBoardList.tag;
+		_period = new DropDown(cast _scoreBoardList.period);
+		_period.addItem("All time"     , Period.ALL);
+		_period.addItem("Current day"  , Period.DAY);
+		_period.addItem("Current week" , Period.WEEK);
+		_period.addItem("Current month", Period.MONTH);
+		_period.addItem("Current year" , Period.YEAR);
+		_period.value = Period.ALL;
 		
 		_loadBoards.onClick = loadBoards;
 		
@@ -327,7 +336,7 @@ class CorePage extends CorePageLite {
 		_boardPages.set(board.id, page);
 		
 		board.onUpdate.addOnce(showScores.bind(board));
-		board.requestScores(10, page * 10, null, _social.on, fieldString(_tag));
+		board.requestScores(10, page * 10, _period.value, _social.on, fieldString(_tag));
 	}
 	
 	function showScores(board:ScoreBoard):Void {
