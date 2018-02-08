@@ -358,7 +358,7 @@ class CorePage extends CorePageLite {
 		
 		var maxChars = 
 			[ "rank"  => 4
-			, "user"  => 20
+			, "user"  => 30
 			, "value" => 5
 			, "tag"   => 0
 			];
@@ -386,7 +386,7 @@ class CorePage extends CorePageLite {
 				( padTo(Std.string(rank           ), maxChars.get("rank" ), true ) + " "
 				+ padTo(Std.string(score.user.name), maxChars.get("user" ), true ) + " "
 				+ padTo(score.formatted_value      , maxChars.get("value"), false) + " "
-				+ padTo(score.tag                  , maxChars.get("tag"  ), true )
+				+ padTo(score.tag                  , maxChars.get("tag"  ), true ) + "\n"
 				);
 			
 			rank++;
