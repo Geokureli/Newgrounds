@@ -62,7 +62,7 @@ class DropDown {
 	
 	function onClickExpand():Void {
 		
-		_choiceContainer.visible = true;
+		_choiceContainer.visible = !_choiceContainer.visible;
 	}
 	
 	function onChoiceClick(name:String):Void{
