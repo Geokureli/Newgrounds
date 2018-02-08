@@ -52,7 +52,7 @@ class ScoreBoardComponent extends Component {
 	, user  :Dynamic = null
 	):Call<ScoreResult> {
 		
-		if (!Std.is(user, String) && !Std.is(user, Int))
+		if (user != null && !Std.is(user, String) && !Std.is(user, Int))
 			user = user.id;
 		
 		return new Call<ScoreResult>(_core, "ScoreBoard.getScores")
