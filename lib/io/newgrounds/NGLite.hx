@@ -1,6 +1,8 @@
 package io.newgrounds;
 
-import io.newgrounds.crypto.NgRc4;
+import haxe.crypto.Base64;
+import haxe.io.Bytes;
+import io.newgrounds.crypto.Rc4;
 import io.newgrounds.Call.ICallable;
 import io.newgrounds.objects.events.Response;
 import io.newgrounds.components.ComponentList;
@@ -164,19 +166,31 @@ class NGLite {
 	, format:EncryptionFormat = EncryptionFormat.BASE_64
 	):Void {
 		
-		if (cipher == EncryptionCipher.NONE) {
-			
+		if (cipher == EncryptionCipher.NONE)
 			encryptionHandler = null;
-			return;
-			
-		} else if (cipher == EncryptionCipher.RC4) {
-			
-			encryptionHandler = new NgRc4(key, format).encrypt;
-			
-		} else {
-			
+		else if (cipher == EncryptionCipher.RC4)
+			encryptionHandler = encryptRc4.bind(key, format);
+		else
 			throw "aes not yet implemented";
-		}
+	}
+	
+	function encryptRc4(key:String, format:EncryptionFormat, data:String):String {
+		
+		if (format == EncryptionFormat.HEX)
+			throw "hex format not yet implemented";
+		
+		var keyBytes:Bytes;
+		if (format == EncryptionFormat.BASE_64)
+			keyBytes = Base64.decode(key);
+		else
+			keyBytes = null;//TODO
+		
+		var dataBytes = new Rc4(keyBytes).crypt(Bytes.ofString(data));
+		
+		if (format == EncryptionFormat.BASE_64)
+			return Base64.encode(dataBytes);
+		
+		return null;
 	}
 }
 
