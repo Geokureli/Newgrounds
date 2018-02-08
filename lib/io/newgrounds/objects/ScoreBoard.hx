@@ -1,13 +1,14 @@
 package io.newgrounds.objects;
 
+import io.newgrounds.components.ScoreBoardComponent.Period;
+import io.newgrounds.objects.events.Response;
 import io.newgrounds.objects.events.Result;
 import io.newgrounds.objects.events.Result.ScoreResult;
-import io.newgrounds.components.ScoreBoardComponent;
 import io.newgrounds.NGLite;
 
 class ScoreBoard extends Object {
 	
-	public var scores(default, null):Array<Dynamic>;
+	public var scores(default, null):Array<Score>;
 	
 	/** The numeric ID of the scoreboard.*/
 	public var id(default, null):Int;
@@ -24,33 +25,47 @@ class ScoreBoard extends Object {
 		
 		super.parse(data);
 	}
-	
-	public function getScores
+
+	/**
+	 * Fetches score data from the server, this removes all of the existing scores cached
+	 * 
+	 * We don't unify the old and new scores because a user's rank or score may change between requests
+	 */
+	public function requestScores
 	( limit :Int     = 10
 	, skip  :Int     = 0
-	, period:String  = null
+	, period:Period  = null
 	, social:Bool    = false
 	, tag   :String  = null
 	, user  :Dynamic = null
-	):Call<ScoreResult> {
+	):Void {
 		
-		return _core.calls.scoreBoard.getScores(id, limit, skip, period, social, tag, user);
+		_core.calls.scoreBoard.getScores(id, limit, skip, period, social, tag, user)
+			.addDataHandler(onScoresReceived)
+			.send();
 	}
 	
-	@:allow(ScoreBoardComponent)
-	function parseScores(scores:Array<Dynamic>):Void {
+	function onScoresReceived(response:Response<ScoreResult>):Void {
 		
-		scores = new Array<Score>();
+		if (!response.success || !response.result.success)
+			return;
 		
-		for (boardData in scores)
-			scores.push(new ScoreBoard(_core, boardData));
+		scores = response.result.data.scores;
+		_core.logVerbose('received ${scores.length} scores');
 		
-		_core.log('created ${scores.length} scores');
+		onUpdate.dispatch();
 	}
 	
-	public function postScore(value :Int, tag:String = null):Call<ResultBase> {
+	public function postScore(value :Int, tag:String = null):Void {
 		
-		return _core.calls.scoreBoard.postScore(id, value, tag);
+		_core.calls.scoreBoard.postScore(id, value, tag)
+			.addDataHandler(onScorePosted)
+			.send();
+	}
+	
+	function onScorePosted(response:Response<PostScoreResult>):Void {
+		
+		
 	}
 	
 	public function toString():String {

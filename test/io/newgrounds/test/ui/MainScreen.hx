@@ -95,5 +95,6 @@ class MainScreen extends Sprite {
 	function logOutput(msg:String, ?pos:PosInfos):Void {
 		
 		_output.appendText(msg + "\n");
+		_output.setSelection(_output.text.length, _output.text.length);
 	}
 }

@@ -36,6 +36,21 @@ class Page<T:Component> {
 		else
 			call.send();
 	}
+	
+	function fieldString(field:TextField):String {
+		
+		var text:String = Input.trimEndWhitespace(field.text);
+		
+		if (text == "")
+			return null;
+		
+		return text;
+	}
+	
+	function fieldInt(field:TextField):Int {
+		
+		return Std.parseInt(fieldString(field));
+	}
 }
 
 class AppPage extends Page<AppComponent> {
@@ -58,7 +73,7 @@ class AppPage extends Page<AppComponent> {
 		_checkSession      = new Button(target.checkSession     , function() { send(_calls.checkSession()); } );
 		_endSession        = new Button(target.endSession       , function() { send(_calls.endSession()); } );
 		_getHostLicense    = new Button(target.getHostLicense   , function() { send(_calls.getHostLicense()); } );
-		_getCurrentVersion = new Button(target.getCurrentVersion, function() { send(_calls.getCurrentVersion(_version.text)); } );
+		_getCurrentVersion = new Button(target.getCurrentVersion, function() { send(_calls.getCurrentVersion(fieldString(_version))); } );
 		_logView           = new Button(target.logView          , function() { send(_calls.logView()); } );
 	}
 }
@@ -71,7 +86,7 @@ class EventPage extends Page<EventComponent> {
 	public function new (target:EventPageSwf) {
 		super(NG.core.calls.event);
 		
-		_logEvent = new Button(target.logEvent, function () { send(_calls.logEvent(Input.trimEndWhitespace(_event.text))); });
+		_logEvent = new Button(target.logEvent, function () { send(_calls.logEvent(fieldString(_event))); });
 		_event = target.event;
 	}
 }
@@ -122,7 +137,7 @@ class MedalPage extends Page<MedalComponent> {
 		super(NG.core.calls.medal);
 		
 		_getList = new Button(target.getList, function () { send(_calls.getList()); } );
-		_unlock  = new Button(target.unlock , function () { send(_calls.unlock(Std.parseInt(_id.text))); } );
+		_unlock  = new Button(target.unlock , function () { send(_calls.unlock(fieldInt(_id))); } );
 		_id = target.id;
 	}
 }
@@ -160,20 +175,28 @@ class ScoreboardPage extends Page<ScoreBoardComponent> {
 				
 				send
 				( _calls.getScores
-					( Std.parseInt(_id.text)
-					, Std.parseInt(_limit.text)
-					, Std.parseInt(_skip.text)
-					, _period.text
+					( fieldInt(_id)
+					, fieldInt(_limit)
+					, fieldInt(_skip)
+					, fieldString(_period)
 					, _social.on
-					, _tag.text
-					, _user.text
+					, fieldString(_tag)
+					, fieldString(_user)
 					)
 				);
 			}
 		);
 		_postScore = new Button(target.postScore,
-			function () { send(_calls.postScore(Std.parseInt(_id.text), Std.parseInt(_value.text), _tag.text)); }
+			function () {
+				
+				send
+				( _calls.postScore
+					( fieldInt(_id)
+					, fieldInt(_value)
+					, fieldString(_tag)
+					)
+				);
+			}
 		);
-	
 	}
 }

@@ -14,3 +14,4 @@ TODO
      - ad viewer
  - better handling of auto login  on non-ng hosts
  - fix checkbox disabled state
+ - continuous integrations

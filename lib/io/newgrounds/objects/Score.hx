@@ -10,7 +10,7 @@ typedef Score = {
 	var tag:String;
 	
 	/** The user who earned value. If this property is absent, the value belongs to the active user. */
-	var user:Dynamic;
+	var user:User;
 	
 	/** The integer value of the value. */
 	var value:Int;

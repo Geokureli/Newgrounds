@@ -1,5 +1,6 @@
 package io.newgrounds.components;
 
+import io.newgrounds.objects.User;
 import io.newgrounds.objects.events.Response;
 import io.newgrounds.objects.events.Result;
 import io.newgrounds.objects.events.Result.ScoreBoardResult;
@@ -45,40 +46,35 @@ class ScoreBoardComponent extends Component {
 	( id    :Int
 	, limit :Int     = 10
 	, skip  :Int     = 0
-	, period:String  = null
+	, period:Period  = Period.DAY
 	, social:Bool    = false
 	, tag   :String  = null
 	, user  :Dynamic = null
 	):Call<ScoreResult> {
 		
+		if (!Std.is(user, String) && !Std.is(user, Int))
+			user = user.id;
+		
 		return new Call<ScoreResult>(_core, "ScoreBoard.getScores")
 			.addComponentParameter("id"    , id    )
-			.addComponentParameter("limit" , limit , 10   )
-			.addComponentParameter("skip"  , skip  , 0    )
-			.addComponentParameter("period", period, null )
+			.addComponentParameter("limit" , limit , 10)
+			.addComponentParameter("skip"  , skip  , 0)
+			.addComponentParameter("period", period, Period.DAY)
 			.addComponentParameter("social", social, false)
-			.addComponentParameter("tag"   , tag   , null )
-			.addComponentParameter("user"  , user  , null );
+			.addComponentParameter("tag"   , tag   , null)
+			.addComponentParameter("user"  , user  , null);
 	}
-	
-	/*function onScoresReceived(response:Response<ScoreResult>):Void {
-		
-		if (!response.result.success)
-			return;
-		
-		//createBoard(response.result.scoreboard).parseScores(response.result.scores);
-	}*/
 	
 	// -------------------------------------------------------------------------------------------
 	//                                       POST SCORE
 	// -------------------------------------------------------------------------------------------
 	
-	public function postScore(id:Int, value:Int, tag:String = null):Call<ResultBase> {
+	public function postScore(id:Int, value:Int, tag:String = null):Call<PostScoreResult> {
 		
-		return new Call<ResultBase>(_core, "ScoreBoard.postScore", true, true)
+		return new Call<PostScoreResult>(_core, "ScoreBoard.postScore", true, true)
 			.addComponentParameter("id"   , id)
 			.addComponentParameter("value", value)
-			.addComponentParameter("tag"  , tag);
+			.addComponentParameter("tag"  , tag  , null);
 	}
 	
 	/*function onScorePosted(response:Response<ResultBase>):Void {
@@ -100,4 +96,19 @@ class ScoreBoardComponent extends Component {
 		
 		return board;
 	}
+}
+
+@:enum 
+abstract Period(String) to String from String{
+	
+	/** Indicates scores are from the current day. */
+	var DAY = "D";
+	/** Indicates scores are from the current week. */
+	var WEEK = "W";
+	/** Indicates scores are from the current month. */
+	var MONTH = "M";
+	/** Indicates scores are from the current year. */
+	var YEAR = "Y";
+	/** Indicates scores are from all-time. */
+	var ALL = "A";
 }
