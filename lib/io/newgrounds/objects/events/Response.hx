@@ -19,7 +19,15 @@ class Response<T:ResultBase> {
 	
 	public function new (core:NGLite, reply:String) {
 		
-		var data = Json.parse(reply);
+		var data:Dynamic;
+		
+		try {
+			data = Json.parse(reply);
+			
+		} catch (e:Dynamic) {
+			
+			data = Json.parse('{"success":false,"error":{"message":"${Std.string(reply)}","code":0}}');
+		}
 		
 		success = data.success;
 		debug = data.debug;

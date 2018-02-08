@@ -96,6 +96,14 @@ typedef ScoreBoardResult = {
 typedef ScoreResult = {
 	> ResultBase,
 	
-	var scores:Array<Dynamic>;
+	var scores:Array<Score>;
 	var scoreboard:Dynamic;
+}
+
+typedef PostScoreResult = {
+	> ResultBase,
+	
+	var tag:String;
+	var scoreboard:Dynamic;
+	var score:Score;
 }

@@ -6,6 +6,7 @@ import io.newgrounds.utils.Dispatcher;
 import io.newgrounds.objects.Error;
 import io.newgrounds.objects.events.Result.SessionResult;
 import io.newgrounds.objects.events.Result.MedalListResult;
+import io.newgrounds.objects.events.Result.ScoreBoardResult;
 import io.newgrounds.objects.events.Response;
 import io.newgrounds.objects.User;
 import io.newgrounds.objects.Medal;
@@ -42,6 +43,7 @@ class NG extends NGLite {
 		return _session.user;
 	}
 	public var medals(default, null):IntMap<Medal>;
+	public var scoreBoards(default, null):IntMap<ScoreBoard>;
 	
 	// --- EVENTS
 	
@@ -56,7 +58,6 @@ class NG extends NGLite {
 	var _loginCancelled:Bool;
 	
 	var _session:Session;
-	var _scoreBoards:IntMap<ScoreBoard>;
 	
 	/** 
 	 * Iniitializes the API, call before utilizing any other component
@@ -265,6 +266,8 @@ class NG extends NGLite {
 		if (!response.success || !response.result.success)
 			return;
 		
+		var idList:Array<Int> = new Array<Int>();
+		
 		if (medals == null) {
 			
 			medals = new IntMap<Medal>();
@@ -273,16 +276,68 @@ class NG extends NGLite {
 				
 				var medal = new Medal(this, medalData);
 				medals.set(medal.id, medal);
+				idList.push(medal.id);
 			}
 		} else {
 			
 			for (medalData in response.result.data.medals) {
 				
 				medals.get(medalData.id).parse(medalData);
+				idList.push(medalData.id);
 			}
 		}
 		
-		logVerbose('${response.result.data.medals.length} Medals received');
+		logVerbose('${response.result.data.medals.length} Medals received [${idList.join(", ")}]');
+	}
+	
+	// -------------------------------------------------------------------------------------------
+	//                                       SCOREBOARDS
+	// -------------------------------------------------------------------------------------------
+	
+	public function requestScoreBoards(onSuccess:Void->Void = null, onFail:Error->Void = null):Void {
+		
+		if (scoreBoards != null) {
+			
+			log("aborting scoreboard request, all scoreboards are loaded");
+			
+			if (onSuccess != null)
+				onSuccess();
+			
+			return;
+		}
+		
+		var call = calls.scoreBoard.getBoards()
+			.addDataHandler(onBoardsReceived);
+		
+		if (onSuccess != null)
+			call.addSuccessHandler(onSuccess);
+		
+		if (onFail != null)
+			call.addErrorHandler(onFail);
+		
+		call.send();
+	}
+	
+	function onBoardsReceived(response:Response<ScoreBoardResult>):Void {
+		
+		if (!response.success || !response.result.success)
+			return;
+		
+		var idList:Array<Int> = new Array<Int>();
+		
+		if (scoreBoards == null) {
+			
+			scoreBoards = new IntMap<ScoreBoard>();
+			
+			for (boardData in response.result.data.scoreboards) {
+				
+				var board = new ScoreBoard(this, boardData);
+				scoreBoards.set(board.id, board);
+				idList.push(board.id);
+			}
+		}
+		
+		logVerbose('${response.result.data.scoreboards.length} ScoreBoards received [${idList.join(", ")}]');
 	}
 	
 	// -------------------------------------------------------------------------------------------
