@@ -5,40 +5,6 @@ import io.newgrounds.NGLite.EncryptionFormat;
 import haxe.crypto.Base64;
 import haxe.io.Bytes;
 
-class NgRc4 extends RC4_Internal {
-	
-	var _format:EncryptionFormat;
-	
-	public function new(key:String, format:EncryptionFormat) {
-		
-		_format = format;
-		
-		var keyBytes:Bytes;
-		if (_format == EncryptionFormat.BASE_64)
-			keyBytes = Base64.decode(key);
-		else {
-			
-			throw "hex format not yet implemented";
-			keyBytes = null;//TODO
-		}
-		
-		super(keyBytes);
-	}
-	
-	public function encrypt(data:String):String {
-		
-		var dataBytes = Bytes.ofString(data);
-		
-		dataBytes = crypt(dataBytes);
-		
-		if (_format == EncryptionFormat.BASE_64)
-			return Base64.encode(dataBytes);
-		
-		//TODO: HEX
-		return null;
-	}
-}
-
 /**
  * The following was straight-up ganked from https://github.com/iskolbin/rc4hx
  * 
@@ -66,7 +32,7 @@ class NgRc4 extends RC4_Internal {
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
 **/
-class RC4_Internal {
+class Rc4 {
 	var perm = Bytes.alloc( 256 );
 	var index1: Int = 0;
 	var index2: Int = 0;
