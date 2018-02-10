@@ -1,10 +1,7 @@
 package io.newgrounds.test.ui;
 
-import io.newgrounds.components.ScoreBoardComponent.Period;
-import haxe.xml.Check;
-import haxe.ds.StringMap;
 import haxe.ds.IntMap;
-import io.newgrounds.objects.ScoreBoard;
+
 import flash.Lib;
 
 import io.newgrounds.test.art.ScoreBoardListSwf;
@@ -15,7 +12,9 @@ import io.newgrounds.test.art.CorePageSwf;
 import io.newgrounds.test.art.MedalSwf;
 import io.newgrounds.objects.Error;
 import io.newgrounds.objects.Medal;
+import io.newgrounds.objects.ScoreBoard;
 import io.newgrounds.components.Component;
+import io.newgrounds.components.ScoreBoardComponent.Period;
 
 import openfl.net.URLRequest;
 import openfl.display.Loader;
@@ -151,6 +150,7 @@ class CorePage extends CorePageLite {
 		
 		_loadMedals.onClick = loadMedals;
 		_medalList.info.text = DEFAULT_MEDAL_INFO;
+		NG.core.onMedalsLoaded.add(onMedalsLoaded);
 	}
 	
 	function loadMedals():Void {
@@ -158,7 +158,7 @@ class CorePage extends CorePageLite {
 		_medalList.visible = true;
 		_medalList.loading.visible = true;
 		
-		NG.core.requestMedals(onMedalsLoaded);
+		NG.core.requestMedals();
 	}
 	
 	function onMedalsLoaded():Void {

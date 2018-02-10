@@ -30,6 +30,7 @@ import openfl.utils.Timer;
 class NG extends NGLite {
 	
 	static public var core(default, null):NG;
+	static public var onCoreReady(default, null):Dispatcher = new Dispatcher();
 	
 	// --- DATA
 	
@@ -49,6 +50,8 @@ class NG extends NGLite {
 	
 	public var onLogin(default, null):Dispatcher;
 	public var onLogOut(default, null):Dispatcher;
+	public var onMedalsLoaded(default, null):Dispatcher;
+	public var onScoreBoardsLoaded(default, null):Dispatcher;
 	
 	// --- MISC
 	
@@ -69,6 +72,8 @@ class NG extends NGLite {
 		_session = new Session(this);
 		onLogin = new Dispatcher();
 		onLogOut = new Dispatcher();
+		onMedalsLoaded = new Dispatcher();
+		onScoreBoardsLoaded = new Dispatcher();
 		
 		super(appId, sessionId);
 	}
@@ -288,6 +293,8 @@ class NG extends NGLite {
 		}
 		
 		logVerbose('${response.result.data.medals.length} Medals received [${idList.join(", ")}]');
+		
+		onMedalsLoaded.dispatch();
 	}
 	
 	// -------------------------------------------------------------------------------------------
@@ -338,6 +345,8 @@ class NG extends NGLite {
 		}
 		
 		logVerbose('${response.result.data.scoreboards.length} ScoreBoards received [${idList.join(", ")}]');
+		
+		onScoreBoardsLoaded.dispatch();
 	}
 	
 	// -------------------------------------------------------------------------------------------

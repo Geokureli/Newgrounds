@@ -1,4 +1,4 @@
-package;
+package io.newgrounds.test;
 
 import io.newgrounds.NG;
 import io.newgrounds.NGLite.EncryptionCipher;
@@ -11,7 +11,6 @@ import io.newgrounds.test.ui.MainScreen;
 import io.newgrounds.test.ui.Page;
 import io.newgrounds.test.ui.Button;
 
-import openfl.events.Event;
 import openfl.display.Stage;
 import openfl.display.Sprite;
 import openfl.text.TextField;
