@@ -28,10 +28,12 @@ class MedalPopup extends MovieClip {
 	public function new() {
 		super();
 		
+		#if !ng_lite
 		if (stage != null)
 			onAdded(null);
 		else
 			addEventListener(Event.ADDED_TO_STAGE, onAdded);
+		#end
 		
 		mouseEnabled = false;
 		mouseChildren = false;
@@ -46,19 +48,15 @@ class MedalPopup extends MovieClip {
 		gotoAndStop(FRAME_HIDDEN);
 	}
 	
+	#if !ng_lite
 	function onAdded(e:Event):Void {
 		
-		#if ng_lite
-		NG.core.logError("Medal popup does not work with ng_lite");
-		#else
 		if (NG.core != null)
 			onReady();
 		else
 			NG.onCoreReady.add(onReady);
-		#end
 	}
 	
-	#if !ng_lite
 	function onReady():Void {
 		
 		if (NG.core.medals != null)

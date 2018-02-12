@@ -488,7 +488,7 @@ class CorePageLite extends Page<Component> {
 		_loadMedals.enabled = false;
 		_loadBoards.enabled = false;
 		_user.backgroundColor = 0xCCCCCC;
-		_user.text = "Note: this page is mostly deactivated but you're using ng_lite";
+		_user.text = "Note: this page is mostly deactivated because you're using ng_lite";
 		#end
 	}
 	
