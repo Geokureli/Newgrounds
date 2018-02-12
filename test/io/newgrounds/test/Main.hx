@@ -60,8 +60,6 @@ class IntroPage extends Page<Component> {
 		_sessionId = target.sessionId;
 		_start = new Button(target.start, onStartClick);
 		
-		
-		
 		#if ng_lite
 		target.autoConnect.gotoAndStop("disabled");
 		target.autoConnect.getChildByName("check").visible = false;
