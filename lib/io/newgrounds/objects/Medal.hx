@@ -1,5 +1,7 @@
 package io.newgrounds.objects;
 
+import io.newgrounds.objects.events.Response;
+import io.newgrounds.objects.events.Result.MedalUnlockResult;
 import io.newgrounds.utils.Dispatcher;
 import io.newgrounds.NGLite;
 
@@ -54,12 +56,44 @@ class Medal extends Object {
 		
 		if (!unlocked && data.unlocked)
 			onUnlock.dispatch();
+		
 	}
 	
 	public function sendUnlock():Void {
 		
 		_core.calls.medal.unlock(id)
+			.addDataHandler(onUnlockResponse)
 			.send();
+	}
+	
+	function onUnlockResponse(response:Response<MedalUnlockResult>):Void {
+		
+		if (response.success && response.result.success) {
+			
+			parse(response.result.data.medal);
+			
+			// --- Unlock response doesn't include unlock=true, so parse won't change it.
+			if (!unlocked) {
+				
+				unlocked = true;
+				onUnlock.dispatch();
+			}
+		}
+	}
+	
+	/** Locks the medal on the client and sends an unlock request, Server responds the same either way. */ 
+	public function sendDebugUnlock():Void {
+		
+		if (NG.core.sessionId == null) {
+			
+			onUnlock.dispatch();
+			
+		} else {
+			
+			unlocked = false;
+			
+			sendUnlock();
+		}
 	}
 	
 	public function get_difficultyName():String {

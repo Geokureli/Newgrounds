@@ -163,6 +163,7 @@ class CorePage extends CorePageLite {
 	
 	function onMedalsLoaded():Void {
 		
+		_medalList.visible = true;
 		_medalList.loading.visible = false;
 		
 		if (_displayMedals == null)
@@ -187,7 +188,12 @@ class CorePage extends CorePageLite {
 			
 			_displayMedals.set(medal, medalData);
 			
-			new Button(medal, function () { medalData.sendUnlock(); }, showMedalInfo.bind(medalData), hideMedalInfo);
+			new Button
+				( medal
+				, medalData.sendDebugUnlock
+				, showMedalInfo.bind(medalData)
+				, hideMedalInfo
+				);
 			medalData.onUnlock.add(updateDisplayMedal.bind(medal));
 			
 			updateDisplayMedal(medal);

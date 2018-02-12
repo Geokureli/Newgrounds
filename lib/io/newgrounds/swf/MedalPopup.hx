@@ -2,77 +2,152 @@ package io.newgrounds.swf;
 
 import io.newgrounds.objects.Medal;
 
+import openfl.text.TextFieldAutoSize;
+import openfl.text.TextField;
+import openfl.display.DisplayObject;
 import openfl.display.Loader;
+import openfl.display.MovieClip;
 import openfl.net.URLRequest;
 import openfl.events.Event;
-import openfl.display.MovieClip;
 
 class MedalPopup extends MovieClip {
-    
-    static inline var FRAME_HIDDEN:String = "hidden";
-    static inline var FRAME_MEDAL_UNLOCKED:String = "medalUnlocked";
-    
-    public var medalIcon(default, null):MovieClip;
-    
-    var _animQueue:Array<Medal>;
-    
-    public function new() {
-        super();
-        
-        if (stage != null)
-            onAdded(null);
-        else
-            addEventListener(Event.ADDED_TO_STAGE, onAdded);
-        
-        gotoAndStop(FRAME_HIDDEN);
-        addFrameScript(totalFrames, onUnlockAnimComplete);
-    }
-    
-    function onAdded(e:Event):Void{
-        
-        if (NG.core.medals != null)
-            onMedalsLoaded();
-        else
-            NG.core.onLogin.addOnce(NG.core.requestMedals.bind(onMedalsLoaded));
-    }
-    
-    function onMedalsLoaded():Void {
-        
-        for (medal in NG.core.medals)
-            medal.onUnlock.addOnce(onMedalOnlock.bind(medal));
-    }
-    
-    function onMedalOnlock(medal:Medal):Void {
-        
-        _animQueue.push(medal);
-        
-        if (currentLabel == FRAME_HIDDEN)
-            showNextAnim();
-    }
-    
-    function showNextAnim():Void{
-        
-        visible = true;
-        gotoAndPlay(FRAME_MEDAL_UNLOCKED);
-        
-        var loader = new Loader();
-        medalIcon.addChild(loader);
-        loader.load(new URLRequest(_animQueue.shift().icon));
-    }
-    
-    function onUnlockAnimComplete():Void {
-        
-        medalIcon.removeChildAt(0);
-        
-        if (_animQueue.length == 0)
-            hide();
-        else 
-            showNextAnim();
-    }
-    
-    function hide():Void {
-        
-        visible = false;
-        gotoAndStop(FRAME_HIDDEN);
-    }
+	
+	static inline var FRAME_HIDDEN:String = "hidden";
+	static inline var FRAME_MEDAL_UNLOCKED:String = "medalUnlocked";
+	static inline var FRAME_INTRO_COMPLETE:String = "introComplete";
+	static inline var FRAME_UNLOCK_COMPLETE:String = "unlockComplete";
+	static inline var MIN_TEXT_SIZE:Int = 12;
+	
+	public var medalIcon(default, null):MovieClip;
+	public var medalName(default, null):MovieClip;
+	public var medalPoints(default, null):MovieClip;
+	
+	var _animQueue = new Array<Void->Void>();
+	var _scrollSpeed:Float;
+	
+	public function new() {
+		super();
+		
+		if (stage != null)
+			onAdded(null);
+		else
+			addEventListener(Event.ADDED_TO_STAGE, onAdded);
+		
+		mouseEnabled = false;
+		mouseChildren = false;
+		
+		hide();
+		addFrameScript(totalFrames - 1, onUnlockAnimComplete);
+	}
+	
+	function hide():Void {
+		
+		visible = false;
+		gotoAndStop(FRAME_HIDDEN);
+	}
+	
+	function onAdded(e:Event):Void {
+		
+		#if ng_lite
+		NG.core.logError("Medal popup does not work with ng_lite");
+		#else
+		if (NG.core != null)
+			onReady();
+		else
+			NG.onCoreReady.add(onReady);
+		#end
+	}
+	
+	#if !ng_lite
+	function onReady():Void {
+		
+		if (NG.core.medals != null)
+			onMedalsLoaded();
+		else
+			NG.core.onLogin.addOnce(NG.core.requestMedals.bind(onMedalsLoaded));
+	}
+	
+	function onMedalsLoaded():Void {
+		
+		for (medal in NG.core.medals)
+			medal.onUnlock.add(onMedalOnlock.bind(medal));
+	}
+	
+	function onMedalOnlock(medal:Medal):Void {
+		
+		var loader = new Loader();
+		loader.load(new URLRequest(medal.icon));
+		
+		playAnim(loader, medal.name, medal.value);
+	}
+	
+	#end
+	
+	public function playAnim(icon:DisplayObject, name:String, value:Int):Void {
+		
+		if (currentLabel == FRAME_HIDDEN)
+			playNextAnim(icon, name, value);
+		else
+			_animQueue.push(playNextAnim.bind(icon, name, value));
+	}
+	
+	function playNextAnim(icon:DisplayObject, name:String, value:Int):Void {
+		
+		visible = true;
+		gotoAndPlay(FRAME_MEDAL_UNLOCKED);
+		
+		while(medalIcon.numChildren > 0)
+			medalIcon.removeChildAt(0);
+		
+		cast(medalPoints.getChildByName("field"), TextField).text = Std.string(value);
+		
+		var field:TextField = cast medalName.getChildByName("field");
+		field.autoSize = TextFieldAutoSize.LEFT;
+		field.x = 0;
+		field.text = "";
+		var oldWidth = medalName.width;
+		field.text = name;
+		
+		_scrollSpeed = 0;
+		if (field.width > oldWidth + 4) {
+			
+			field.x = oldWidth + 4;
+			initScroll(field);
+		}
+		
+		medalIcon.addChild(icon);
+	}
+	
+	function initScroll(field:TextField):Void {
+		//TODO: Find out why scrollrect didn't work
+		
+		var animDuration = 0;
+		
+		for (frame in currentLabels){
+			
+			if (frame.name == FRAME_INTRO_COMPLETE )
+				animDuration -= frame.frame;
+			else if (frame.name == FRAME_UNLOCK_COMPLETE)
+				animDuration += frame.frame;
+		}
+		
+		_scrollSpeed = (field.width + field.x + 4) / animDuration;
+		field.addEventListener(Event.ENTER_FRAME, updateScroll);
+	}
+	
+	function updateScroll(e:Event):Void{
+		
+		if (currentLabel == FRAME_INTRO_COMPLETE)
+			cast (e.currentTarget, TextField).x -= _scrollSpeed;
+	}
+	
+	function onUnlockAnimComplete():Void {
+		
+		cast (medalName.getChildByName("field"), TextField).removeEventListener(Event.ENTER_FRAME, updateScroll);
+		
+		if (_animQueue.length == 0)
+			hide();
+		else
+			(_animQueue.shift())();
+	}
 }
