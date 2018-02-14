@@ -9,7 +9,7 @@ import io.newgrounds.test.ui.CheckBox;
 import io.newgrounds.test.art.IntroScreenSwf;
 import io.newgrounds.test.ui.MainScreen;
 import io.newgrounds.test.ui.Page;
-import io.newgrounds.test.ui.Button;
+import io.newgrounds.swf.common.Button;
 
 import openfl.display.Stage;
 import openfl.display.Sprite;

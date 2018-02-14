@@ -1,5 +1,7 @@
-package io.newgrounds.test.ui;
+package io.newgrounds.swf.common;
 
+import openfl.display.Stage;
+import openfl.events.Event;
 import openfl.events.MouseEvent;
 import openfl.display.MovieClip;
 
@@ -39,15 +41,38 @@ class Button {
 		for (label in _target.currentLabels)
 			_foundLabels.push(label.name);
 		
-		_target.stage.addEventListener(MouseEvent.MOUSE_UP, mouseHandler);
+		_target.stop();
+		_target.addEventListener(Event.ADDED_TO_STAGE, onAdded);
+		if (target.stage != null)
+			onAdded(null);
+		
+		enabled = true;
+	}
+	
+	function onAdded(e:Event):Void {
+		
+		var stage = _target.stage;
+		stage.addEventListener(MouseEvent.MOUSE_UP, mouseHandler);
 		_target.addEventListener(MouseEvent.MOUSE_OVER, mouseHandler);
 		_target.addEventListener(MouseEvent.MOUSE_OUT, mouseHandler);
 		_target.addEventListener(MouseEvent.MOUSE_DOWN, mouseHandler);
 		_target.addEventListener(MouseEvent.CLICK, mouseHandler);
 		
-		_target.stop();
+		function selfRemoveEvent(e:Event):Void {
+			
+			_target.removeEventListener(Event.REMOVED_FROM_STAGE, selfRemoveEvent);
+			onRemove(e, stage);
+		}
+		_target.addEventListener(Event.REMOVED_FROM_STAGE, selfRemoveEvent);
+	}
+	
+	function onRemove(e:Event, stage:Stage):Void {
 		
-		enabled = true;
+		stage.removeEventListener(MouseEvent.MOUSE_UP, mouseHandler);
+		_target.removeEventListener(MouseEvent.MOUSE_OVER, mouseHandler);
+		_target.removeEventListener(MouseEvent.MOUSE_OUT, mouseHandler);
+		_target.removeEventListener(MouseEvent.MOUSE_DOWN, mouseHandler);
+		_target.removeEventListener(MouseEvent.CLICK, mouseHandler);
 	}
 	
 	function mouseHandler(event:MouseEvent):Void {
@@ -115,24 +140,12 @@ class Button {
 	
 	public function destroy():Void {
 		
-		_target.stage.removeEventListener(MouseEvent.MOUSE_UP, mouseHandler);
-		_target.removeEventListener(MouseEvent.MOUSE_OVER, mouseHandler);
-		_target.removeEventListener(MouseEvent.MOUSE_OUT, mouseHandler);
-		_target.removeEventListener(MouseEvent.MOUSE_DOWN, mouseHandler);
-		_target.removeEventListener(MouseEvent.CLICK, mouseHandler);
+		_target.removeEventListener(Event.ADDED_TO_STAGE, onAdded);
 		
 		_target = null;
 		onClick = null;
 		onOver = null;
 		onOut = null;
 		_foundLabels = null;
-	}
-	
-	static public function caster(onClick:Void->Void):MovieClip->Button {
-		
-		return function (target:MovieClip):Button {
-			
-			return new Button(target, onClick);
-		}
 	}
 }

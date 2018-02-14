@@ -1,5 +1,6 @@
 package io.newgrounds.swf;
 
+import io.newgrounds.swf.common.BaseAsset;
 import io.newgrounds.objects.Medal;
 
 import openfl.text.TextFieldAutoSize;
@@ -10,7 +11,7 @@ import openfl.display.MovieClip;
 import openfl.net.URLRequest;
 import openfl.events.Event;
 
-class MedalPopup extends MovieClip {
+class MedalPopup extends BaseAsset {
 	
 	static inline var FRAME_HIDDEN:String = "hidden";
 	static inline var FRAME_MEDAL_UNLOCKED:String = "medalUnlocked";
@@ -22,18 +23,13 @@ class MedalPopup extends MovieClip {
 	public var medalName(default, null):MovieClip;
 	public var medalPoints(default, null):MovieClip;
 	
+	public var alwaysOnTop:Bool;
+	
 	var _animQueue = new Array<Void->Void>();
 	var _scrollSpeed:Float;
 	
 	public function new() {
 		super();
-		
-		#if !ng_lite
-		if (stage != null)
-			onAdded(null);
-		else
-			addEventListener(Event.ADDED_TO_STAGE, onAdded);
-		#end
 		
 		mouseEnabled = false;
 		mouseChildren = false;
@@ -49,15 +45,8 @@ class MedalPopup extends MovieClip {
 	}
 	
 	#if !ng_lite
-	function onAdded(e:Event):Void {
-		
-		if (NG.core != null)
-			onReady();
-		else
-			NG.onCoreReady.add(onReady);
-	}
-	
-	function onReady():Void {
+	override function onReady():Void {
+		super.onReady();
 		
 		if (NG.core.medals != null)
 			onMedalsLoaded();
@@ -93,6 +82,11 @@ class MedalPopup extends MovieClip {
 		
 		visible = true;
 		gotoAndPlay(FRAME_MEDAL_UNLOCKED);
+		
+		if (alwaysOnTop && parent != null) {
+			
+			parent.setChildIndex(this, parent.numChildren - 1);
+		}
 		
 		while(medalIcon.numChildren > 0)
 			medalIcon.removeChildAt(0);

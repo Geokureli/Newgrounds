@@ -85,6 +85,8 @@ class NG extends NGLite {
 	static public function create(appId:String = "test", sessionId:String = null):Void {
 		
 		core = new NG(appId, sessionId);
+		
+		onCoreReady.dispatch();
 	}
 	
 	/**

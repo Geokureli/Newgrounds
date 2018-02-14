@@ -1,5 +1,6 @@
 package io.newgrounds.test.ui;
 
+import openfl.events.TextEvent;
 import openfl.events.Event;
 import openfl.text.TextField;
 
@@ -21,6 +22,7 @@ class Input {
 		this.trimMethod = trimMethod;
 		
 		_target.addEventListener(Event.CHANGE, handleChange);
+		// TODO: track focus events to reduce calls
 		
 		trim();
 	}

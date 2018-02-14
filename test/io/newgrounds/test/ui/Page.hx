@@ -1,7 +1,10 @@
 package io.newgrounds.test.ui;
 
+import io.newgrounds.swf.common.Button;
+import io.newgrounds.swf.ScoreBrowser;
 import io.newgrounds.Call.ICallable;
 import io.newgrounds.test.art.AppPageSwf;
+import io.newgrounds.test.art.AssetsPageSwf;
 import io.newgrounds.test.art.ScoreboardPageSwf;
 import io.newgrounds.test.art.MedalPageSwf;
 import io.newgrounds.test.art.LoaderPageSwf;
@@ -50,6 +53,17 @@ class Page<T:Component> {
 	function fieldInt(field:TextField):Int {
 		
 		return Std.parseInt(fieldString(field));
+	}
+}
+
+class AssetsPage extends Page<Component> {
+	
+	var _scoreBoard:ScoreBrowser;
+	
+	public function new (target:AssetsPageSwf) {
+		super(null);
+		
+		_scoreBoard = cast target.scoreBrowser;
 	}
 }
 
