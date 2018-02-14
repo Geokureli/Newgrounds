@@ -7,8 +7,7 @@ TODO
  - flash ads?
  - kill all humans
  - flash API assets
-     - auto connecter
-     - score board
+     - auto connector
      - ad viewer
  - better handling of auto login  on non-ng hosts
  - fix checkbox disabled state
