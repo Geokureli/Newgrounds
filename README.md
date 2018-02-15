@@ -12,7 +12,8 @@ just use git...
 
 ## Implement an instance of io.newgrounds.core into your game:
 
-**OpenFL:** add `<haxelib name="newgrounds" />` to your project.xml
+**OpenFL:** add `<haxelib name="newgrounds" />` to your project.xml (not implemented). 
+You can also just include the local library in your xml via `<classpath path="../[libr path]/Newgrounds/lib" />`
 
 If you don't want to include openfl in your project, or you just hate my shitty core helpers, 
 you can enable the compiler flag `ng_lite`. and it removes all openfl dependencies, 
