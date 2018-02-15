@@ -3,14 +3,14 @@
 Before using this library make sure you have read the 
 <a href="http://www.newgrounds.io/">Introduction to Newgrounds.io</a>!
 
-####Installing the library
+#### Installing the library
 
 **using haxelib:** (not implemented yet)
 `haxelib install newgrounds`
 
 just use git...
 
-####Implement an instance of io.newgrounds.core into your game:
+#### Implement an instance of io.newgrounds.core into your game:
 
 **OpenFL:** add `<haxelib name="newgrounds" />` to your project.xml
 
@@ -32,14 +32,13 @@ Once the core is created you can access it via NG.core but this is not possible 
 
 If no session ID was found, you will need to start one.
 
-`if (NG.core.loggedIn == false) { NG.core.requestLogin(onSuccess); }`
+```
+if (NG.core.loggedIn == false)
+    NG.core.requestLogin(function():Void { trace("logged on"): });
+```
 
-`testCode():Void {
-    doStuff();
-}`
 
-
-####Using fla assets
+#### Using fla assets
 If your project already uses a .swf you can add them to your .fla 
 and they will automatically listen to your core for events. 
 You can also instantiate them in code. These assets work with ng_lite enabled (with caveats)
@@ -62,7 +61,7 @@ it has the following public properties
 
 
 
-TODO
+## TODO
  - better readme.md
  - AES-128 encryption
  - Hex encoding
