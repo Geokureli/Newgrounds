@@ -93,7 +93,30 @@ it has the following public properties
  - **tag:** A tag to filter results by
  - **social:** Whether to only list scores by the user and their friends, defaults to false
 
-## Unlocking Medals 
+## Using Core Objects
+Using core methods will cause the core to automatically keep track of server data in the underlying calls. 
+much like how `NG.core.requestLogin()` stores the resulting sessionId for future calls, Medal and Scoreboard 
+data is maintained from NG.core methods, but not direct `NG.core.calls` 
+
+### Medals 
+Use `NG.core.requestMedals()` to populate `NG.core.medals`, once Medal objects are created 
+you can interface with them directly. For instance: 
+```
+var medal =  NG.core.medals.get(id);
+trace('${medal.name} is worth ${medal.value}');
+
+if (!medal.unlocked) {
+    
+    medal.onUnlock.add(function ():Void { trace('${medal.name} unlocked:${medal.unlocked}'); });
+    medal.unlock();
+}
+```
+
+### ScoreBoards
+Just like Medals `NG.core.scoreBoards` is auto populated from `NG.core.requestScoreBoards` 
+which allows you make postScore and getScores calls directly on the board.
+
+**Note:** ScoreBoard instances persist across multiple requestScoreBoards calls, but a ScoreBoard's score instances do not
 
 ## Calling Components and Handling Results
 You can talk to the NG.io server directly, but NG.core won't automatically handle 
