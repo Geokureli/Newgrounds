@@ -164,7 +164,7 @@ class NGLite {
     // -------------------------------------------------------------------------------------------
 	
 	/** Sets */
-	public function setDefaultEncryptionHandler
+	public function initEncryption
 	( key   :String
 	, cipher:EncryptionCipher = EncryptionCipher.RC4
 	, format:EncryptionFormat = EncryptionFormat.BASE_64
