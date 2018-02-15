@@ -34,7 +34,7 @@ class ScoreBoard extends Object {
 	public function requestScores
 	( limit :Int     = 10
 	, skip  :Int     = 0
-	, period:Period  = null
+	, period:Period  = Period.ALL
 	, social:Bool    = false
 	, tag   :String  = null
 	, user  :Dynamic = null

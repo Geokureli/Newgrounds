@@ -1,5 +1,6 @@
 package io.newgrounds;
 
+import io.newgrounds.utils.Dispatcher;
 import haxe.crypto.Base64;
 import haxe.io.Bytes;
 import io.newgrounds.crypto.Rc4;
@@ -24,6 +25,7 @@ import haxe.Json;
 class NGLite {
 	
 	static public var core(default, null):NGLite;
+	static public var onCoreReady(default, null):Dispatcher = new Dispatcher();
 	
 	/** Enables verbose logging */
 	public var verbose:Bool;
@@ -83,6 +85,8 @@ class NGLite {
 	static public function create(appId:String = "test", sessionId:String = null):Void {
 		
 		core = new NGLite(appId, sessionId);
+		
+		onCoreReady.dispatch();
 	}
 	
 	// -------------------------------------------------------------------------------------------
@@ -160,7 +164,7 @@ class NGLite {
     // -------------------------------------------------------------------------------------------
 	
 	/** Sets */
-	public function setDefaultEncryptionHandler
+	public function initEncryption
 	( key   :String
 	, cipher:EncryptionCipher = EncryptionCipher.RC4
 	, format:EncryptionFormat = EncryptionFormat.BASE_64

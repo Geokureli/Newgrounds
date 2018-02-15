@@ -1,14 +1,13 @@
-package io.newgrounds.test.ui;
+package io.newgrounds.swf.common;
+
 
 import haxe.ds.StringMap;
+
+import openfl.display.MovieClip;
 import openfl.display.Sprite;
 import openfl.text.TextField;
-import io.newgrounds.test.art.DropDownItemSwf;
-import io.newgrounds.test.art.DropDownSwf;
 
 class DropDown {
-	
-	inline static var SPACING:Int = 20;
 	
 	public var value(default, set):String;
 	function set_value(v:String):String {
@@ -26,35 +25,50 @@ class DropDown {
 	}
 	
 	var _choiceContainer:Sprite;
-	var _button:Button;
 	var _selectedLabel:TextField;
 	var _onChange:Void->Void;
 	var _values:StringMap<String>;
+	var _unusedChoices:Array<MovieClip>;
 	
-	public function new(target:DropDownSwf, label:String = "", onChange:Void->Void = null) {
+	public function new(target:MovieClip, label:String = "", onChange:Void->Void = null) {
 		
 		_onChange = onChange;
 		
-		_selectedLabel = target.label;
+		_selectedLabel = cast cast(target.getChildByName("currentItem"), MovieClip).getChildByName("label");
 		_selectedLabel.text = label;
 		
 		_values = new StringMap<String>();
 		
-		_button = new Button(target.button, onClickExpand);
-		_selectedLabel = target.label;
+		new Button(cast target.getChildByName("button"), onClickExpand);
+		new Button(cast target.getChildByName("currentItem"), onClickExpand);
 		_choiceContainer = new Sprite();
-		//_choiceContainer.y = SPACING;
 		_choiceContainer.visible = false;
 		target.addChild(_choiceContainer);
+		
+		_unusedChoices = new Array<MovieClip>();
+		while(true) {
+			
+			var item:MovieClip = cast target.getChildByName('item${_unusedChoices.length}');
+			if (item == null)
+				break;
+			
+			target.removeChild(item);
+			_unusedChoices.push(item);
+		}
 	}
 	
 	public function addItem(name:String, value:String):Void {
 		
 		_values.set(value, name);
 		
-		var button = new DropDownItemSwf();
-		button.label.text = name;
-		button.y = (_choiceContainer.numChildren + 1) * -SPACING;
+		if (_unusedChoices.length == 0) {
+			
+			NG.core.logError('cannot create another dropBox item max=${_choiceContainer.numChildren}');
+			return;
+		}
+		
+		var button = _unusedChoices.shift();
+		cast(button.getChildByName("label"), TextField).text = name;
 		_choiceContainer.addChild(button);
 		
 		new Button(button, onChoiceClick.bind(value));
@@ -65,7 +79,7 @@ class DropDown {
 		_choiceContainer.visible = !_choiceContainer.visible;
 	}
 	
-	function onChoiceClick(name:String):Void{
+	function onChoiceClick(name:String):Void {
 		
 		value = name;
 		

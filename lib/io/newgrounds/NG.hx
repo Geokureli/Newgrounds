@@ -30,6 +30,7 @@ import openfl.utils.Timer;
 class NG extends NGLite {
 	
 	static public var core(default, null):NG;
+	static public var onCoreReady(default, null):Dispatcher = new Dispatcher();
 	
 	// --- DATA
 	
@@ -49,6 +50,8 @@ class NG extends NGLite {
 	
 	public var onLogin(default, null):Dispatcher;
 	public var onLogOut(default, null):Dispatcher;
+	public var onMedalsLoaded(default, null):Dispatcher;
+	public var onScoreBoardsLoaded(default, null):Dispatcher;
 	
 	// --- MISC
 	
@@ -69,6 +72,8 @@ class NG extends NGLite {
 		_session = new Session(this);
 		onLogin = new Dispatcher();
 		onLogOut = new Dispatcher();
+		onMedalsLoaded = new Dispatcher();
+		onScoreBoardsLoaded = new Dispatcher();
 		
 		super(appId, sessionId);
 	}
@@ -80,13 +85,15 @@ class NG extends NGLite {
 	static public function create(appId:String = "test", sessionId:String = null):Void {
 		
 		core = new NG(appId, sessionId);
+		
+		onCoreReady.dispatch();
 	}
 	
 	/**
 	 * Creates NG.core, and tries to create a session. This is not the only way to create an instance,
 	 * nor is NG a forced singleton, but it's the only way to set the static NG.core.
 	**/
-	static public function createAndCheckLoaderVars(stage:Stage, appId:String = "test"):Void {
+	static public function createAndCheckSession(stage:Stage, appId:String = "test"):Void {
 		
 		var sessionId = getSessionId(stage);
 		create(appId, sessionId);
@@ -182,6 +189,7 @@ class NG extends NGLite {
 		
 		if (_session.status == SessionStatus.USER_LOADED) {
 			
+			loggedIn = true;
 			endLoginAndCall(onSucceess);
 			onLogin.dispatch();
 			
@@ -288,6 +296,8 @@ class NG extends NGLite {
 		}
 		
 		logVerbose('${response.result.data.medals.length} Medals received [${idList.join(", ")}]');
+		
+		onMedalsLoaded.dispatch();
 	}
 	
 	// -------------------------------------------------------------------------------------------
@@ -338,6 +348,8 @@ class NG extends NGLite {
 		}
 		
 		logVerbose('${response.result.data.scoreboards.length} ScoreBoards received [${idList.join(", ")}]');
+		
+		onScoreBoardsLoaded.dispatch();
 	}
 	
 	// -------------------------------------------------------------------------------------------

@@ -1,10 +1,9 @@
 package io.newgrounds.test.ui;
 
 import io.newgrounds.components.ScoreBoardComponent.Period;
-import haxe.xml.Check;
-import haxe.ds.StringMap;
+import io.newgrounds.test.swf.ScoreBrowserSlim;
 import haxe.ds.IntMap;
-import io.newgrounds.objects.ScoreBoard;
+
 import flash.Lib;
 
 import io.newgrounds.test.art.ScoreBoardListSwf;
@@ -13,8 +12,11 @@ import io.newgrounds.test.art.ProfileSwf;
 import io.newgrounds.test.art.MedalListSwf;
 import io.newgrounds.test.art.CorePageSwf;
 import io.newgrounds.test.art.MedalSwf;
+
+import io.newgrounds.swf.common.Button;
 import io.newgrounds.objects.Error;
 import io.newgrounds.objects.Medal;
+import io.newgrounds.objects.ScoreBoard;
 import io.newgrounds.components.Component;
 
 import openfl.net.URLRequest;
@@ -27,10 +29,8 @@ typedef CorePage = CorePageLite;
 #else
 class CorePage extends CorePageLite {
 	
-	inline static var DEFAULT_MEDAL_INFO:String = "Roll over a medal for more info, click to unlock.";
-	
-	var _boardPages:IntMap<Int>;
-	var _currentBoard:Int;
+	inline static var MEDAL_INFO_LOGGED_IN:String = "Roll over a medal for more info, click to unlock.";
+	inline static var MEDAL_INFO_LOGGED_OUT:String = "Roll over a medal for more info, login to enable unlocking.";
 	
 	var _displayMedals:Map<MedalSwf, Medal>;
 	
@@ -150,7 +150,8 @@ class CorePage extends CorePageLite {
 	inline function initMedals():Void {
 		
 		_loadMedals.onClick = loadMedals;
-		_medalList.info.text = DEFAULT_MEDAL_INFO;
+		hideMedalInfo();
+		NG.core.onMedalsLoaded.add(onMedalsLoaded);
 	}
 	
 	function loadMedals():Void {
@@ -158,11 +159,12 @@ class CorePage extends CorePageLite {
 		_medalList.visible = true;
 		_medalList.loading.visible = true;
 		
-		NG.core.requestMedals(onMedalsLoaded);
+		NG.core.requestMedals();
 	}
 	
 	function onMedalsLoaded():Void {
 		
+		_medalList.visible = true;
 		_medalList.loading.visible = false;
 		
 		if (_displayMedals == null)
@@ -187,7 +189,12 @@ class CorePage extends CorePageLite {
 			
 			_displayMedals.set(medal, medalData);
 			
-			new Button(medal, function () { medalData.sendUnlock(); }, showMedalInfo.bind(medalData), hideMedalInfo);
+			new Button
+				( medal
+				, medalData.sendDebugUnlock
+				, showMedalInfo.bind(medalData)
+				, hideMedalInfo
+				);
 			medalData.onUnlock.add(updateDisplayMedal.bind(medal));
 			
 			updateDisplayMedal(medal);
@@ -216,49 +223,26 @@ class CorePage extends CorePageLite {
 	
 	function hideMedalInfo():Void {
 		
-		_medalList.info.text = DEFAULT_MEDAL_INFO;
+		var loggedIn = NG.core.loggedIn;
+		_medalList.info.text = NG.core.loggedIn ? MEDAL_INFO_LOGGED_IN : MEDAL_INFO_LOGGED_OUT;
 	}
 	
 	// -------------------------------------------------------------------------------------------
 	//                                       SCOREBOARDS
 	// -------------------------------------------------------------------------------------------
 	
-	var _boardInfo:TextField;
-	var _prev:Button;
-	var _next:Button;
-	var _refresh:Button;
-	var _tag:TextField;
-	var _social:CheckBox;
-	var _period:DropDown;
+	var _boardPages:IntMap<Int>;
 	
 	inline function initBoards():Void {
 		
-		_boardInfo = _scoreBoardList.info;
-		_boardInfo.text = "";
-		_next = new Button(_scoreBoardList.next, onNextClick);
-		_next.enabled = false;
-		_prev = new Button(_scoreBoardList.prev, onPrevClick);
-		_prev.enabled = false;
-		_refresh = new Button(_scoreBoardList.refresh, onRefreshClick);
-		_refresh.enabled = false;
-		_social = new CheckBox(_scoreBoardList.social);
-		_tag = _scoreBoardList.tag;
-		_period = new DropDown(cast _scoreBoardList.period);
-		_period.addItem("All time"     , Period.ALL);
-		_period.addItem("Current day"  , Period.DAY);
-		_period.addItem("Current week" , Period.WEEK);
-		_period.addItem("Current month", Period.MONTH);
-		_period.addItem("Current year" , Period.YEAR);
-		_period.value = Period.ALL;
-		
 		_loadBoards.onClick = loadBoards;
-		
-		_currentBoard = -1;
+		NG.core.onScoreBoardsLoaded.add(onBoardsLoaded);
+		_scoreBrowser.boardId = -1;
 	}
 	
 	function loadBoards():Void {
 		
-		NG.core.requestScoreBoards(onBoardsLoaded);
+		NG.core.requestScoreBoards();
 	}
 	
 	function onBoardsLoaded():Void {
@@ -290,141 +274,14 @@ class CorePage extends CorePageLite {
 		}
 	}
 	
-	function onRefreshClick():Void {
-		
-		getScoresPage(_boardPages.get(_currentBoard), true);
-	}
-	
-	function onPrevClick():Void {
-		
-		getScoresPage(_boardPages.get(_currentBoard) - 1);
-	}
-	
-	function onNextClick():Void {
-		
-		getScoresPage(_boardPages.get(_currentBoard) + 1);
-	}
-	
 	function getScores(board:ScoreBoard = null):Void {
-		
-		if (board == null)
-			board = NG.core.scoreBoards.get(_currentBoard);
-		else
-			_currentBoard = board.id;
 		
 		var page:Int = _boardPages.get(board.id);
 		if (page == -1)
 			page = 0;
 		
-		getScoresPage(page);
-	}
-	
-	function getScoresPage(page:Int, force:Bool = false):Void {
-		
-		var board = NG.core.scoreBoards.get(_currentBoard);
-		
-		if (!force && page == _boardPages.get(board.id)) {
-			
-			showScores(board);
-			return;
-		}
-		
-		_next.enabled = false;
-		_prev.enabled = false;
-		_refresh.enabled = false;
-		
-		_boardPages.set(board.id, page);
-		
-		board.onUpdate.addOnce(showScores.bind(board));
-		board.requestScores(10, page * 10, _period.value, _social.on, fieldString(_tag));
-	}
-	
-	function showScores(board:ScoreBoard):Void {
-		
-		if (_boardPages.get(NG.core.scoreBoards.get(_currentBoard).id) > 0)
-			_prev.enabled = true;
-		_next.enabled = true;
-		_refresh.enabled = true;
-		
-		_boardInfo.text = board.name + "\n\n";
-		
-		var rank = _boardPages.get(_currentBoard) * 10 + 1;
-		
-		if (board.scores.length == 0) {
-			
-			_boardInfo.appendText('no scores listed at rank $rank or higher');
-			return;
-		}
-		
-		var maxChars = 
-			[ "rank"  => 4
-			, "user"  => 30
-			, "value" => 5
-			, "tag"   => 0
-			];
-		
-		// --- GET MAX CHARS FOR PRETTY PRINT
-		for (score in board.scores) {
-			var len;
-			
-			len = getLength(score.user.name);
-			if (len > maxChars.get("user"))
-				maxChars.set("user", len);
-			
-			len = getLength(score.formatted_value);
-			if (len > maxChars.get("value"))
-				maxChars.set("value", len);
-			
-			len = getLength(score.tag);
-			if (len > maxChars.get("tag"))
-				maxChars.set("tag", len);
-		}
-		
-		for (score in board.scores) {
-			
-			_boardInfo.appendText
-				( padTo(Std.string(rank           ), maxChars.get("rank" ), true ) + " "
-				+ padTo(Std.string(score.user.name), maxChars.get("user" ), true ) + " "
-				+ padTo(score.formatted_value      , maxChars.get("value"), false) + " "
-				+ padTo(score.tag                  , maxChars.get("tag"  ), true ) + "\n"
-				);
-			
-			rank++;
-		}
-	}
-	
-	inline function getLength(value:Dynamic):Int {
-		
-		if (value == null)
-			return 0;
-		
-		return Std.string(value).length;
-	}
-	
-	inline function padTo(str:String, padding:Int, padRight:Bool = true):String {
-		
-		if (str == null)
-			str = "";
-		
-		padding -= str.length;
-		
-		if (padRight) {
-			
-			while(padding > 0) {
-				
-				str += " ";
-				padding--;
-			}
-		} else {
-			
-			while(padding > 0) {
-				
-				str = " " + str;
-				padding--;
-			}
-		}
-		
-		return str;
+		_scoreBrowser.boardId = board.id;
+		_scoreBrowser.page = page;
 	}
 }
 #end
@@ -446,6 +303,7 @@ class CorePageLite extends Page<Component> {
 	var _loadBoards:Button;
 	var _scoreBoardList:ScoreBoardListSwf;
 	var _displayBoards:Map<ScoreBoardSwf, ScoreBoard>;
+	var _scoreBrowser:ScoreBrowserSlim;
 	
 	public function new (target:CorePageSwf) {
 		super(null);
@@ -453,6 +311,7 @@ class CorePageLite extends Page<Component> {
 		_login = new Button(target.login);
 		_loginLabel = target.loginLabel;
 		_loginLabel.mouseEnabled = false;
+		
 		_logout = new Button(target.logout);
 		_logout.enabled = false;
 		
@@ -475,6 +334,7 @@ class CorePageLite extends Page<Component> {
 		_loadBoards = new Button(target.loadBoards);
 		_scoreBoardList = cast target.scoreBoardList;
 		_scoreBoardList.visible = false;
+		_scoreBrowser = cast _scoreBoardList.scoreBrowser;
 		
 		#if ng_lite
 		_login.enabled = false;
@@ -482,7 +342,7 @@ class CorePageLite extends Page<Component> {
 		_loadMedals.enabled = false;
 		_loadBoards.enabled = false;
 		_user.backgroundColor = 0xCCCCCC;
-		_user.text = "Note: this page is mostly deactivated but you're using ng_lite";
+		_user.text = "Note: this page is mostly deactivated because you're using ng_lite";
 		#end
 	}
 	

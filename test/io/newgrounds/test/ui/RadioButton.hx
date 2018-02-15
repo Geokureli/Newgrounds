@@ -1,5 +1,6 @@
 package io.newgrounds.test.ui;
 
+import io.newgrounds.swf.common.Button;
 import io.newgrounds.test.art.RadioButtonSwf;
 
 import openfl.display.MovieClip;

@@ -1,4 +1,4 @@
-package;
+package io.newgrounds.test;
 
 import io.newgrounds.NG;
 import io.newgrounds.NGLite.EncryptionCipher;
@@ -9,9 +9,8 @@ import io.newgrounds.test.ui.CheckBox;
 import io.newgrounds.test.art.IntroScreenSwf;
 import io.newgrounds.test.ui.MainScreen;
 import io.newgrounds.test.ui.Page;
-import io.newgrounds.test.ui.Button;
+import io.newgrounds.swf.common.Button;
 
-import openfl.events.Event;
 import openfl.display.Stage;
 import openfl.display.Sprite;
 import openfl.text.TextField;
@@ -61,8 +60,6 @@ class IntroPage extends Page<Component> {
 		_sessionId = target.sessionId;
 		_start = new Button(target.start, onStartClick);
 		
-		
-		
 		#if ng_lite
 		target.autoConnect.gotoAndStop("disabled");
 		target.autoConnect.getChildByName("check").visible = false;
@@ -73,6 +70,11 @@ class IntroPage extends Page<Component> {
 			_sessionId.text = autoSession;
 		#else
 		_autoConnect = new CheckBox(target.autoConnect, onAutoConnectToggle);
+		if (NG.getSessionId(_stage) != null){
+			
+			_autoConnect.on = true;
+			onAutoConnectToggle();
+		}
 		#end
 		
 		_encryptionKey = target.encryptionKey;
@@ -117,12 +119,12 @@ class IntroPage extends Page<Component> {
 		NG.core.host = getHost(_stage);
 		#else
 		if (_autoConnect.on)
-			NG.createAndCheckLoaderVars(_stage, _appId.text);
+			NG.createAndCheckSession(_stage, _appId.text);
 		else
 			NG.create(_appId.text, _sessionId.text);
 		#end
 		if (_cipher.selected != EncryptionCipher.NONE)
-			NG.core.setDefaultEncryptionHandler(_encryptionKey.text, cast _cipher.selected,cast _format.selected);
+			NG.core.initEncryption(_encryptionKey.text, cast _cipher.selected,cast _format.selected);
 		
 		NG.core.verbose = true;
 		

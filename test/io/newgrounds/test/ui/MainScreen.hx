@@ -1,23 +1,23 @@
 package io.newgrounds.test.ui;
 
-import io.newgrounds.test.art.MainScreenSwf;
-import openfl.events.Event;
-import haxe.PosInfos;
-import openfl.text.TextField;
+import io.newgrounds.swf.common.Button;
 import haxe.ds.StringMap;
+import haxe.PosInfos;
 
+import openfl.events.Event;
+import openfl.text.TextField;
+import openfl.display.Sprite;
 import openfl.display.MovieClip;
 
-import io.newgrounds.test.ui.Button;
+import io.newgrounds.test.art.MainScreenSwf;
 import io.newgrounds.test.ui.Page;
 import io.newgrounds.NG;
-
-import openfl.display.Sprite;
 
 class MainScreen extends Sprite {
 	
 	static inline var CORE      :String = "core";
 	static inline var APP       :String = "app";
+	static inline var ASSETS    :String = "assets";
 	static inline var EVENT     :String = "event";     
 	static inline var GATEWAY   :String = "gateway";
 	static inline var LOADER    :String = "loader";
@@ -41,6 +41,7 @@ class MainScreen extends Sprite {
 		_pageWrappers = 
 		[ CORE       => CorePage
 		, APP        => AppPage
+		, ASSETS     => AssetsPage
 		, EVENT      => EventPage
 		, GATEWAY    => GatewayPage
 		, LOADER     => LoaderPage
