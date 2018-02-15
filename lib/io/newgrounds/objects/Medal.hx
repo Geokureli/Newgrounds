@@ -43,6 +43,8 @@ class Medal extends Object {
 	@:allow(io.newgrounds.NG)
 	override function parse(data:Dynamic):Void {
 		
+		var wasLocked = !unlocked;
+		
 		id          = data.id;
 		name        = data.name;
 		description = data.description;
@@ -54,7 +56,7 @@ class Medal extends Object {
 		
 		super.parse(data);
 		
-		if (!unlocked && data.unlocked)
+		if (wasLocked && unlocked)
 			onUnlock.dispatch();
 		
 	}

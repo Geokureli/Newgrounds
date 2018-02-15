@@ -70,6 +70,11 @@ class IntroPage extends Page<Component> {
 			_sessionId.text = autoSession;
 		#else
 		_autoConnect = new CheckBox(target.autoConnect, onAutoConnectToggle);
+		if (NG.getSessionId(_stage) != null){
+			
+			_autoConnect.on = true;
+			onAutoConnectToggle();
+		}
 		#end
 		
 		_encryptionKey = target.encryptionKey;

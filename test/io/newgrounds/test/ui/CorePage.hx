@@ -1,5 +1,6 @@
 package io.newgrounds.test.ui;
 
+import io.newgrounds.components.ScoreBoardComponent.Period;
 import io.newgrounds.test.swf.ScoreBrowserSlim;
 import haxe.ds.IntMap;
 
@@ -28,7 +29,8 @@ typedef CorePage = CorePageLite;
 #else
 class CorePage extends CorePageLite {
 	
-	inline static var DEFAULT_MEDAL_INFO:String = "Roll over a medal for more info, click to unlock.";
+	inline static var MEDAL_INFO_LOGGED_IN:String = "Roll over a medal for more info, click to unlock.";
+	inline static var MEDAL_INFO_LOGGED_OUT:String = "Roll over a medal for more info, login to enable unlocking.";
 	
 	var _displayMedals:Map<MedalSwf, Medal>;
 	
@@ -148,7 +150,7 @@ class CorePage extends CorePageLite {
 	inline function initMedals():Void {
 		
 		_loadMedals.onClick = loadMedals;
-		_medalList.info.text = DEFAULT_MEDAL_INFO;
+		hideMedalInfo();
 		NG.core.onMedalsLoaded.add(onMedalsLoaded);
 	}
 	
@@ -221,7 +223,8 @@ class CorePage extends CorePageLite {
 	
 	function hideMedalInfo():Void {
 		
-		_medalList.info.text = DEFAULT_MEDAL_INFO;
+		var loggedIn = NG.core.loggedIn;
+		_medalList.info.text = NG.core.loggedIn ? MEDAL_INFO_LOGGED_IN : MEDAL_INFO_LOGGED_OUT;
 	}
 	
 	// -------------------------------------------------------------------------------------------
@@ -233,12 +236,13 @@ class CorePage extends CorePageLite {
 	inline function initBoards():Void {
 		
 		_loadBoards.onClick = loadBoards;
+		NG.core.onScoreBoardsLoaded.add(onBoardsLoaded);
 		_scoreBrowser.boardId = -1;
 	}
 	
 	function loadBoards():Void {
 		
-		NG.core.requestScoreBoards(onBoardsLoaded);
+		NG.core.requestScoreBoards();
 	}
 	
 	function onBoardsLoaded():Void {

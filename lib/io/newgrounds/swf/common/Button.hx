@@ -90,8 +90,8 @@ class Button {
 				
 				_over = false;
 				
-				if (onOver != null)
-					onOver();
+				if (onOut != null)
+					onOut();
 				
 			case MouseEvent.MOUSE_DOWN:
 				

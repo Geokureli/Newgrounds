@@ -185,14 +185,17 @@ class ScoreBrowser extends BaseAsset {
 		removeEventListener(Event.EXIT_FRAME, onDelayComplete);
 		
 		errorIcon.visible = false;
-		loadingIcon.visible = true;
 		scoreContainer.visible = false;
 		pageField.text = 'page ${page + 1}';
 		
-		if (_coreReady && boardId != -1 && _limit > 0 && period != null)
+		if (_coreReady && boardId != -1 && _limit > 0 && period != null) {
+			
+			loadingIcon.visible = true;
+			
 			NG.core.calls.scoreBoard.getScores(boardId, _limit, _limit * page, period, social, tag)
 				.addDataHandler(onScoresReceive)
 				.send();
+		}
 	}
 	
 	function onScoresReceive(response:Response<ScoreResult>):Void {

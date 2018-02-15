@@ -1,5 +1,7 @@
 package io.newgrounds.test.ui;
 
+import io.newgrounds.objects.events.Result.ScoreBoardResult;
+import io.newgrounds.objects.events.Response;
 import io.newgrounds.swf.common.Button;
 import io.newgrounds.swf.ScoreBrowser;
 import io.newgrounds.Call.ICallable;
@@ -58,12 +60,8 @@ class Page<T:Component> {
 
 class AssetsPage extends Page<Component> {
 	
-	var _scoreBoard:ScoreBrowser;
-	
 	public function new (target:AssetsPageSwf) {
 		super(null);
-		
-		_scoreBoard = cast target.scoreBrowser;
 	}
 }
 
@@ -181,6 +179,15 @@ class ScoreboardPage extends Page<ScoreBoardComponent> {
 		_tag    = target.tag;
 		_value  = target.value;
 		
+		#if ng_lite
+		// --- FIND SCOREBOARD TO SET ID
+		NG.core.calls.scoreBoard.getBoards()
+			.addDataHandler(onBoardsReceived)
+			.queue();
+		#else
+		NG.core.onScoreBoardsLoaded.addOnce(onBoardsReceived);
+		#end
+		
 		_social = new CheckBox(target.social);
 		
 		_getBoards = new Button(target.getBoards, function () { send(_calls.getBoards()); });
@@ -213,4 +220,23 @@ class ScoreboardPage extends Page<ScoreBoardComponent> {
 			}
 		);
 	}
+	
+	#if ng_lite
+	function onBoardsReceived(response:Response<ScoreBoardResult>):Void {
+		
+		if (response.success && response.result.success && response.result.data.scoreboards.length > 0) {
+			
+			_id.text = Std.string(response.result.data.scoreboards[0].id);
+		}
+	}
+	#else
+	function onBoardsReceived():Void {
+		
+		for (board in NG.core.scoreBoards.keys()) {
+			
+			_id.text = Std.string(board);
+			return;
+		}
+	}
+	#end
 }

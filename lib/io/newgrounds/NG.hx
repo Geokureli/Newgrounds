@@ -189,6 +189,7 @@ class NG extends NGLite {
 		
 		if (_session.status == SessionStatus.USER_LOADED) {
 			
+			loggedIn = true;
 			endLoginAndCall(onSucceess);
 			onLogin.dispatch();
 			
