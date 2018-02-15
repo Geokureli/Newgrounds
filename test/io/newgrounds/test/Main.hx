@@ -119,7 +119,7 @@ class IntroPage extends Page<Component> {
 		NG.core.host = getHost(_stage);
 		#else
 		if (_autoConnect.on)
-			NG.createAndCheckLoaderVars(_stage, _appId.text);
+			NG.createAndCheckSession(_stage, _appId.text);
 		else
 			NG.create(_appId.text, _sessionId.text);
 		#end

@@ -282,7 +282,6 @@ class CorePage extends CorePageLite {
 		
 		_scoreBrowser.boardId = board.id;
 		_scoreBrowser.page = page;
-		_scoreBrowser.title = board.name;
 	}
 }
 #end
