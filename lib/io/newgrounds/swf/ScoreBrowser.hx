@@ -74,7 +74,7 @@ class ScoreBrowser extends BaseAsset {
 	public var page(default, set):Int;
 	function set_page(value:Int):Int {
 		
-		if (this.page == value) {
+		if (this.page != value) {
 			
 			this.page = value;
 			delayReload();
@@ -241,12 +241,10 @@ class ScoreBrowser extends BaseAsset {
 		
 		if (page > 0)
 			page--;
-		delayReload();
 	}
 	
 	function onNextClick():Void {
 		
 		page++;
-		delayReload();
 	}
 }
