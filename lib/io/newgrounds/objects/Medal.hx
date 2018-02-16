@@ -35,9 +35,10 @@ class Medal extends Object {
 	public var onUnlock:Dispatcher;
 	
 	public function new(core:NGLite, data:Dynamic = null):Void {
-		super(core, data);
 		
 		onUnlock = new Dispatcher();
+		
+		super(core, data);
 	}
 
 	@:allow(io.newgrounds.NG)

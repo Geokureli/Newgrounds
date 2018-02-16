@@ -5,11 +5,12 @@ import openfl.display.Preloader;
 
 class TestPreloader extends Preloader {
 	
+	var sprite:Sprite;
 	public function new() {
 		
-		var sprite = new Sprite();
+		sprite = new Sprite();
 		sprite.graphics.beginFill(0xFF0000);
-		sprite.graphics.drawRect(50, 50, 700, 700);
+		sprite.graphics.drawRect(50, 350, 700, 50);
 		sprite.graphics.endFill();
 		
 		super(sprite);
@@ -23,5 +24,7 @@ class TestPreloader extends Preloader {
 		var percentLoaded = bytesLoaded / bytesTotal;
 		if (percentLoaded > 1)
 			percentLoaded = 1;
+		
+		sprite.scaleX = percentLoaded;
 	}
 }
