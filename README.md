@@ -203,13 +203,14 @@ NG.core.medal.unlock(id).queue();
 
 ## TODO
  - better readme.md
+    - hxml instructions
+ - add to haxelib
  - AES-128 encryption
  - Hex encoding
  - kill all humans
  - flash API assets
      - ad viewer - not supported in ng.io v3
      - auto connector - requires ads?
- - fix checkbox disabled state
  - continuous integrations
  - local storage
     - save unsent medal unlocks and scoreboard posts
