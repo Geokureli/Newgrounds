@@ -335,6 +335,7 @@ class CorePageLite extends Page<Component> {
 		_scoreBoardList = cast target.scoreBoardList;
 		_scoreBoardList.visible = false;
 		_scoreBrowser = cast _scoreBoardList.scoreBrowser;
+		_scoreBrowser.boardId = -1;
 		
 		#if ng_lite
 		_login.enabled = false;
