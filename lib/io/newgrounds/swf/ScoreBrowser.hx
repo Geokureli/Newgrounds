@@ -136,7 +136,7 @@ class ScoreBrowser extends BaseAsset {
 			#if ng_lite
 			NG.core.calls.scoreBoard.getBoards()
 				.addDataHandler(onBoardsRecieved)
-				.send();
+				.queue();
 			#else
 			if (NG.core.scoreBoards != null)
 				onBoardsLoaded();
