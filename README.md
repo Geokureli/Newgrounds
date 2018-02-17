@@ -50,13 +50,13 @@ Setting the encryption method is easy, just call:
 `NG.core.initEncryption("encryption key", someEncryptionCipher, someEncryptionFormat);`
 
 Encryption Ciphers:
-- **io.newgrounds.NGLite.EncryptionCipher.NONE**
-- **io.newgrounds.NGLite.EncryptionCipher.AES-128** (not implemented)
-- **io.newgrounds.NGLite.EncryptionCipher.RC4** (default)
+- **io.newgrounds.crypto.Cipher.NONE**
+- **io.newgrounds.crypto.Cipher.AES-128** (not implemented)
+- **io.newgrounds.crypto.Cipher.RC4** (default)
 
 Encryption Ciphers:
-- **io.newgrounds.NGLite.EncryptionFormat.BASE_64** (default)
-- **io.newgrounds.NGLite.EncryptionCipher.HEX** (not implemented)
+- **io.newgrounds.crypto.EncryptionFormat.BASE_64** (default)
+- **io.newgrounds.crypto.EncryptionFormat.HEX** (not implemented)
 
 You can also use your own encryption method - if you're some kind of crypto-god from The Matrix -
 by directly setting NG.core.encryptionHandler

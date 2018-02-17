@@ -1,8 +1,8 @@
 package io.newgrounds.test;
 
 import io.newgrounds.NG;
-import io.newgrounds.NGLite.EncryptionCipher;
-import io.newgrounds.NGLite.EncryptionFormat;
+import io.newgrounds.crypto.Cipher;
+import io.newgrounds.crypto.EncryptionFormat;
 import io.newgrounds.components.Component;
 import io.newgrounds.test.ui.RadioGroup;
 import io.newgrounds.test.ui.CheckBox;
@@ -84,8 +84,8 @@ class IntroPage extends Page<Component> {
 		_format.disableChoice(EncryptionFormat.HEX);
 		
 		_cipher = new RadioGroup(target.cipher, onCipherChange);
-		_cipher.selected = EncryptionCipher.RC4;
-		_cipher.disableChoice(EncryptionCipher.AES_128);
+		_cipher.selected = Cipher.RC4;
+		_cipher.disableChoice(Cipher.AES_128);
 		
 	}
 	
@@ -109,7 +109,7 @@ class IntroPage extends Page<Component> {
 	
 	function onCipherChange():Void {
 		
-		_format.enabled = _cipher.selected != EncryptionCipher.NONE;
+		_format.enabled = _cipher.selected != Cipher.NONE;
 	}
 	
 	function onStartClick():Void {
@@ -123,7 +123,7 @@ class IntroPage extends Page<Component> {
 		else
 			NG.create(_appId.text, _sessionId.text);
 		#end
-		if (_cipher.selected != EncryptionCipher.NONE)
+		if (_cipher.selected != Cipher.NONE)
 			NG.core.initEncryption(_encryptionKey.text, cast _cipher.selected,cast _format.selected);
 		
 		NG.core.verbose = true;
