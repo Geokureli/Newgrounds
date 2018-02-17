@@ -1,5 +1,7 @@
 package io.newgrounds;
 
+import io.newgrounds.crypto.EncryptionFormat;
+import io.newgrounds.crypto.Cipher;
 import io.newgrounds.utils.Dispatcher;
 import haxe.crypto.Base64;
 import haxe.io.Bytes;
@@ -11,7 +13,6 @@ import io.newgrounds.objects.events.Result.ResultBase;
 import io.newgrounds.objects.events.Result.SessionResult;
 
 import haxe.PosInfos;
-import haxe.Json;
 
 /**
  * The barebones NG.io API. Allows API calls with code completion
@@ -166,13 +167,13 @@ class NGLite {
 	/** Sets */
 	public function initEncryption
 	( key   :String
-	, cipher:EncryptionCipher = EncryptionCipher.RC4
+	, cipher:Cipher = Cipher.RC4
 	, format:EncryptionFormat = EncryptionFormat.BASE_64
 	):Void {
 		
-		if (cipher == EncryptionCipher.NONE)
+		if (cipher == Cipher.NONE)
 			encryptionHandler = null;
-		else if (cipher == EncryptionCipher.RC4)
+		else if (cipher == Cipher.RC4)
 			encryptionHandler = encryptRc4.bind(key, format);
 		else
 			throw "aes not yet implemented";
@@ -196,17 +197,4 @@ class NGLite {
 		
 		return null;
 	}
-}
-
-@:enum
-abstract EncryptionCipher(String) to String{
-	var NONE    = "none";
-	var AES_128 = "aes128";
-	var RC4     = "rc4";
-}
-
-@:enum
-abstract EncryptionFormat(String) to String {
-	var BASE_64 = "base64";
-	var HEX     = "hex";
 }
