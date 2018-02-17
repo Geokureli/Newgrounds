@@ -1,8 +1,5 @@
 package io.newgrounds.crypto;
 
-import io.newgrounds.NGLite.EncryptionFormat;
-
-import haxe.crypto.Base64;
 import haxe.io.Bytes;
 
 /**
