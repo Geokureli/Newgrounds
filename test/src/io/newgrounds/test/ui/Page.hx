@@ -1,18 +1,12 @@
 package io.newgrounds.test.ui;
 
-import io.newgrounds.objects.events.Result.ScoreBoardResult;
-import io.newgrounds.objects.events.Response;
-import io.newgrounds.swf.common.Button;
-import io.newgrounds.swf.ScoreBrowser;
-import io.newgrounds.Call.ICallable;
-import io.newgrounds.test.art.AppPageSwf;
-import io.newgrounds.test.art.AssetsPageSwf;
-import io.newgrounds.test.art.ScoreboardPageSwf;
-import io.newgrounds.test.art.MedalPageSwf;
-import io.newgrounds.test.art.LoaderPageSwf;
-import io.newgrounds.test.art.GatewayPageSwf;
-import io.newgrounds.test.art.EventPageSwf;
+import openfl.display.DisplayObjectContainer;
+import openfl.display.MovieClip;
+import openfl.text.TextField;
+import openfl.text.TextFieldType;
 
+import io.newgrounds.swf.common.Button;
+import io.newgrounds.Call.ICallable;
 import io.newgrounds.components.EventComponent;
 import io.newgrounds.components.ScoreBoardComponent;
 import io.newgrounds.components.MedalComponent;
@@ -21,7 +15,13 @@ import io.newgrounds.components.GatewayComponent;
 import io.newgrounds.components.AppComponent;
 import io.newgrounds.components.Component;
 
-import openfl.text.TextField;
+import io.newgrounds.test.art.AppPageSwf;
+import io.newgrounds.test.art.AssetsPageSwf;
+import io.newgrounds.test.art.ScoreboardPageSwf;
+import io.newgrounds.test.art.MedalPageSwf;
+import io.newgrounds.test.art.LoaderPageSwf;
+import io.newgrounds.test.art.GatewayPageSwf;
+import io.newgrounds.test.art.EventPageSwf;
 
 class Page<T:Component> {
 	
@@ -29,7 +29,11 @@ class Page<T:Component> {
 	
 	var _calls:T;
 	
-	public function new(component:T = null) {
+	public function new(target:MovieClip, component:T = null) {
+		
+		#if html5
+		mouseDisableText(target);
+		#end
 		
 		_calls = component;
 	}
@@ -56,12 +60,32 @@ class Page<T:Component> {
 		
 		return Std.parseInt(fieldString(field));
 	}
+	
+	function mouseDisableText(parent:DisplayObjectContainer):Void {
+		
+		var i = parent.numChildren;
+		
+		while(i > 0) {
+			i--;
+			
+			var child = parent.getChildAt(i);
+			if (Std.is(child, TextField)) {
+				
+				var field:TextField = cast child;
+				
+				if (field.type == TextFieldType.DYNAMIC) {
+					
+					field.mouseEnabled = field.selectable;
+				}
+			}
+		}
+	}
 }
 
 class AssetsPage extends Page<Component> {
 	
 	public function new (target:AssetsPageSwf) {
-		super(null);
+		super(target);
 	}
 }
 
@@ -77,7 +101,7 @@ class AppPage extends Page<AppComponent> {
 	var _logView:Button;
 	
 	public function new (target:AppPageSwf) {
-		super(NG.core.calls.app);
+		super(target, NG.core.calls.app);
 		
 		_force = new CheckBox(target.force);
 		_version = target.version;
@@ -96,7 +120,7 @@ class EventPage extends Page<EventComponent> {
 	var _event:TextField;
 	
 	public function new (target:EventPageSwf) {
-		super(NG.core.calls.event);
+		super(target, NG.core.calls.event);
 		
 		_logEvent = new Button(target.logEvent, function () { send(_calls.logEvent(fieldString(_event))); });
 		_event = target.event;
@@ -110,7 +134,7 @@ class GatewayPage extends Page<GatewayComponent> {
 	var _ping:Button;
 	
 	public function new (target:GatewayPageSwf) {
-		super(NG.core.calls.gateway);
+		super(target, NG.core.calls.gateway);
 		
 		_getDatetime = new Button(target.getDatetime  , function () { send(_calls.getDatetime()); } );
 		_getVersion  = new Button(target.getVersionBtn, function () { send(_calls.getVersion ()); } );
@@ -128,7 +152,7 @@ class LoaderPage extends Page<LoaderComponent> {
 	var _redirect:CheckBox;
 	
 	public function new (target:LoaderPageSwf) {
-		super(NG.core.calls.loader);
+		super(target, NG.core.calls.loader);
 		
 		_loadAuthorUrl   = new Button(target.loadAuthorUrl  , function () { send(_calls.loadAuthorUrl  (_redirect.on)); } );
 		_loadMoreGames   = new Button(target.loadMoreGames  , function () { send(_calls.loadMoreGames  (_redirect.on)); } );
@@ -146,7 +170,7 @@ class MedalPage extends Page<MedalComponent> {
 	var _id:TextField;
 	
 	public function new (target:MedalPageSwf) {
-		super(NG.core.calls.medal);
+		super(target, NG.core.calls.medal);
 		
 		_getList = new Button(target.getList, function () { send(_calls.getList()); } );
 		_unlock  = new Button(target.unlock , function () { send(_calls.unlock(fieldInt(_id))); } );
@@ -169,7 +193,7 @@ class ScoreboardPage extends Page<ScoreBoardComponent> {
 	var _value:TextField;
 	
 	public function new (target:ScoreboardPageSwf) {
-		super(NG.core.calls.scoreBoard);
+		super(target, NG.core.calls.scoreBoard);
 		
 		_limit  = target.limit;
 		_skip   = target.skip;
