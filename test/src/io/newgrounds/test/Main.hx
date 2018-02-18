@@ -50,7 +50,7 @@ class IntroPage extends Page<Component> {
 	var _format:RadioGroup;
 	
 	public function new (target:IntroScreenSwf, onStart:Void->Void):Void {
-		super();
+		super(target);
 		
 		_stage = target.stage;
 		
@@ -115,16 +115,16 @@ class IntroPage extends Page<Component> {
 	function onStartClick():Void {
 		
 		#if ng_lite
-		NG.create(_appId.text, _sessionId.text);
+		NG.create(fieldString(_appId), fieldString_sessionId));
 		NG.core.host = getHost(_stage);
 		#else
 		if (_autoConnect.on)
-			NG.createAndCheckSession(_stage, _appId.text);
+			NG.createAndCheckSession(_stage, fieldString(_appId));
 		else
-			NG.create(_appId.text, _sessionId.text);
+			NG.create(fieldString(_appId), fieldString(_sessionId));
 		#end
 		if (_cipher.selected != Cipher.NONE)
-			NG.core.initEncryption(_encryptionKey.text, cast _cipher.selected,cast _format.selected);
+			NG.core.initEncryption(fieldString(_encryptionKey), cast _cipher.selected, cast _format.selected);
 		
 		NG.core.verbose = true;
 		

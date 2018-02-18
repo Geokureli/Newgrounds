@@ -2,19 +2,19 @@
 <project>
 	
 	<meta title="Newgrounds.io" package="io.newgrounds.test.Main" version="1.0.0" company="GeoKureli" />
-	<app main="io.newgrounds.test.Main" path="Export" file="Newgrounds" preloader="io.newgrounds.test.TestPreloader" />
+	<app main="io.newgrounds.test.Main" path="bin" file="Newgrounds" preloader="io.newgrounds.test.TestPreloader" />
 	
 	<window width="800" height="800" fps="30" background="#CCCCCC" />
 	
-	<source path="test" />
+	<source path="src" />
 	
 	<haxelib name="openfl" />
 	<haxelib name="swf" />
-	<classpath path="lib" />
+	<classpath path="../lib/src" />
 	
 	<!--<haxedef name="ng_lite" />-->
 	
-	<library path="assets/Test Layout.swf" id="layout" type="swflite" generate="true" preload="true" />
+	<library path="res/Test Layout.swf" id="layout" type="swflite" generate="true" preload="true" />
 	<!--<assets path="assets" exclude="openfl.svg|*.swf" embed="true" />-->
 	
 </project>

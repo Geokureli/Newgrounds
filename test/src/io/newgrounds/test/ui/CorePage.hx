@@ -306,7 +306,7 @@ class CorePageLite extends Page<Component> {
 	var _scoreBrowser:ScoreBrowserSlim;
 	
 	public function new (target:CorePageSwf) {
-		super(null);
+		super(target);
 		
 		_login = new Button(target.login);
 		_loginLabel = target.loginLabel;
