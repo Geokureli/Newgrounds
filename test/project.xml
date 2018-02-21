@@ -2,7 +2,8 @@
 <project>
 	
 	<meta title="Newgrounds.io" package="io.newgrounds.test.Main" version="1.0.0" company="GeoKureli" />
-	<app main="io.newgrounds.test.Main" path="bin" file="Newgrounds" preloader="io.newgrounds.test.TestPreloader" />
+	<app main="io.newgrounds.test.Main" path="bin" file="Newgrounds" />
+	<app preloader="io.newgrounds.test.TestPreloader" if="flash"/>
 	
 	<window width="800" height="800" fps="30" background="#CCCCCC" />
 	
@@ -11,8 +12,10 @@
 	<haxelib name="openfl" />
 	<haxelib name="swf" />
 	<classpath path="../lib/src" />
+	<!-- <classpath path="bin/flash/haxe/_generated" /> -->
 	
-	<!--<haxedef name="ng_lite" />-->
+	<!-- <haxedef name="ng_lite" /> -->
+	<!-- <haxedef name="simulate_preloader" /> -->
 	
 	<library path="res/Test Layout.swf" id="layout" type="swflite" generate="true" preload="true" />
 	<!--<assets path="assets" exclude="openfl.svg|*.swf" embed="true" />-->

@@ -1,30 +1,38 @@
 package io.newgrounds.test;
 
 import openfl.display.Sprite;
-import openfl.display.Preloader;
+import openfl.events.Event;
+import openfl.events.ProgressEvent;
 
-class TestPreloader extends Preloader {
+class TestPreloader extends Sprite {
 	
-	var sprite:Sprite;
+	var _sprite:Sprite;
+	
 	public function new() {
+		super();
 		
-		sprite = new Sprite();
-		sprite.graphics.beginFill(0xFF0000);
-		sprite.graphics.drawRect(50, 350, 700, 50);
-		sprite.graphics.endFill();
+		x += 50;
+		graphics.beginFill(0xFF0000);
+		graphics.drawRect(0, 350, 700, 50);
+		graphics.endFill();
 		
-		super(sprite);
-		
-		onProgress.add(onUpdate);
+		addEventListener(Event.COMPLETE, onComplete);
+		addEventListener(ProgressEvent.PROGRESS, onProgress);
 	}
 	
-	public function onUpdate(bytesLoaded:Int, bytesTotal:Int):Void {
+	function onProgress(e:ProgressEvent):Void {
 		
-		// calculate the percent loaded
-		var percentLoaded = bytesLoaded / bytesTotal;
-		if (percentLoaded > 1)
-			percentLoaded = 1;
+		if (e.bytesTotal == 0)
+			scaleX = 0;
+		else if (e.bytesLoaded < e.bytesTotal)
+			scaleX = e.bytesLoaded / e.bytesTotal;
+		else
+			scaleX = 1;
+	}
+	
+	function onComplete(event:Event):Void {
 		
-		sprite.scaleX = percentLoaded;
+		// event.preventDefault();
+		// cast (event.currentTarget, Sprite).dispatchEvent(new Event(Event.UNLOAD));
 	}
 }
