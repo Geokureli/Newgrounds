@@ -64,6 +64,13 @@ class Medal extends Object {
 	
 	public function sendUnlock():Void {
 		
+		if (_core.sessionId == null) {
+			// --- Unlock regardless, show medal popup to encourage NG signup
+			unlocked = true;
+			onUnlock.dispatch();
+			//TODO: save unlock in local save
+		}
+		
 		_core.calls.medal.unlock(id)
 			.addDataHandler(onUnlockResponse)
 			.send();
