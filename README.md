@@ -8,7 +8,9 @@ Before using this library make sure you have read the
 **using haxelib:** (not implemented yet)
 `haxelib install newgrounds`
 
-just use git...
+just use git for now...
+
+`haxelib git newgrounds https://github.com/Geokureli/Newgrounds.hx`
 
 ## Implement an instance of io.newgrounds.core into your game:
 
