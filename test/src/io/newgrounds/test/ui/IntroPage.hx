@@ -1,5 +1,6 @@
 package io.newgrounds.test.ui;
 
+import io.newgrounds.test.art.IntroScreenSwf;
 import io.newgrounds.components.Component;
 import io.newgrounds.crypto.Cipher;
 import io.newgrounds.crypto.EncryptionFormat;
