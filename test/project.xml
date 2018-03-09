@@ -2,7 +2,8 @@
 <project>
 	
 	<meta title="Newgrounds.io" package="io.newgrounds.test.Main" version="1.0.0" company="GeoKureli" />
-	<app main="io.newgrounds.test.Main" path="bin" file="Newgrounds" preloader="io.newgrounds.test.TestPreloader" />
+	<app main="io.newgrounds.test.Main" path="bin" file="Newgrounds" />
+	<app preloader="io.newgrounds.test.TestPreloader" />
 	
 	<window width="800" height="800" fps="30" background="#CCCCCC" />
 	
@@ -10,11 +11,13 @@
 	
 	<haxelib name="openfl" />
 	<haxelib name="swf" />
+	<!--<haxelib name="flixel" />-->
 	<classpath path="../lib/src" />
 	
+	<!--<haxedef name="FLX_NO_GAMEPAD" />-->
 	<!--<haxedef name="ng_lite" />-->
 	
-	<library path="res/Test Layout.swf" id="layout" type="swflite" generate="true" preload="true" />
+	<library path="res/Test Layout.swf" id="layout" generate="true" preload="true" />
 	<!--<assets path="assets" exclude="openfl.svg|*.swf" embed="true" />-->
 	
 </project>
