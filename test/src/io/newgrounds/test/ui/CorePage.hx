@@ -1,6 +1,5 @@
 package io.newgrounds.test.ui;
 
-import io.newgrounds.components.ScoreBoardComponent.Period;
 import io.newgrounds.test.swf.ScoreBrowserSlim;
 import haxe.ds.IntMap;
 
@@ -223,7 +222,6 @@ class CorePage extends CorePageLite {
 	
 	function hideMedalInfo():Void {
 		
-		var loggedIn = NG.core.loggedIn;
 		_medalList.info.text = NG.core.loggedIn ? MEDAL_INFO_LOGGED_IN : MEDAL_INFO_LOGGED_OUT;
 	}
 	

@@ -24,6 +24,9 @@ class MedalPopup extends BaseAsset {
 	public var medalPoints(default, null):MovieClip;
 	
 	public var alwaysOnTop:Bool;
+	#if !ng_lite
+	public var requiresSession:Bool;
+	#end
 	
 	var _animQueue = new Array<Void->Void>();
 	var _scrollSpeed:Float;
@@ -61,6 +64,9 @@ class MedalPopup extends BaseAsset {
 	}
 	
 	function onMedalOnlock(medal:Medal):Void {
+		
+		if (requiresSession && !NG.core.loggedIn)
+			return;
 		
 		var loader = new Loader();
 		loader.load(new URLRequest(medal.icon));

@@ -7,7 +7,7 @@ import openfl.text.TextField;
 
 import io.newgrounds.swf.ScoreBrowser;
 
-class ScoreBrowserSlim extends ScoreBrowser{
+class ScoreBrowserSlim extends ScoreBrowser {
 	
 	public var tagField:TextField;
 	public var socialBox:MovieClip;

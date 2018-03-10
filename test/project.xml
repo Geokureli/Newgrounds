@@ -14,6 +14,7 @@
 	<!--<haxelib name="flixel" />-->
 	<classpath path="../lib/src" />
 	
+	<haxedef name="simulate_preloader" if="debug"/> 
 	<!--<haxedef name="FLX_NO_GAMEPAD" />-->
 	<!--<haxedef name="ng_lite" />-->
 	
