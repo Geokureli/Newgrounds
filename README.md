@@ -204,6 +204,7 @@ NG.core.medal.unlock(id).queue();
 ```
 
 ## TODO
+ - html5 equivalent to flash's loader vars (sessionID without requesting passport)
  - better readme.md
     - hxml instructions
  - add to haxelib
