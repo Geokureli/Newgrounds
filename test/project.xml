@@ -11,11 +11,13 @@
 	
 	<haxelib name="openfl" />
 	<haxelib name="swf" />
+	<!--<haxelib name="flixel" />-->
 	<classpath path="../lib/src" />
 	<!-- <classpath path="bin/flash/haxe/_generated" /> -->
 	
 	<!-- <haxedef name="ng_lite" /> -->
 	<!-- <haxedef name="simulate_preloader" /> -->
+	<!--<haxedef name="FLX_NO_GAMEPAD" />-->
 	
 	<library path="res/Test Layout.swf" id="layout" generate="true" preload="true" />
 	<!--<assets path="assets" exclude="openfl.svg|*.swf" embed="true" />-->
