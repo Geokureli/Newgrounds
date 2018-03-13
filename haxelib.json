@@ -1,0 +1,12 @@
+{
+    "name"        : "newgrounds.io",
+    "description" : "Newgrounds API for haxe",
+    "version"     : "0.0.1-beta",
+    "releasenote" : "not actually released",
+    "url"         : "https://github.com/Geokureli/Newgrounds.hx",
+    "classPath"   : "lib/src",
+    "license"     : "MIT",
+    "tags"        : ["newgrounds", "newgrounds.io", "ng.io", "web", "strawberryclock"],
+    "contributors": ["GeoKureli"],
+    "dependencies": { }
+}
