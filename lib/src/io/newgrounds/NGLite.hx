@@ -1,18 +1,26 @@
 package io.newgrounds;
 
-import io.newgrounds.crypto.EncryptionFormat;
-import io.newgrounds.crypto.Cipher;
-import io.newgrounds.utils.Dispatcher;
 import haxe.crypto.Base64;
 import haxe.io.Bytes;
-import io.newgrounds.crypto.Rc4;
+import haxe.PosInfos;
+
 import io.newgrounds.Call.ICallable;
-import io.newgrounds.objects.events.Response;
 import io.newgrounds.components.ComponentList;
+import io.newgrounds.crypto.EncryptionFormat;
+import io.newgrounds.crypto.Cipher;
+import io.newgrounds.crypto.Rc4;
+import io.newgrounds.objects.Error;
+import io.newgrounds.objects.events.Response;
 import io.newgrounds.objects.events.Result.ResultBase;
 import io.newgrounds.objects.events.Result.SessionResult;
+import io.newgrounds.utils.Dispatcher;
 
-import haxe.PosInfos;
+#if html5
+	import js.Browser;
+#elseif flash
+	import flash.display.Stage;
+	import flash.Lib;
+#end
 
 /**
  * The barebones NG.io API. Allows API calls with code completion
@@ -55,8 +63,8 @@ class NGLite {
 	
 	/** 
 	 * Iniitializes the API, call before utilizing any other component
-	 * @param appId  The unique ID of your app as found in the 'API Tools' tab of your Newgrounds.com project.
-	 * @param host   The name of the host the game is being played on.
+	 * @param appId  	The unique ID of your app as found in the 'API Tools' tab of your Newgrounds.com project.
+	 * @param sessionId A unique session id used to identify the active user.
 	**/
 	public function new(appId:String = "test", sessionId:String = null) {
 		
@@ -75,7 +83,7 @@ class NGLite {
 	
 	function checkInitialSession(response:Response<SessionResult>):Void {
 		
-		if (!response.success || response.result.success || response.result.data.session.expired)
+		if (!response.success || !response.result.success || response.result.data.session.expired)
 			sessionId = null;
 	}
 	
@@ -88,6 +96,66 @@ class NGLite {
 		core = new NGLite(appId, sessionId);
 		
 		onCoreReady.dispatch();
+	}
+	
+	/**
+	 * Creates NG.core, and tries to create a session. This is not the only way to create an instance,
+	 * nor is NG a forced singleton, but it's the only way to set the static NG.core.
+	**/
+	static public function createAndCheckSession(appId:String = "test"):Void {
+		
+		create(appId, getSessionId());
+	}
+	
+	inline static public function getUrl():String {
+		
+		#if html5
+			return Browser.document.location.href;
+		#elseif flash
+			return Lib.current.stage.loaderInfo != null
+				? Lib.current.stage.loaderInfo.url
+				: null;
+		#end
+	}
+	
+	static function getSessionId():String {
+		
+		#if html5
+			
+			var url = getUrl();
+			
+			// Check for URL params
+			var index = url.indexOf("?");
+			if (index != -1) {
+				
+				// Check for session ID in params
+				for (param in url.substr(index + 1).split("&")) {
+					
+					index = param.indexOf("=");
+					if (index != -1 && param.substr(0, index) == "ngio_session_id")
+						return param.substr(index + 1);
+				}
+			}
+			
+		#elseif flash
+			
+			if (Lib.current.stage.loaderInfo != null && Reflect.hasField(Lib.current.stage.loaderInfo.parameters, "ngio_session_id"))
+				return Reflect.field(Lib.current.stage.loaderInfo.parameters, "ngio_session_id");
+			
+		#end
+		
+		return null;
+		
+		// --- EXAMPLE LOADER PARAMS
+		//{ "1517703669"                : ""
+		//, "ng_username"               : "GeoKureli"
+		//, "NewgroundsAPI_SessionID"   : "F1LusbG6P8Qf91w7zeUE37c1752563f366688ac6153996d12eeb111a2f60w2xn"
+		//, "NewgroundsAPI_PublisherID" : 1
+		//, "NewgroundsAPI_UserID"      : 488329
+		//, "NewgroundsAPI_SandboxID"   : "5a76520e4ae1e"
+		//, "ngio_session_id"           : "0c6c4e02567a5116734ba1a0cd841dac28a42e79302290"
+		//, "NewgroundsAPI_UserName"    : "GeoKureli"
+		//}
 	}
 	
 	// -------------------------------------------------------------------------------------------
