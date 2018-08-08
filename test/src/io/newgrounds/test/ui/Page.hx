@@ -14,6 +14,10 @@ import io.newgrounds.components.LoaderComponent;
 import io.newgrounds.components.GatewayComponent;
 import io.newgrounds.components.AppComponent;
 import io.newgrounds.components.Component;
+#if ng_lite
+	import io.newgrounds.objects.events.Response;
+	import io.newgrounds.objects.events.Result.ScoreBoardResult;
+#end
 
 import io.newgrounds.test.art.AppPageSwf;
 import io.newgrounds.test.art.AssetsPageSwf;

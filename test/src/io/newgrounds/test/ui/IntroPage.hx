@@ -44,7 +44,7 @@ class IntroPage extends Page<Component> {
 			_sessionId.text = autoSession;
 		#else
 		_autoConnect = new CheckBox(target.autoConnect, onAutoConnectToggle);
-		if (NG.getSessionId(_stage) != null){
+		if (NGLite.getSessionId() != null){
 			
 			_autoConnect.on = true;
 			onAutoConnectToggle();
@@ -89,11 +89,11 @@ class IntroPage extends Page<Component> {
 	function onStartClick():Void {
 		
 		#if ng_lite
-		NG.create(fieldString(_appId), fieldString_sessionId));
+		NG.create(fieldString(_appId), fieldString(_sessionId));
 		NG.core.host = getHost(_stage);
 		#else
 		if (_autoConnect.on)
-			NG.createAndCheckSession(_stage, fieldString(_appId));
+			NG.createAndCheckSession(fieldString(_appId));
 		else
 			NG.create(fieldString(_appId), fieldString(_sessionId));
 		#end

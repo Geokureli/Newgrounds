@@ -118,7 +118,7 @@ class NGLite {
 		#end
 	}
 	
-	static function getSessionId():String {
+	static public function getSessionId():String {
 		
 		#if html5
 			
