@@ -30,10 +30,10 @@ Once the core is created you can access it via NG.core but this is not possible 
 When your game is being played on Newgrounds.com you can find the sessionId in the loaderVars,
 or you can have the API find it automatically with
 
-`NG.createAndCheckSession(myGame.stage, "app id here");`
+`NG.createAndCheckSession("app id here");`
 
 
-This will also determine the host that will be used when logging events. You can also set or change 
+This will also determine the host that will be used when logging events (except when ng_lite is active). You can also set or change 
 the host using `NG.core.host`. The host is used to track views and various other events logged to NG.io.
 
 ### Manual Login
@@ -204,7 +204,6 @@ NG.core.medal.unlock(id).queue();
 ```
 
 ## TODO
- - html5 equivalent to flash's loader vars (sessionID without requesting passport)
  - better readme.md
     - hxml instructions
  - add to haxelib
