@@ -36,12 +36,20 @@ class NG extends NGLite {
 	
 	/** The logged in user */
 	public var user(get, never):User;
-	public function get_user():User {
+	function get_user():User {
 		
 		if (_session == null)
 			return null;
 		
 		return _session.user;
+	}
+	public var passportUrl(get, never):String;
+	function get_passportUrl():String {
+		
+		if (_session == null || _session.status != SessionStatus.REQUEST_LOGIN)
+			return null;
+		
+		return _session.passportUrl;
 	}
 	public var medals(default, null):IntMap<Medal>;
 	public var scoreBoards(default, null):IntMap<ScoreBoard>;
@@ -59,6 +67,7 @@ class NG extends NGLite {
 	public var attemptingLogin(default, null):Bool;
 	
 	var _loginCancelled:Bool;
+	var _passportCallback:Void->Void;
 	
 	var _session:Session;
 	
@@ -111,8 +120,20 @@ class NG extends NGLite {
 		onSessionReceive(response);
 	}
 	
+	/**
+	 * Begins the login process
+	 * 
+	 * @param onSuccess Called when the login is a success
+	 * @param onPending Called when the passportUrl has been identified, call NG.core.openPassportLink 
+	 *                  to open the link continue the process. Leave as null to open the url automatically
+	 *                  NOTE: Browser games must open links on click events or else it will be blocked by
+	 *                  the popup blocker.
+	 * @param onFail    
+	 * @param onCancel  Called when the user denies the passport connection.
+	 */
 	public function requestLogin
 	( onSuccess:Void->Void  = null
+	, onPending:Void->Void  = null
 	, onFail   :Error->Void = null
 	, onCancel :Void->Void  = null
 	):Void {
@@ -131,9 +152,10 @@ class NG extends NGLite {
 		
 		attemptingLogin = true;
 		_loginCancelled = false;
+		_passportCallback = null;
 		
 		var call = calls.app.startSession(true)
-			.addDataHandler(onSessionReceive.bind(_, onSuccess, onFail, onCancel));
+			.addDataHandler(onSessionReceive.bind(_, onSuccess, onPending, onFail, onCancel));
 		
 		if (onFail != null)
 			call.addErrorHandler(onFail);
@@ -144,6 +166,7 @@ class NG extends NGLite {
 	function onSessionReceive
 	( response :Response<SessionResult>
 	, onSuccess:Void->Void = null
+	, onPending:Void->Void = null
 	, onFail   :Error->Void = null
 	, onCancel :Void->Void = null
 	):Void {
@@ -166,11 +189,41 @@ class NG extends NGLite {
 		
 		if (_session.status == SessionStatus.REQUEST_LOGIN) {
 			
-			logVerbose('loading passport: ${_session.passportUrl}');
-			Lib.getURL(new URLRequest(_session.passportUrl),"_blank");//TODO: pop non fullscreen web page
-		}
+			_passportCallback = checkSession.bind(null, onSuccess, onCancel);
+			if (onPending != null)
+				onPending();
+			else
+				openPassportUrl();
+			
+		} else
+			checkSession(null, onSuccess, onCancel);
+	}
+	
+	/**
+	 * Call this once the passport link is established and it will load the passport URL and
+	 * start checking for session connect periodically
+	 */
+	public function openPassportUrl():Void {
 		
-		checkSession(null, onSuccess, onCancel);
+		if (passportUrl != null) {
+			
+			logVerbose('loading passport: ${passportUrl}');
+			Lib.getURL(new URLRequest(passportUrl), "_blank");//TODO: pop non fullscreen web page
+			onPassportUrlOpen();
+			
+		} else
+			logError("Cannot open passport");
+	}
+	
+	/**
+	 * Call this once the passport link is established and it will start checking for session connect periodically
+	 */
+	public function onPassportUrlOpen():Void {
+		
+		if (_passportCallback != null)
+			_passportCallback();
+		
+		_passportCallback = null;
 	}
 	
 	function checkSession(response:Response<SessionResult>, onSucceess:Void->Void, onCancel:Void->Void):Void {

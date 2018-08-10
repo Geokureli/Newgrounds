@@ -3,6 +3,8 @@
 Before using this library make sure you have read the 
 <a href="http://www.newgrounds.io/">Introduction to Newgrounds.io</a>!
 
+If you're confused by anything be sure to <a href="https://www.newgrounds.com/projects/games/1181322/preview/">try out the test project</a>.
+
 ## Installing the library
 
 **using haxelib:** (not implemented yet)
@@ -204,8 +206,6 @@ NG.core.medal.unlock(id).queue();
 ```
 
 ## TODO
- - better readme.md
-    - hxml instructions
  - add to haxelib
  - AES-128 encryption
  - Hex encoding
