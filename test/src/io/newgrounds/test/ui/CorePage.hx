@@ -58,7 +58,9 @@ class CorePage extends CorePageLite {
 			
 			_loginLabel.text = "cancel";
 			_login.onClick = onCancelClick;
-		}
+			
+		} else if (NG.core.loggedIn)
+			onLogin();
 	}
 	
 	function onLoginFail(error:Error):Void {
@@ -104,7 +106,7 @@ class CorePage extends CorePageLite {
 	
 	function onLogin():Void {
 		
-		_loginLabel.text = "login";
+		_loginLabel.text = "logout";
 		_login.onClick = function ():Void { NG.core.logOut(); };
 		_openPassport.enabled = false;
 		_passportLink.text = "";
