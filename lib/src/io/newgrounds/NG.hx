@@ -199,6 +199,10 @@ class NG extends NGLite {
 			checkSession(null, onSuccess, onCancel);
 	}
 	
+	/**
+	 * Call this once the passport link is established and it will load the passport URL and
+	 * start checking for session connect periodically
+	 */
 	public function openPassportUrl():Void {
 		
 		if (passportUrl != null) {
@@ -211,6 +215,9 @@ class NG extends NGLite {
 			logError("Cannot open passport");
 	}
 	
+	/**
+	 * Call this once the passport link is established and it will start checking for session connect periodically
+	 */
 	public function onPassportUrlOpen():Void {
 		
 		if (_passportCallback != null)
