@@ -216,6 +216,19 @@ class ScoreboardPage extends Page<ScoreBoardComponent> {
 		NG.core.onScoreBoardsLoaded.addOnce(onBoardsReceived);
 		#end
 		
+		#if html5
+		for(i in 0 ... target.numChildren) {
+			
+			if (Std.is(target.getChildAt(i), TextField)) {
+				
+				var field = cast(target.getChildAt(i), TextField);
+				if (!field.selectable)
+					field.mouseEnabled = false;
+			}
+			
+		}
+		#end
+		
 		_social = new CheckBox(target.social);
 		
 		_getBoards = new Button(target.getBoards, function () { send(_calls.getBoards()); });

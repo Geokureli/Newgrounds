@@ -48,7 +48,7 @@ class CorePage extends CorePageLite {
 	inline function initLogInOut():Void {
 		
 		_login.onClick = onLoginClick;
-		_logout.onClick = function() { NG.core.logOut(); };
+		_openPassport.enabled = false;
 		_profileButton.onClick = onProfileClick;
 		
 		NG.core.onLogin.add(onLogin);
@@ -66,9 +66,21 @@ class CorePage extends CorePageLite {
 		onLoginCancel();
 	}
 	
+	function onLoginPendingPassport():Void {
+		
+		_passportLink.text = NG.core.passportUrl;
+		_openPassport.enabled = true;
+		_openPassport.onClick = NG.core.openPassportUrl;
+	}
+	
 	function onLoginClick():Void {
 		
-		NG.core.requestLogin(onLoginFail, onLoginCancel);
+		NG.core.requestLogin
+			( null
+			, onLoginPendingPassport
+			, onLoginFail
+			, onLoginCancel
+			);
 		
 		_loginLabel.text = "cancel";
 		_login.onClick = onCancelClick;
@@ -86,14 +98,16 @@ class CorePage extends CorePageLite {
 		_login.enabled = true;
 		_login.onClick = onLoginClick;
 		_loginLabel.text = "login";
+		_passportLink.text = "";
+		_openPassport.enabled = false;
 	}
 	
 	function onLogin():Void {
 		
 		_loginLabel.text = "login";
-		_login.onClick = onLoginClick;
-		_login.enabled = false;
-		_logout.enabled = true;
+		_login.onClick = function ():Void { NG.core.logOut(); };
+		_openPassport.enabled = false;
+		_passportLink.text = "";
 		
 		_sessionId.text = NG.core.sessionId;
 		
@@ -110,9 +124,6 @@ class CorePage extends CorePageLite {
 	}
 	
 	function onLogOut():Void {
-		
-		_login.enabled = true;
-		_logout.enabled = false;
 		
 		_sessionId.text = "";
 		_user.text = "";
@@ -288,12 +299,13 @@ class CorePageLite extends Page<Component> {
 	
 	var _login:Button;
 	var _loginLabel:TextField;
-	var _logout:Button;
 	var _host:Input;
 	var _sessionId:Input;
 	var _user:TextField;
 	var _profile:ProfileSwf;
 	var _profileButton:Button;
+	var _openPassport:Button;
+	var _passportLink:TextField;
 	
 	var _loadMedals:Button;
 	var _medalList:MedalListSwf;
@@ -310,8 +322,8 @@ class CorePageLite extends Page<Component> {
 		_loginLabel = target.loginLabel;
 		_loginLabel.mouseEnabled = false;
 		
-		_logout = new Button(target.logout);
-		_logout.enabled = false;
+		_openPassport = new Button(target.openPassport);
+		_passportLink = target.passportLink;
 		
 		_user = target.user;
 		_profile = cast target.profile;
@@ -337,7 +349,7 @@ class CorePageLite extends Page<Component> {
 		
 		#if ng_lite
 		_login.enabled = false;
-		_logout.enabled = false;
+		_openPassport.enabled = false;
 		_loadMedals.enabled = false;
 		_loadBoards.enabled = false;
 		_user.backgroundColor = 0xCCCCCC;

@@ -204,8 +204,6 @@ NG.core.medal.unlock(id).queue();
 ```
 
 ## TODO
- - better readme.md
-    - hxml instructions
  - add to haxelib
  - AES-128 encryption
  - Hex encoding
