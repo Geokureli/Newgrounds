@@ -5,7 +5,7 @@
 	<app main="io.newgrounds.test.Main" path="bin" file="Newgrounds" />
 	<app preloader="io.newgrounds.test.TestPreloader" />
 	
-	<window width="800" height="800" fps="30" background="#CCCCCC" />
+	<window width="800" height="800" fps="30" background="#4C4848" />
 	
 	<source path="src" />
 	

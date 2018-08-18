@@ -56,7 +56,7 @@ class CorePage extends CorePageLite {
 		
 		if (NG.core.attemptingLogin) {
 			
-			_loginLabel.text = "cancel";
+			_loginLabel.text = "CANCEL";
 			_login.onClick = onCancelClick;
 			
 		} else if (NG.core.loggedIn)
@@ -84,7 +84,7 @@ class CorePage extends CorePageLite {
 			, onLoginCancel
 			);
 		
-		_loginLabel.text = "cancel";
+		_loginLabel.text = "CANCEL";
 		_login.onClick = onCancelClick;
 	}
 	
@@ -99,14 +99,14 @@ class CorePage extends CorePageLite {
 		
 		_login.enabled = true;
 		_login.onClick = onLoginClick;
-		_loginLabel.text = "login";
+		_loginLabel.text = "LOGIN";
 		_passportLink.text = "";
 		_openPassport.enabled = false;
 	}
 	
 	function onLogin():Void {
 		
-		_loginLabel.text = "logout";
+		_loginLabel.text = "LOGOUT";
 		_login.onClick = function ():Void { NG.core.logOut(); };
 		_openPassport.enabled = false;
 		_passportLink.text = "";
