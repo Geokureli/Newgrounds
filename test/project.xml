@@ -18,6 +18,6 @@
 	<!-- <haxedef name="ng_lite" /> -->
 	
 	<library path="res/Test Layout.swf" id="layout" generate="true" preload="true" />
-	<!--<assets path="assets" exclude="openfl.svg|*.swf" embed="true" />-->
+	<assets path="res/fonts" rename="fonts" embed="true" />
 	
 </project>
