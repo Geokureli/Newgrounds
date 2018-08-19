@@ -1,9 +1,7 @@
 package io.newgrounds.test.ui;
 
-import openfl.display.DisplayObjectContainer;
 import openfl.display.MovieClip;
 import openfl.text.TextField;
-import openfl.text.TextFieldType;
 
 import io.newgrounds.swf.common.Button;
 import io.newgrounds.Call.ICallable;
@@ -36,7 +34,7 @@ class Page<T:Component> {
 	public function new(target:MovieClip, component:T = null) {
 		
 		#if html5
-		mouseDisableText(target);
+			Input.mouseDisableText(target);
 		#end
 		
 		_calls = component;
@@ -63,26 +61,6 @@ class Page<T:Component> {
 	function fieldInt(field:TextField):Int {
 		
 		return Std.parseInt(fieldString(field));
-	}
-	
-	function mouseDisableText(parent:DisplayObjectContainer):Void {
-		
-		var i = parent.numChildren;
-		
-		while(i > 0) {
-			i--;
-			
-			var child = parent.getChildAt(i);
-			if (Std.is(child, TextField)) {
-				
-				var field:TextField = cast child;
-				
-				if (field.type == TextFieldType.DYNAMIC) {
-					
-					field.mouseEnabled = field.selectable;
-				}
-			}
-		}
 	}
 }
 
@@ -214,19 +192,6 @@ class ScoreboardPage extends Page<ScoreBoardComponent> {
 			.queue();
 		#else
 		NG.core.onScoreBoardsLoaded.addOnce(onBoardsReceived);
-		#end
-		
-		#if html5
-		for(i in 0 ... target.numChildren) {
-			
-			if (Std.is(target.getChildAt(i), TextField)) {
-				
-				var field = cast(target.getChildAt(i), TextField);
-				if (!field.selectable)
-					field.mouseEnabled = false;
-			}
-			
-		}
 		#end
 		
 		_social = new CheckBox(target.social);

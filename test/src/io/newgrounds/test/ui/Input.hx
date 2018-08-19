@@ -2,7 +2,9 @@ package io.newgrounds.test.ui;
 
 import openfl.events.TextEvent;
 import openfl.events.Event;
+import openfl.display.DisplayObjectContainer;
 import openfl.text.TextField;
+import openfl.text.TextFieldType;
 
 class Input {
 	
@@ -51,5 +53,22 @@ class Input {
 			return whitespaceRemover.matched(1);
 		
 		return value;
+	}
+	
+	inline static public function mouseDisableText(parent:DisplayObjectContainer):Void {
+		
+		var i = parent.numChildren;
+		
+		while(i > 0) {
+			i--;
+			
+			var child = parent.getChildAt(i);
+			if (Std.is(child, TextField)) {
+				
+				var field:TextField = cast child;
+				if (field.type == TextFieldType.DYNAMIC)
+					field.mouseEnabled = field.selectable;
+			}
+		}
 	}
 }
