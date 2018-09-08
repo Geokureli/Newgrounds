@@ -3,6 +3,7 @@ package io.newgrounds.test;
 import io.newgrounds.test.art.IntroScreenSwf;
 import io.newgrounds.test.ui.IntroPage;
 import io.newgrounds.test.ui.MainScreen;
+import io.newgrounds.test.ui.Input;
 
 import openfl.display.Sprite;
 

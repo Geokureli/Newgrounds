@@ -33,9 +33,10 @@ class Page<T:Component> {
 	
 	public function new(target:MovieClip, component:T = null) {
 		
-		#if html5
+		#if !flash
 			Input.mouseDisableText(target);
 		#end
+		Input.drawInputBg(target);
 		
 		_calls = component;
 	}
