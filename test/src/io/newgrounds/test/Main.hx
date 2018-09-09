@@ -5,7 +5,6 @@ import io.newgrounds.test.ui.IntroPage;
 import io.newgrounds.test.ui.MainScreen;
 
 import openfl.display.Sprite;
-import haxe.crypto.Hmac;
 
 class Main extends Sprite {
 	
