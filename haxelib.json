@@ -4,7 +4,7 @@
     "version"     : "0.0.1-beta",
     "releasenote" : "not actually released",
     "url"         : "https://github.com/Geokureli/Newgrounds.hx",
-    "classPath"   : "lib/src",
+    "classPath"   : "lib/Source",
     "license"     : "MIT",
     "tags"        : ["newgrounds", "newgrounds.io", "ng.io", "web", "strawberryclock"],
     "contributors": ["GeoKureli"],
