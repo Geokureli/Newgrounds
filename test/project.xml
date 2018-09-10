@@ -7,17 +7,17 @@
 	
 	<window width="800" height="800" fps="30" background="#4C4848" />
 	
-	<source path="src" />
+	<source path="Source" />
 	
 	<haxelib name="openfl" />
 	<haxelib name="swf" />
 	<!--<haxelib name="flixel" />-->
-	<classpath path="../lib/src" />
+	<classpath path="../lib/Source" />
 	
 	<!-- <haxedef name="simulate_preloader" if="debug"/> -->
 	<!-- <haxedef name="ng_lite" /> -->
 	
-	<library path="res/Test Layout.swf" id="layout" generate="true" preload="true" />
-	<assets path="res/fonts" rename="fonts" embed="true" />
+	<library path="Assets/Test Layout.swf" id="layout" generate="true" preload="true" />
+	<assets path="Assets/fonts" rename="fonts" embed="true" />
 	
 </project>
