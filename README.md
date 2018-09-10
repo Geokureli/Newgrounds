@@ -8,15 +8,15 @@ If you're confused by anything be sure to <a href="https://www.newgrounds.com/pr
 ## Installing the library
 
 **using haxelib:** (not implemented yet)
-`haxelib install newgrounds.io`
+`haxelib install newgrounds`
 
 just use git for now...
 
-`haxelib git newgrounds.io https://github.com/Geokureli/Newgrounds.hx`
+`haxelib git newgrounds https://github.com/Geokureli/Newgrounds.hx`
 
 ## Implement an instance of io.newgrounds.core into your game:
 
-**OpenFL:** add `<haxelib name="newgrounds.io" />` to your project.xml (not implemented). 
+**OpenFL:** add `<haxelib name="newgrounds" />` to your project.xml (not implemented). 
 You can also just include the local library in your xml via `<classpath path="../[libr path]/lib/src" />`
 
 If you don't want to include openfl in your project, or you just hate my shitty core helpers, 
