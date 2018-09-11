@@ -24,14 +24,18 @@ but limits NG.core's functionality to basic component calls and responses
 
 ### Creating the core
 
-`NG.create("app id here", "session id, here, if you know it");`
+```haxe
+NG.create("app id here", "session id, here, if you know it");
+```
 
 Once the core is created you can access it via NG.core but this is not possible if the core was instantiated directly.
 
 When your game is being played on Newgrounds.com you can find the sessionId in the loaderVars,
 or you can have the API find it automatically with
 
-`NG.createAndCheckSession("app id here");`
+```haxe
+NG.createAndCheckSession("app id here");
+```
 
 
 This will also determine the host that will be used when logging events (except when ng_lite is active). You can also set or change 
@@ -41,7 +45,7 @@ the host using `NG.core.host`. The host is used to track views and various other
 
 If no session ID was found, you will need to start one.
 
-```
+```haxe
 if (NG.core.loggedIn == false)
     NG.core.requestLogin(function():Void { trace("logged on"): });
 ```
@@ -50,7 +54,9 @@ if (NG.core.loggedIn == false)
 
 Setting the encryption method is easy, just call:
 
-`NG.core.initEncryption("encryption key", someEncryptionCipher, someEncryptionFormat);`
+```haxe
+NG.core.initEncryption("encryption key", someEncryptionCipher, someEncryptionFormat);
+```
 
 Encryption Ciphers:
 - **io.newgrounds.crypto.Cipher.NONE**
@@ -65,7 +71,7 @@ You can also use your own encryption method - if you're some kind of crypto-god 
 by directly setting NG.core.encryptionHandler
 
 #### Example
-```
+```haxe
 NG.core.encryptionHandler = myEncryptionHandler;
 
 function myEncryptionHandler(data:String):String {
@@ -105,7 +111,7 @@ data is maintained from NG.core methods, but not direct `NG.core.calls`
 ### Medals 
 Use `NG.core.requestMedals()` to populate `NG.core.medals`, once Medal objects are created 
 you can interface with them directly. For instance: 
-```
+```haxe
 var medal =  NG.core.medals.get(id);
 trace('${medal.name} is worth ${medal.value}');
 
@@ -128,7 +134,7 @@ the response for you (unlike NG.core.requestMedals()). All of the component call
 in `NG.core.call.[componentName].[callName]("call args")`
 
 #### Example:
-```
+```haxe
 var call = NG.core.calls.medal.unlock(medalId);
 call.send();
 ```
@@ -136,7 +142,7 @@ call.send();
 ### Handling responses
 You can add various listeners to a call to track successful or unsuccessful responses from the NG server.
 
-```
+```haxe
 var call = NG.core.calls.medal.unlock(medalId);
 call.addDataHandler(onMedalUnlockDataReceived);
 call.send();
@@ -148,7 +154,7 @@ contained in `myResponse.result.data`.
 
 #### Example Usage:
 
-```
+```haxe
 var call = NG.core.calls.medal.unlock(medalId);
 call.addDataHandler(
     function(response:Response<MedalUnlockResult>):Void {
@@ -174,7 +180,7 @@ to only listen for successful responses from the server
 You can also use myCall.addErrorHandler to listen for errors thrown by NG server, or errors
  resulting from general Http remoting
 
-```
+```haxe
 myCall.addErrorHandler(
     function(e:io.newgrounds.objects.Error):Void {
         
@@ -185,7 +191,7 @@ myCall.addErrorHandler(
 
 ### Chaining call methods
 All Call methods support chaining, meaning you can setup your calls without using local vars.
-```
+```haxe
 NG.core.call.medalUnlock(id)
     .setProperty("debug", true)
     .addSuccessHandler(onSuccess)
@@ -197,7 +203,7 @@ NG.core.call.medalUnlock(id)
 ### Queueing calls
 All calls can be queued so that they are sent sequentially rather than sending them all at once.
 
-```
+```haxe
 NG.core.session = "session id here";
 NG.core.app.checkSession().queue();
 NG.core.medal.unlock(id).queue();
