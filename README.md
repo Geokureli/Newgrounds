@@ -1,5 +1,5 @@
 [![MIT License](https://img.shields.io/github/license/openfl/openfl.svg?style=flat)](LICENSE.md)
-[![Haxelib Version](https://img.shields.io/github/tag/geokureli/newgrounds.hx.svg?style=flat&label=haxelib)](https://lib.haxe.org/search/?v=newgrounds)
+[![Haxelib Version](https://img.shields.io/github/tag/geokureli/newgrounds.hx.svg?style=flat&label=haxelib)](https://lib.haxe.org/p/newgrounds/)
 
 # Newgrounds.hx
 
