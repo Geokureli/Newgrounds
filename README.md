@@ -1,3 +1,6 @@
+[![MIT License](https://img.shields.io/github/license/openfl/openfl.svg?style=flat)](LICENSE.md)
+[![Haxelib Version](https://img.shields.io/github/tag/geokureli/newgrounds.hx.svg?style=flat&label=haxelib)](https://lib.haxe.org/search/?v=newgrounds)
+
 # Newgrounds.hx
 
 Before using this library make sure you have read the 
@@ -7,16 +10,12 @@ If you're confused by anything be sure to <a href="https://www.newgrounds.com/pr
 
 ## Installing the library
 
-**using haxelib:** (not implemented yet)
+**using haxelib:**
 `haxelib install newgrounds`
-
-just use git for now...
-
-`haxelib git newgrounds https://github.com/Geokureli/Newgrounds.hx`
 
 ## Implement an instance of io.newgrounds.core into your game:
 
-**OpenFL:** add `<haxelib name="newgrounds" />` to your project.xml (not implemented). 
+**OpenFL:** add `<haxelib name="newgrounds" />` to your project.xml.
 You can also just include the local library in your xml via `<classpath path="../[libr path]/lib/src" />`
 
 If you don't want to include openfl in your project, or you just hate my shitty core helpers, 
