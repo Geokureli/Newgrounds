@@ -2,7 +2,7 @@
 <project>
 	
 	<meta title="Newgrounds.io" package="io.newgrounds.test.Main" version="1.0.0" company="GeoKureli" />
-	<app main="io.newgrounds.test.Main" path="bin" file="Newgrounds" />
+	<app main="io.newgrounds.test.Main" path="Export" file="Newgrounds" />
 	<app preloader="io.newgrounds.test.TestPreloader" />
 	
 	<window width="800" height="800" fps="30" background="#4C4848" />
