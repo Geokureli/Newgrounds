@@ -66,7 +66,7 @@ class NGLite {
 	 * @param appId  	The unique ID of your app as found in the 'API Tools' tab of your Newgrounds.com project.
 	 * @param sessionId A unique session id used to identify the active user.
 	**/
-	public function new(appId:String = "test", sessionId:String = null) {
+	public function new(appId = "test", sessionId:String = null, ?onSessionFail:Error->Void) {
 		
 		this.appId = appId;
 		this.sessionId = sessionId;
@@ -76,25 +76,29 @@ class NGLite {
 		if (this.sessionId != null) {
 			
 			calls.app.checkSession()
-				.addDataHandler(checkInitialSession)
-				// .addErrorHandler(onInitialSessionFail) // needs some way of notifying the caller
+				.addDataHandler(checkInitialSession.bind(onSessionFail))
 				.send();
 		}
 	}
 	
-	function checkInitialSession(response:Response<SessionResult>):Void {
+	function checkInitialSession(onFail:Error->Void, response:Response<SessionResult>):Void {
 		
-		if (!response.success || !response.result.success || response.result.data.session.expired)
+		if (!response.success || !response.result.success || response.result.data.session.expired) {
+			
 			sessionId = null;
+			
+			if (onFail != null)
+				onFail(response.success ? response.result.error : response.error);
+		}
 	}
 	
 	/**
 	 * Creates NG.core, the heart and soul of the API. This is not the only way to create an instance,
 	 * nor is NG a forced singleton, but it's the only way to set the static NG.core.
 	**/
-	static public function create(appId:String = "test", sessionId:String = null):Void {
+	static public function create(appId = "test", sessionId:String = null, ?onSessionFail:Error->Void):Void {
 		
-		core = new NGLite(appId, sessionId);
+		core = new NGLite(appId, sessionId, onSessionFail);
 		
 		onCoreReady.dispatch();
 	}
@@ -103,9 +107,17 @@ class NGLite {
 	 * Creates NG.core, and tries to create a session. This is not the only way to create an instance,
 	 * nor is NG a forced singleton, but it's the only way to set the static NG.core.
 	**/
-	static public function createAndCheckSession(appId:String = "test"):Void {
+	static public function createAndCheckSession
+	( appId = "test"
+	, backupSession:String = null
+	, ?onSessionFail:Error->Void
+	):Void {
 		
-		create(appId, getSessionId());
+		var session = getSessionId();
+		if (session == null)
+			session = backupSession;
+		
+		create(appId, session, onSessionFail);
 	}
 	
 	inline static public function getUrl():String {
