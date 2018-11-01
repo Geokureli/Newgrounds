@@ -34,7 +34,7 @@ When your game is being played on Newgrounds.com you can find the sessionId in t
 or you can have the API find it automatically with
 
 ```haxe
-NG.createAndCheckSession("app id here");
+NG.createAndCheckSession("app id here", "backup session id, if none is found");
 ```
 
 
@@ -211,7 +211,6 @@ NG.core.medal.unlock(id).queue();
 ```
 
 ## TODO
- - add to haxelib
  - AES-128 encryption
  - Hex encoding
  - kill all humans
@@ -222,3 +221,4 @@ NG.core.medal.unlock(id).queue();
  - local storage
     - save unsent medal unlocks and scoreboard posts
     - save previous session rather than creating a new one
+ - allow synchronous http requests
