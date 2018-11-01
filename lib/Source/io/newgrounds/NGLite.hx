@@ -77,6 +77,7 @@ class NGLite {
 			
 			calls.app.checkSession()
 				.addDataHandler(checkInitialSession)
+				// .addErrorHandler(onInitialSessionFail) // needs some way of notifying the caller
 				.send();
 		}
 	}

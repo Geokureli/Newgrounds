@@ -84,6 +84,8 @@ class NG extends NGLite {
 		onMedalsLoaded = new Dispatcher();
 		onScoreBoardsLoaded = new Dispatcher();
 		
+		attemptingLogin = sessionId != null;
+		
 		super(appId, sessionId);
 	}
 	
@@ -102,9 +104,13 @@ class NG extends NGLite {
 	 * Creates NG.core, and tries to create a session. This is not the only way to create an instance,
 	 * nor is NG a forced singleton, but it's the only way to set the static NG.core.
 	**/
-	static public function createAndCheckSession(appId:String = "test"):Void {
+	static public function createAndCheckSession(appId:String = "test", backupSession:String = null):Void {
 		
-		create(appId, NGLite.getSessionId());
+		var session = NGLite.getSessionId();
+		if (session == null)
+			session = backupSession;
+		
+		create(appId, session);
 		
 		core.host = getHost();
 		if (core.sessionId != null)
