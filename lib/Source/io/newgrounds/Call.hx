@@ -1,6 +1,7 @@
 package io.newgrounds;
 
 import io.newgrounds.utils.Dispatcher;
+import io.newgrounds.utils.AsyncHttp;
 import io.newgrounds.objects.Error;
 import io.newgrounds.objects.events.Result;
 import io.newgrounds.objects.events.Result.ResultBase;
@@ -8,7 +9,6 @@ import io.newgrounds.objects.events.Response;
 
 import haxe.ds.StringMap;
 import haxe.Json;
-import haxe.Http;
 
 /** A generic way to handle calls agnostic to their type */
 interface ICallable {
@@ -22,8 +22,6 @@ interface ICallable {
 
 class Call<T:ResultBase>
 	implements ICallable {
-	
-	inline static var PATH:String = "https://newgrounds.io/gateway_v3.php";
 	
 	public var component(default, null):String;
 	
@@ -168,12 +166,7 @@ class Call<T:ResultBase>
 		
 		_core.markCallPending(this);
 		
-		var http = new Http(PATH);
-		http.setParameter("input", Json.stringify(data));
-		http.onData   = onData;
-		http.onError  = onHttpError;
-		http.onStatus = onStatus;
-		http.request(true);
+		AsyncHttp.send(_core, Json.stringify(data), onData, onHttpError, onStatus);
 	}
 	
 	/** Adds the call to the queue */
