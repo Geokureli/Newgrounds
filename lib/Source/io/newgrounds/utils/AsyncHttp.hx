@@ -183,9 +183,9 @@ class AsyncHttp {
 		sendSync
 			( data.core
 			, data.args
-			,	function(reply)  { data.source.sendMessage({ key:data.key, data  :reply  }); }
-			,	function(error)  { data.source.sendMessage({ key:data.key, error :error  }); }
-			,	function(status) { data.source.sendMessage({ key:data.key, status:status }); }
+			, function(reply)  { data.source.sendMessage({ key:data.key, data  :reply  }); }
+			, function(error)  { data.source.sendMessage({ key:data.key, error :error  }); }
+			, function(status) { data.source.sendMessage({ key:data.key, status:status }); }
 			);
 	}
 	#end
