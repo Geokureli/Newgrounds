@@ -178,18 +178,24 @@ class AsyncHttp {
 	
 	static function sendThreaded():Void {
 		
-		var data:LoaderData = cast Thread.readMessage(true);
-		data.core.logVerbose('start message received: ${data.key}');
-		sendSync
-			( data.core
-			, data.args
-			, function(reply)  { data.source.sendMessage({ key:data.key, data  :reply  }); }
-			, function(error)  { data.source.sendMessage({ key:data.key, error :error  }); }
-			, function(status) { data.source.sendMessage({ key:data.key, status:status }); }
-			);
+		while(true) {
+			
+			var data:LoaderData = cast Thread.readMessage(true);
+			data.core.logVerbose('start message received: ${data.key}');
+			
+			sendSync
+				( data.core
+				, data.args
+				, function(reply ) { data.source.sendMessage({ key:data.key, data  :reply  }); }
+				, function(error ) { data.source.sendMessage({ key:data.key, error :error  }); }
+				, function(status) { data.source.sendMessage({ key:data.key, status:status }); }
+				);
+		}
 	}
+	
 	#end
 }
+
 
 #if (neko || java || cpp)
 typedef LoaderData = { source:Thread, key:Int, args:String, core:NGLite };
