@@ -1,8 +1,8 @@
 {
     "name"        : "newgrounds",
     "description" : "Newgrounds API for haxe",
-    "version"     : "1.0.0",
-    "releasenote" : "renamed from newgrounds.io to just newgrounds",
+    "version"     : "1.1.0",
+    "releasenote" : "added async http requests on cpp targets",
     "url"         : "https://github.com/Geokureli/Newgrounds.hx",
     "classPath"   : "lib/Source",
     "license"     : "MIT",
