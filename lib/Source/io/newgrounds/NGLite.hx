@@ -19,13 +19,6 @@ import io.newgrounds.utils.Dispatcher;
 	#error "Target not supported, use: Flash, JS/HTML5, cpp or maybe neko";
 #end
 
-#if html5
-	import js.Browser;
-#elseif flash
-	import flash.display.Stage;
-	import flash.Lib;
-#end
-
 /**
  * The barebones NG.io API. Allows API calls with code completion
  * and retrieves server data via strongly typed Objects
@@ -127,10 +120,10 @@ class NGLite {
 	inline static public function getUrl():String {
 		
 		#if html5
-			return Browser.document.location.href;
+			return js.Browser.document.location.href;
 		#elseif flash
-			return Lib.current.stage.loaderInfo != null
-				? Lib.current.stage.loaderInfo.url
+			return flash.Lib.current.stage.loaderInfo != null
+				? flash.Lib.current.stage.loaderInfo.url
 				: null;
 		#else
 			return null;
@@ -158,8 +151,9 @@ class NGLite {
 			
 		#elseif flash
 			
-			if (Lib.current.stage.loaderInfo != null && Reflect.hasField(Lib.current.stage.loaderInfo.parameters, "ngio_session_id"))
-				return Reflect.field(Lib.current.stage.loaderInfo.parameters, "ngio_session_id");
+			if (flash.Lib.current.stage.loaderInfo != null
+			&&  Reflect.hasField(flash.Lib.current.stage.loaderInfo.parameters, "ngio_session_id"))
+				return Reflect.field(flash.Lib.current.stage.loaderInfo.parameters, "ngio_session_id");
 			
 		#end
 		
