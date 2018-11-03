@@ -15,6 +15,10 @@ import io.newgrounds.objects.events.Result.ResultBase;
 import io.newgrounds.objects.events.Result.SessionResult;
 import io.newgrounds.utils.Dispatcher;
 
+#if !(html5 || flash || desktop || neko)
+	#error "Target not supported, use: Flash, JS/HTML5, cpp or maybe neko";
+#end
+
 #if html5
 	import js.Browser;
 #elseif flash
