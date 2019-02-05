@@ -1,8 +1,8 @@
 {
     "name"        : "newgrounds",
     "description" : "Newgrounds API for haxe",
-    "version"     : "1.1.0",
-    "releasenote" : "added async http requests on cpp targets",
+    "version"     : "1.1.1",
+    "releasenote" : "set loggedIn to false on logOut",
     "url"         : "https://github.com/Geokureli/Newgrounds.hx",
     "classPath"   : "lib/Source",
     "license"     : "MIT",
