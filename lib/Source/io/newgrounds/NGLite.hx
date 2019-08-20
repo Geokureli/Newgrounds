@@ -74,6 +74,7 @@ class NGLite {
 			
 			calls.app.checkSession()
 				.addDataHandler(checkInitialSession.bind(onSessionFail))
+				.addErrorHandler(initialSessionFail.bind(onSessionFail))
 				.send();
 		}
 	}
@@ -82,11 +83,16 @@ class NGLite {
 		
 		if (!response.success || !response.result.success || response.result.data.session.expired) {
 			
-			sessionId = null;
-			
-			if (onFail != null)
-				onFail(response.success ? response.result.error : response.error);
+			initialSessionFail(onFail, response.success ? response.result.error : response.error);
 		}
+	}
+	
+	function initialSessionFail(onFail:Error->Void, error:Error):Void {
+		
+		sessionId = null;
+		
+		if (onFail != null)
+			onFail(error);
 	}
 	
 	/**
