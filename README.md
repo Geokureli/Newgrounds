@@ -1,7 +1,7 @@
-[![MIT License](https://img.shields.io/github/license/geokureli/newgrounds.hx.svg?style=flat)](LICENSE.md)
-[![Haxelib Version](https://img.shields.io/github/tag/geokureli/newgrounds.hx.svg?style=flat&label=haxelib)](https://lib.haxe.org/p/newgrounds/)
+[![MIT License](https://img.shields.io/github/license/geokureli/newgrounds.svg?style=flat)](LICENSE.md)
+[![Haxelib Version](https://img.shields.io/github/tag/geokureli/newgrounds.svg?style=flat&label=haxelib)](https://lib.haxe.org/p/newgrounds/)
 
-# Newgrounds.hx
+# Newgrounds
 
 Before using this library make sure you have read the 
 <a href="http://www.newgrounds.io/">Introduction to Newgrounds.io</a>!
