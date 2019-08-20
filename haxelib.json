@@ -2,7 +2,7 @@
     "name"        : "newgrounds",
     "description" : "Newgrounds API for haxe",
     "version"     : "1.1.1",
-    "releasenote" : "set loggedIn to false on logOut",
+    "releasenote" : "remove OpenFL references in NG.hx",
     "url"         : "https://github.com/Geokureli/Newgrounds.hx",
     "classPath"   : "lib/Source",
     "license"     : "MIT",

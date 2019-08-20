@@ -15,11 +15,8 @@ import io.newgrounds.objects.events.Result.ResultBase;
 import io.newgrounds.objects.events.Result.SessionResult;
 import io.newgrounds.utils.Dispatcher;
 
-#if html5
-	import js.Browser;
-#elseif flash
-	import flash.display.Stage;
-	import flash.Lib;
+#if !(html5 || flash || desktop || neko)
+	#error "Target not supported, use: Flash, JS/HTML5, cpp or maybe neko";
 #end
 
 /**
@@ -123,10 +120,10 @@ class NGLite {
 	inline static public function getUrl():String {
 		
 		#if html5
-			return Browser.document.location.href;
+			return js.Browser.document.location.href;
 		#elseif flash
-			return Lib.current.stage.loaderInfo != null
-				? Lib.current.stage.loaderInfo.url
+			return flash.Lib.current.stage.loaderInfo != null
+				? flash.Lib.current.stage.loaderInfo.url
 				: null;
 		#else
 			return null;
@@ -154,8 +151,9 @@ class NGLite {
 			
 		#elseif flash
 			
-			if (Lib.current.stage.loaderInfo != null && Reflect.hasField(Lib.current.stage.loaderInfo.parameters, "ngio_session_id"))
-				return Reflect.field(Lib.current.stage.loaderInfo.parameters, "ngio_session_id");
+			if (flash.Lib.current.stage.loaderInfo != null
+			&&  Reflect.hasField(flash.Lib.current.stage.loaderInfo.parameters, "ngio_session_id"))
+				return Reflect.field(flash.Lib.current.stage.loaderInfo.parameters, "ngio_session_id");
 			
 		#end
 		

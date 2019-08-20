@@ -1,4 +1,5 @@
 package io.newgrounds;
+
 #if ng_lite
 typedef NG = NGLite; //TODO: test and make lite UI
 #else
@@ -14,12 +15,7 @@ import io.newgrounds.objects.Session;
 import io.newgrounds.objects.ScoreBoard;
 
 import haxe.ds.IntMap;
-
-import openfl.display.Stage;
-import openfl.events.TimerEvent;
-import openfl.Lib;
-import openfl.net.URLRequest;
-import openfl.utils.Timer;
+import haxe.Timer;
 
 /**
  * The Newgrounds API for Haxe.
@@ -218,11 +214,38 @@ class NG extends NGLite {
 		if (passportUrl != null) {
 			
 			logVerbose('loading passport: ${passportUrl}');
-			Lib.getURL(new URLRequest(passportUrl), "_blank");//TODO: pop non fullscreen web page
+			openPassportHelper(passportUrl);
 			onPassportUrlOpen();
 			
 		} else
 			logError("Cannot open passport");
+	}
+	
+	
+	static function openPassportHelper(url:String):Void {
+		var window = "_blank";
+		
+		#if flash
+			flash.Lib.getURL(new flash.net.URLRequest(url), window);
+		#elseif (js && html5)
+			js.Browser.window.open(url, window);
+		#elseif desktop
+			
+			#if (sys && windows)
+				Sys.command("start", ["", url]);
+			#elseif mac
+				Sys.command("/usr/bin/open", [url]);
+			#elseif linux
+				Sys.command("/usr/bin/xdg-open", [path, "&"]);
+			#end
+			
+		#elseif android
+			JNI.createStaticMethod
+				( "org/haxe/lime/GameActivity"
+				, "openURL"
+				, "(Ljava/lang/String;Ljava/lang/String;)V"
+				) (url, window);
+		#end
 	}
 	
 	/**
@@ -423,16 +446,12 @@ class NG extends NGLite {
 	
 	function timer(delay:Float, callback:Void->Void):Void {
 		
-		var timer = new Timer(delay * 1000.0, 1);
-		
-		function func(e:TimerEvent):Void {
+		var timer = new Timer(Std.int(delay * 1000));
+		timer.run = function func():Void {
 			
-			timer.removeEventListener(TimerEvent.TIMER_COMPLETE, func);
+			timer.stop();
 			callback();
 		}
-		
-		timer.addEventListener(TimerEvent.TIMER_COMPLETE, func);
-		timer.start();
 	}
 	
 	static var urlParser:EReg = ~/^(?:http[s]?:\/\/)?([^:\/\s]+)(:[0-9]+)?((?:\/\w+)*\/)([\w\-\.]+[^#?\s]+)([^#\s]*)?(#[\w\-]+)?$/i;//TODO:trim

@@ -1,4 +1,4 @@
-[![MIT License](https://img.shields.io/github/license/openfl/openfl.svg?style=flat)](LICENSE.md)
+[![MIT License](https://img.shields.io/github/license/geokureli/newgrounds.hx.svg?style=flat)](LICENSE.md)
 [![Haxelib Version](https://img.shields.io/github/tag/geokureli/newgrounds.hx.svg?style=flat&label=haxelib)](https://lib.haxe.org/p/newgrounds/)
 
 # Newgrounds.hx
@@ -6,7 +6,8 @@
 Before using this library make sure you have read the 
 <a href="http://www.newgrounds.io/">Introduction to Newgrounds.io</a>!
 
-If you're confused by anything be sure to <a href="https://www.newgrounds.com/projects/games/1181322/preview/">try out the test project</a>.
+If you're confused by anything be sure to 
+<a href="https://www.newgrounds.com/projects/games/1181322/preview/">try out the test project</a>.
 
 ## Installing the library
 
@@ -15,12 +16,13 @@ If you're confused by anything be sure to <a href="https://www.newgrounds.com/pr
 
 ## Implement an instance of io.newgrounds.core into your game:
 
-**OpenFL:** add `<haxelib name="newgrounds" />` to your project.xml.
-You can also just include the local library in your xml via `<classpath path="../[libr path]/lib/src" />`
+Add `<haxelib name="newgrounds" />` to your project.xml.
+You can also just include the local library in your xml
+via `<classpath path="../[libr path]/lib/src" />`
 
-If you don't want to include openfl in your project, or you just hate my shitty core helpers, 
-you can enable the compiler flag `ng_lite`. and it removes all openfl dependencies, 
-but limits NG.core's functionality to basic component calls and responses
+If you hate my shitty core helpers, you can enable
+the compiler flag `ng_lite` to limit NG.core's
+functionality to basic component calls and responses.
 
 ### Creating the core
 
@@ -28,18 +30,23 @@ but limits NG.core's functionality to basic component calls and responses
 NG.create("app id here", "session id, here, if you know it");
 ```
 
-Once the core is created you can access it via NG.core but this is not possible if the core was instantiated directly.
+Once the core is created you can access it via NG.core but 
+this is not possible if the core was instantiated directly.
 
-When your game is being played on Newgrounds.com you can find the sessionId in the loaderVars,
-or you can have the API find it automatically with
+When your game is being played on Newgrounds.com you can
+find the sessionId in the loaderVars, or you can have the
+API find it automatically with
 
 ```haxe
 NG.createAndCheckSession("app id here", "backup session id, if none is found");
 ```
 
 
-This will also determine the host that will be used when logging events (except when ng_lite is active). You can also set or change 
-the host using `NG.core.host`. The host is used to track views and various other events logged to NG.io.
+This will also determine the host that will be used when
+logging events (except when ng_lite is active). You can
+also set or change the host using `NG.core.host`. The
+host is used to track views and various other events logged
+to NG.io.
 
 ### Manual Login
 
