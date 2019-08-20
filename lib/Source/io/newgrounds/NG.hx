@@ -336,6 +336,7 @@ class NG extends NGLite {
 		
 		_session.expire();
 		sessionId = null;
+		loggedIn = false;
 	}
 	
 	// -------------------------------------------------------------------------------------------
