@@ -3,13 +3,14 @@ package io.newgrounds.objects;
 import io.newgrounds.utils.Dispatcher;
 import io.newgrounds.NGLite;
 
-class Object {
+class Object<T> {
 	
 	var _core:NGLite;
+	var _data:T;
 	
 	public var onUpdate(default, null):Dispatcher;
 	
-	public function new(core:NGLite, data:Dynamic = null) {
+	public function new(core:NGLite, data:T = null) {
 		
 		this._core = core; 
 		
@@ -20,8 +21,9 @@ class Object {
 	}
 	
 	@:allow(io.newgrounds.NGLite)
-	function parse(data:Dynamic):Void {
+	function parse(data:T):Void {
 		
+		_data = data;
 		onUpdate.dispatch();
 	}
 	

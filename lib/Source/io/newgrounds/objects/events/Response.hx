@@ -33,7 +33,7 @@ class Response<T:ResultBase> {
 		debug = data.debug;
 		
 		if (!success) {
-			error = new Error(data.error.message, data.error.code);
+			error = data.error;
 			core.logError('Call unseccessful: $error');
 			return;
 		}

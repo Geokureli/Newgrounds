@@ -1,20 +1,25 @@
 package io.newgrounds.objects;
-class Error {
+
+@:noCompletion
+typedef RawErrorData = {
 	
-	public var code(default, null):Int;
-	public var message(default, null):String;
+	message:String,
+	?code  :Int
+}
+
+
+abstract Error(RawErrorData) {
 	
-	public function new (message:String, code:Int = 0) {
-		
-		this.message = message;
-		this.code = code;
+	public var code   (get, never):Null<Int>; inline function get_code   () return this.code;
+	public var message(get, never):String   ; inline function get_message() return this.message;
+	
+	inline public function new(message:String, ?code:Int)
+	{
+		this = { message:message, code:code };
 	}
 	
-	public function toString():String {
+	inline public function toString():String {
 		
-		if (code > 0)
-			return '#$code - $message';
-		
-		return message;
+		return (code != null ? '#$code - ' : "") + message;
 	}
 }

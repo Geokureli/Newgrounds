@@ -21,7 +21,7 @@ class Result<T:ResultBase> {
 		
 		if(!data.success) {
 			
-			error = new Error(data.error.message, data.error.code);
+			error = data.error;
 			core.logError('$component fail: $error');
 			
 		} else

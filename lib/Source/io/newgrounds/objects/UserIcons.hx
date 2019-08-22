@@ -1,14 +1,24 @@
 package io.newgrounds.objects;
 
-typedef UserIcons = {
+@:noCompletion
+typedef RawUserIconsData = {
 	
-	/**The URL of the user's large icon. */
-	var large:String;
-	
-	/** The URL of the user's medium icon. */
-	var medium:String;
-	
-	/** The URL of the user's small icon. */
-	var small:String;
+	large :String,
+	medium:String,
+	small :String
 }
 
+abstract UserIcons(RawUserIconsData) from RawUserIconsData {
+	
+	/**The URL of the user's large icon. */
+	public var large(get, never):String;
+	inline function get_large() return this.large;
+	
+	/** The URL of the user's medium icon. */
+	public var medium(get, never):String;
+	inline function get_medium() return this.medium;
+	
+	/** The URL of the user's small icon. */
+	public var small(get, never):String;
+	inline function get_small() return this.small;
+}

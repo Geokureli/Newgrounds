@@ -6,25 +6,26 @@ import io.newgrounds.objects.events.Result;
 import io.newgrounds.objects.events.Result.ScoreResult;
 import io.newgrounds.NGLite;
 
-class ScoreBoard extends Object {
+@:noCompletion
+typedef RawScoreBoardData = {
+	
+	id  :Int,
+	name:String
+}
+
+class ScoreBoard extends Object<RawScoreBoardData> {
 	
 	public var scores(default, null):Array<Score>;
 	
 	/** The numeric ID of the scoreboard.*/
-	public var id(default, null):Int;
+	public var id(get, never):Int;
+	inline function get_id() return _data.id;
 	
 	/** The name of the scoreboard. */
-	public var name(default, null):String;
+	public var name(get, never):String;
+	inline function get_name() return _data.name;
 	
-	public function new(core:NGLite, data:Dynamic):Void {super(core, data); }
-	
-	override function parse(data:Dynamic):Void {
-		
-		id   = data.id;
-		name = data.name;
-		
-		super.parse(data);
-	}
+	public function new(core:NGLite, data:RawScoreBoardData):Void {super(core, data); }
 
 	/**
 	 * Fetches score data from the server, this removes all of the existing scores cached
