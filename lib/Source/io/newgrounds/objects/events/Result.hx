@@ -34,25 +34,44 @@ typedef SessionResult = ResultBase & {
 	var session(default, null):Session;
 }
 
-typedef GetHostResult = ResultBase & {
+@:noCompletion
+typedef RawGetHostResult = ResultBase
+	& { host_approved:Bool }
+abstract GetHostResult(RawGetHostResult) from RawGetHostResult to ResultBase {
 	
-	var host_approved(default, null):Bool;
+	public var hostApproved(get, never):Bool;
+	inline function get_hostApproved() return this.host_approved;
 }
 
-typedef GetCurrentVersionResult = ResultBase & {
+@:noCompletion
+typedef RawGetCurrentVersionResult = ResultBase
+	& { current_version:String, client_deprecated:Bool }
+abstract GetCurrentVersionResult(RawGetCurrentVersionResult) from RawGetCurrentVersionResult to ResultBase {
 	
-	var current_version  (default, null):String;
-	var client_deprecated(default, null):Bool;
+	public var currentVersion(get, never):String;
+	inline function get_currentVersion() return this.current_version;
+	
+	public var clientDeprecated(get, never):Bool;
+	inline function get_clientDeprecated() return this.client_deprecated;
+	
 }
 
-typedef LogEventResult = ResultBase & {
+@:noCompletion
+typedef RawLogEventResult = ResultBase
+	& { event_name:String }
+abstract LogEventResult(RawLogEventResult) from RawLogEventResult to ResultBase {
 	
-	var event_name(default, null):String;
+	public var eventName(get, never):String;
+	inline function get_eventName() return this.event_name;
 }
 
-typedef GetDateTimeResult = ResultBase & {
+@:noCompletion
+typedef RawGetDateTimeResult = ResultBase
+	& { datetime:String }
+abstract GetDateTimeResult(RawGetDateTimeResult) from RawGetDateTimeResult to ResultBase {
 	
-	var datetime(default, null):String;
+	public var dateTime(get, never):String;
+	inline function get_dateTime() return this.datetime;
 }
 
 typedef GetVersionResult = ResultBase & {
@@ -70,10 +89,18 @@ typedef MedalListResult = ResultBase & {
 	var medals(default, null):Array<RawMedalData>;
 }
 
-typedef MedalUnlockResult = ResultBase & {
+@:noCompletion
+typedef RawMedalUnlockResult = ResultBase
+	& { medal_score:String, medal:RawMedalData }
+
+abstract MedalUnlockResult(RawMedalUnlockResult) from RawMedalUnlockResult to ResultBase {
 	
-	var medal_score(default, null):String;
-	var medal      (default, null):RawMedalData;
+	public var medalScore(get, never):String;
+	inline function get_medalScore() return this.medal_score;
+	
+	public var medal(get, never):RawMedalData;
+	inline function get_medal() return this.medal;
+	
 }
 
 typedef ScoreBoardResult = ResultBase & {

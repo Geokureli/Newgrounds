@@ -72,7 +72,7 @@ class NG extends NGLite {
 	 * @param appId     The unique ID of your app as found in the 'API Tools' tab of your Newgrounds.com project.
 	 * @param sessionId A unique session id used to identify the active user.
 	**/
-	public function new(appId = "test", sessionId:String = null, ?onSessionFail:Error->Void) {
+	public function new(appId = "test", ?sessionId:String, debug = false, ?onSessionFail:Error->Void) {
 		
 		onLogin = new Dispatcher();
 		onLogOut = new Dispatcher();
@@ -81,16 +81,21 @@ class NG extends NGLite {
 		
 		attemptingLogin = sessionId != null;
 		
-		super(appId, sessionId, onSessionFail);
+		super(appId, sessionId, debug, onSessionFail);
 	}
 	
 	/**
 	 * Creates NG.core, the heart and soul of the API. This is not the only way to create an instance,
 	 * nor is NG a forced singleton, but it's the only way to set the static NG.core.
 	**/
-	static public function create(appId = "test", sessionId:String = null, ?onSessionFail:Error->Void):Void {
+	static public function create
+	( appId = "test"
+	, ?sessionId:String
+	, debug = false
+	, ?onSessionFail:Error->Void
+	):Void {
 		
-		core = new NG(appId, sessionId, onSessionFail);
+		core = new NG(appId, sessionId, debug, onSessionFail);
 		
 		onCoreReady.dispatch();
 	}
@@ -101,6 +106,7 @@ class NG extends NGLite {
 	**/
 	static public function createAndCheckSession
 	( appId = "test"
+	, debug = false
 	, backupSession:String = null
 	, ?onSessionFail:Error->Void
 	):Void {
@@ -109,7 +115,7 @@ class NG extends NGLite {
 		if (session == null)
 			session = backupSession;
 		
-		create(appId, session, onSessionFail);
+		create(appId, session, debug, onSessionFail);
 		
 		core.host = getHost();
 		if (core.sessionId != null)

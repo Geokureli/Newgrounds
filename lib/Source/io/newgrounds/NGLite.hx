@@ -63,10 +63,11 @@ class NGLite {
 	 * @param appId  	The unique ID of your app as found in the 'API Tools' tab of your Newgrounds.com project.
 	 * @param sessionId A unique session id used to identify the active user.
 	**/
-	public function new(appId = "test", sessionId:String = null, ?onSessionFail:Error->Void) {
+	public function new(appId = "test", ?sessionId:String, debug = false, ?onSessionFail:Error->Void) {
 		
 		this.appId = appId;
 		this.sessionId = sessionId;
+		this.debug = debug;
 		
 		calls = new ComponentList(this);
 		

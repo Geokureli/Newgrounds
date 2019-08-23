@@ -18,6 +18,7 @@ class IntroPage extends Page<Component> {
 	var _sessionId:TextField;
 	var _start:Button;
 	var _autoConnect:CheckBox;
+	var _debug:CheckBox;
 	var _stage:Stage;
 	var _encryptionKey:TextField;
 	var _cipher:RadioGroup;
@@ -44,6 +45,7 @@ class IntroPage extends Page<Component> {
 			_sessionId.text = autoSession;
 		#else
 		_autoConnect = new CheckBox(target.autoConnect, onAutoConnectToggle);
+		_debug = new CheckBox(target.debug);
 		if (NGLite.getSessionId() != null){
 			
 			_autoConnect.on = true;
@@ -89,13 +91,13 @@ class IntroPage extends Page<Component> {
 	function onStartClick():Void {
 		
 		#if ng_lite
-		NG.create(fieldString(_appId), fieldString(_sessionId));
+		NG.create(fieldString(_appId), fieldString(_sessionId), _debug.on);
 		NG.core.host = getHost(_stage);
 		#else
 		if (_autoConnect.on)
-			NG.createAndCheckSession(fieldString(_appId));
+			NG.createAndCheckSession(fieldString(_appId), _debug.on);
 		else
-			NG.create(fieldString(_appId), fieldString(_sessionId));
+			NG.create(fieldString(_appId), fieldString(_sessionId), _debug.on);
 		#end
 		if (_cipher.selected != Cipher.NONE)
 			NG.core.initEncryption(fieldString(_encryptionKey), cast _cipher.selected, cast _format.selected);
