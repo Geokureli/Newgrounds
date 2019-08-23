@@ -1,8 +1,8 @@
 package io.newgrounds.objects.events;
 
-import io.newgrounds.objects.events.Result.ResultBase;
 import haxe.Json;
 import io.newgrounds.objects.Error;
+import io.newgrounds.objects.events.Result;
 
 typedef DebugResponse = {
 	
@@ -10,34 +10,35 @@ typedef DebugResponse = {
 	var input:Dynamic;
 }
 
-class Response<T:ResultBase> {
+@:noCompletion
+typedef RawResponse<T:ResultBase> =
+{
+	success:Bool,
+	?error :Error,
+	?debug :DebugResponse,
+	?result:Result<T>,
+	app_id :String
+}
+
+abstract Response<T:ResultBase>(RawResponse<T>) {
 	
-	public var success(default, null):Bool;
-	public var error(default, null):Error;
-	public var debug(default, null):DebugResponse;
-	public var result(default, null):Result<T>;
+	public var success(get, never):Bool               ; inline function get_success () return this.success;
+	public var error  (get, never):Null<Error>        ; inline function get_error   () return this.error;
+	public var debug  (get, never):Null<DebugResponse>; inline function get_debug   () return this.debug;
+	public var result (get, never):Null<Result<T>>    ; inline function get_result  () return this.result;
+	public var appId  (get, never):String             ; inline function get_appId   () return this.app_id;
 	
 	public function new (core:NGLite, reply:String) {
 		
-		var data:Dynamic;
-		
-		try {
-			data = Json.parse(reply);
+		try { this = Json.parse(reply); }
+		catch (e:Dynamic) {
 			
-		} catch (e:Dynamic) {
-			
-			data = Json.parse('{"success":false,"error":{"message":"${Std.string(reply)}","code":0}}');
+			this = Json.parse('{"success":false,"error":{"message":"Error parsing reply:\'$reply\' error:\'$e\'","code":0}}');
 		}
 		
-		success = data.success;
-		debug = data.debug;
-		
-		if (!success) {
-			error = data.error;
+		if (!success)
 			core.logError('Call unseccessful: $error');
-			return;
-		}
-		
-		result = new Result<T>(core, data.result);
+		else if(!result.success)
+			core.logError('${result.component} fail: ${result.error}');
 	}
 }

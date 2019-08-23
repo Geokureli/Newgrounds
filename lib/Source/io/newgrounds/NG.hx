@@ -74,7 +74,6 @@ class NG extends NGLite {
 	**/
 	public function new(appId = "test", sessionId:String = null, ?onSessionFail:Error->Void) {
 		
-		_session = new Session(this);
 		onLogin = new Dispatcher();
 		onLogOut = new Dispatcher();
 		onMedalsLoaded = new Dispatcher();
@@ -188,7 +187,7 @@ class NG extends NGLite {
 			return;
 		}
 		
-		_session.parse(response.result.data.session);
+		_session = response.result.data.session;
 		sessionId = _session.id;
 		
 		logVerbose('session started - status: ${_session.status}');
@@ -271,7 +270,7 @@ class NG extends NGLite {
 				return;
 			}
 			
-			_session.parse(response.result.data.session);
+			_session = response.result.data.session;
 		}
 		
 		if (_session.status == SessionStatus.USER_LOADED) {
@@ -334,7 +333,7 @@ class NG extends NGLite {
 	
 	function onLogOutSuccessful():Void {
 		
-		_session.expire();
+		_session = null;
 		sessionId = null;
 		loggedIn = false;
 	}

@@ -1,58 +1,49 @@
 package io.newgrounds.objects;
 
-class Session extends Object {
+@:noCompletion
+typedef RawSessionData = {
+	
+	var id          (default, never):String;
+	var expired     (default, never):Bool;
+	var passport_url(default, never):String;
+	var remember    (default, never):Bool;
+	var user        (default, never):User;
+}
+
+abstract Session(RawSessionData) from RawSessionData {
 	
 	/** If true, the session_id is expired. Use App.startSession to get a new one.*/
-	public var expired(default, null):Bool;
+	public var expired(get, never):Bool;
+	public function get_expired() return this.expired;
 	
 	/** A unique session identifier */
-	public var id(default, null):String;
+	public var id(get, never):String;
+	public function get_id() return this.id;
 	
 	/** If the session has no associated user but is not expired, this property will provide a URL that can be used to sign the user in. */
-	public var passportUrl(default, null):String;
+	public var passportUrl(get, never):String;
+	public function get_passportUrl() return this.passport_url;
 	
 	/** If true, the user would like you to remember their session id. */
-	public var remember(default, null):Bool;
+	public var remember(get, never):Bool;
+	public function get_remember() return this.remember;
 	
 	/** If the user has not signed in, or granted access to your app, this will be null */
-	public var user(default, null):User;
+	public var user(get, never):User;
+	public function get_user() return this.user;
 	
 	//TODO:desciption
 	public var status(get, never):SessionStatus;
 	
-	public function new(core:NGLite, data:Dynamic = null) { super(core, data); }
-	
-	override public function parse(data:Dynamic):Void {
-		
-		id = data.id;
-		expired = data.expired;
-		passportUrl = data.passport_url;
-		remember = data.remember;
-		
-		// --- KEEP THE SAME INSTANCE
-		if (user == null)
-			user = data.user;
-		// TODO?: update original user instance with new data. (probly not) 
-		
-		super.parse(data);
-	}
-	
 	public function get_status():SessionStatus {
 		
-		if (expired || id == null || id == "")
+		if (this.expired || this.id == null || this.id == "")
 			return SessionStatus.SESSION_EXPIRED;
 		
-		if (user != null && user.name != null && user.name != "")
+		if (this.user != null && this.user.name != null && this.user.name != "")
 			return SessionStatus.USER_LOADED;
 		
 		return SessionStatus.REQUEST_LOGIN;
-	}
-	
-	public function expire():Void {
-		
-		expired = true;
-		id = null;
-		user = null;
 	}
 }
 

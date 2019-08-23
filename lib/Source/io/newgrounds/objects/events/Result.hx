@@ -1,109 +1,95 @@
 package io.newgrounds.objects.events;
 
-class Result<T:ResultBase> {
+import io.newgrounds.objects.Medal.RawMedalData;
+import io.newgrounds.objects.ScoreBoard.RawScoreBoardData;
+
+@:noCompletion
+typedef RawResult<T:ResultBase> = {
 	
-	public var echo(default, null):String;
-	public var component(default, null):String;
-	
-	public var data(default, null):T;
-	public var success(default, null):Bool;
-	public var debug(default, null):Bool;
-	public var error(default, null):Error;
-	
-	public function new(core:NGLite, data:Dynamic) {
-		
-		echo = data.echo;
-		component = data.component;
-		
-		data = data.data;
-		success = data.success;
-		debug = data.debug;
-		
-		if(!data.success) {
-			
-			error = data.error;
-			core.logError('$component fail: $error');
-			
-		} else
-			this.data = data;
-	}
+	var component(default, null):String;
+	var echo     (default, null):String;
+	var data     (default, null):T;
 }
 
-typedef ResultBase = { };
-
-typedef SessionResult = {
-	> ResultBase,
+ abstract Result<T:ResultBase>(RawResult<T>) from RawResult<T> {
 	
-	var session:Dynamic;
+	public var component(get, never):String; inline function get_component() return this.component;
+	public var echo     (get, never):String; inline function get_echo     () return this.echo;
+	public var data     (get, never):T     ; inline function get_data     () return this.data;
+	public var success  (get, never):Bool  ; inline function get_success  () return data.success;
+	public var debug    (get, never):Bool  ; inline function get_debug    () return data.debug;
+	public var error    (get, never):Error ; inline function get_error    () return data.error;
 }
 
-typedef GetHostResult = {
-	> ResultBase,
+typedef ResultBase = {
 	
-	var host_approved:Bool;
+	var success(default, null):Bool;
+	var debug  (default, null):Bool;
+	var error  (default, null):Error;
 }
 
-typedef GetCurrentVersionResult = {
-	> ResultBase,
+
+typedef SessionResult = ResultBase & {
 	
-	var current_version:String;
-	var client_deprecated:Bool;
+	var session(default, null):Session;
 }
 
-typedef LogEventResult = {
-	> ResultBase,
+typedef GetHostResult = ResultBase & {
 	
-	var event_name:String;
+	var host_approved(default, null):Bool;
 }
 
-typedef GetDateTimeResult = {
-	> ResultBase,
+typedef GetCurrentVersionResult = ResultBase & {
 	
-	var datetime:String;
+	var current_version  (default, null):String;
+	var client_deprecated(default, null):Bool;
 }
 
-typedef GetVersionResult = {
-	> ResultBase,
+typedef LogEventResult = ResultBase & {
 	
-	var version:String;
+	var event_name(default, null):String;
 }
 
-typedef PingResult = {
-	> ResultBase,
+typedef GetDateTimeResult = ResultBase & {
 	
-	var pong:String;
+	var datetime(default, null):String;
 }
 
-typedef MedalListResult = {
-	> ResultBase,
+typedef GetVersionResult = ResultBase & {
 	
-	var medals:Array<Dynamic>;
+	var version(default, null):String;
 }
 
-typedef MedalUnlockResult = {
-	> ResultBase,
+typedef PingResult = ResultBase & {
 	
-	var medal_score:String;
-	var medal:Dynamic;
+	var pong(default, null):String;
 }
 
-typedef ScoreBoardResult = {
-	> ResultBase,
+typedef MedalListResult = ResultBase & {
 	
-	var scoreboards:Array<Dynamic>;
+	var medals(default, null):Array<RawMedalData>;
 }
 
-typedef ScoreResult = {
-	> ResultBase,
+typedef MedalUnlockResult = ResultBase & {
 	
-	var scores:Array<Score>;
-	var scoreboard:Dynamic;
+	var medal_score(default, null):String;
+	var medal      (default, null):RawMedalData;
 }
 
-typedef PostScoreResult = {
-	> ResultBase,
+typedef ScoreBoardResult = ResultBase & {
 	
-	var tag:String;
-	var scoreboard:Dynamic;
-	var score:Score;
+	var scoreboards(default, null):Array<RawScoreBoardData>;
+}
+
+typedef ScoreResult = ResultBase & {
+	
+	var scores    (default, null):Array<Score>;
+	var scoreboard(default, null):RawScoreBoardData;
+}
+
+typedef PostScoreResult = ResultBase & {
+	
+	var tag       (default, null):String;
+	var scoreboard(default, null):RawScoreBoardData;
+	var score     (default, null):Score;
 }

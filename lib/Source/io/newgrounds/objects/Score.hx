@@ -3,10 +3,10 @@ package io.newgrounds.objects;
 @:noCompletion
 typedef RawScoreData = {
 	
-	var formatted_value:String;
-	var tag:String;
-	var user:User;
-	var value:Int;
+	var formatted_value(default, null):String;
+	var tag            (default, null):String;
+	var user           (default, null):User;
+	var value          (default, null):Int;
 }
 
 /** We don't want to serialize scores since there's a bajillion of them. */
