@@ -8,7 +8,7 @@ typedef RawErrorData = {
 }
 
 
-abstract Error(RawErrorData) {
+abstract Error(RawErrorData) from RawErrorData {
 	
 	public var code   (get, never):Null<Int>; inline function get_code   () return this.code;
 	public var message(get, never):String   ; inline function get_message() return this.message;
