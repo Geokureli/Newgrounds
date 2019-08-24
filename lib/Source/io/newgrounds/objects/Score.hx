@@ -19,7 +19,7 @@ abstract Score(RawScoreData) from RawScoreData {
 	
 	/** The value value in the format selected in your scoreboard settings. */
 	public var formatted_value(get, never):String;
-	@:deprecated("Use get_formattedValue")
+	@:deprecated("Use formattedValue")
 	inline function get_formatted_value() return this.formatted_value;
 	/** The value value in the format selected in your scoreboard settings. */
 	public var formattedValue(get, never):String;
