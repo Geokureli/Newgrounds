@@ -1,58 +1,41 @@
 package io.newgrounds.objects;
 
-class Session extends Object {
-	
-	/** If true, the session_id is expired. Use App.startSession to get a new one.*/
-	public var expired(default, null):Bool;
+@:noCompletion
+typedef RawSessionData = {
 	
 	/** A unique session identifier */
-	public var id(default, null):String;
+	var id          (default, never):String;
+	/** If true, the session_id is expired. Use App.startSession to get a new one.*/
+	var expired     (default, never):Bool;
+	/** If the session has no associated user but is not expired, this property will provide a URL that can be used to sign the user in. */
+	var passport_url(default, never):String;
+	/** If true, the user would like you to remember their session id. */
+	var remember    (default, never):Bool;
+	/** If the user has not signed in, or granted access to your app, this will be null */
+	var user        (default, never):User;
+}
+
+@:forward
+abstract Session(RawSessionData) from RawSessionData {
 	
 	/** If the session has no associated user but is not expired, this property will provide a URL that can be used to sign the user in. */
-	public var passportUrl(default, null):String;
-	
-	/** If true, the user would like you to remember their session id. */
-	public var remember(default, null):Bool;
-	
-	/** If the user has not signed in, or granted access to your app, this will be null */
-	public var user(default, null):User;
+	public var passportUrl(get, never):String;
+	inline function get_passportUrl() return this.passport_url;
+	var passport_url(get, never):String;
+	inline function get_passport_url() return this.passport_url;
 	
 	//TODO:desciption
 	public var status(get, never):SessionStatus;
 	
-	public function new(core:NGLite, data:Dynamic = null) { super(core, data); }
-	
-	override public function parse(data:Dynamic):Void {
+	function get_status():SessionStatus {
 		
-		id = data.id;
-		expired = data.expired;
-		passportUrl = data.passport_url;
-		remember = data.remember;
-		
-		// --- KEEP THE SAME INSTANCE
-		if (user == null)
-			user = data.user;
-		// TODO?: update original user instance with new data. (probly not) 
-		
-		super.parse(data);
-	}
-	
-	public function get_status():SessionStatus {
-		
-		if (expired || id == null || id == "")
+		if (this.expired || this.id == null || this.id == "")
 			return SessionStatus.SESSION_EXPIRED;
 		
-		if (user != null && user.name != null && user.name != "")
+		if (this.user != null && this.user.name != null && this.user.name != "")
 			return SessionStatus.USER_LOADED;
 		
 		return SessionStatus.REQUEST_LOGIN;
-	}
-	
-	public function expire():Void {
-		
-		expired = true;
-		id = null;
-		user = null;
 	}
 }
 

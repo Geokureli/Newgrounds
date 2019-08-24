@@ -232,7 +232,7 @@ class ScoreBrowser extends BaseAsset {
 			
 			asset.visible = true;
 			cast (asset.getChildByName("nameField" ), TextField).text = score.user.name;
-			cast (asset.getChildByName("scoreField"), TextField).text = score.formatted_value;
+			cast (asset.getChildByName("scoreField"), TextField).text = score.formattedValue;
 			cast (asset.getChildByName("rankField" ), TextField).text = Std.string(rank + 1);
 		}
 	}

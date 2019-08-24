@@ -3,17 +3,13 @@ package io.newgrounds.objects;
 typedef User = {
 	
 	/** The user's icon images. */
-	var icons:UserIcons;
-	
+	var icons    (default, null):UserIcons;
 	/** The user's numeric ID. */
-	var id:Int;
-	
+	var id       (default, null):Int;
 	/** The user's textual name. */ 
-	var name:String;
-	
+	var name     (default, null):String;
 	/** Returns true if the user has a Newgrounds Supporter upgrade. */ 
-	var supporter:Bool;
-	
+	var supporter(default, null):Bool;
 	/** The user's NG profile url. */
-	var url:String;
+	var url      (default, null):String;
 }
