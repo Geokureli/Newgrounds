@@ -74,6 +74,7 @@ class NG extends NGLite {
 	**/
 	public function new(appId = "test", ?sessionId:String, debug = false, ?onSessionFail:Error->Void) {
 		
+		host = getHost();
 		onLogin = new Dispatcher();
 		onLogOut = new Dispatcher();
 		onMedalsLoaded = new Dispatcher();
@@ -117,7 +118,6 @@ class NG extends NGLite {
 		
 		create(appId, session, debug, onSessionFail);
 		
-		core.host = getHost();
 		if (core.sessionId != null)
 			core.attemptingLogin = true;
 	}
