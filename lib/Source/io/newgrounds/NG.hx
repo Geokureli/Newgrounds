@@ -74,6 +74,7 @@ class NG extends NGLite {
 	**/
 	public function new(appId = "test", ?sessionId:String, debug = false, ?onSessionFail:Error->Void) {
 		
+		host = getHost();
 		onLogin = new Dispatcher();
 		onLogOut = new Dispatcher();
 		onMedalsLoaded = new Dispatcher();
@@ -117,7 +118,6 @@ class NG extends NGLite {
 		
 		create(appId, session, debug, onSessionFail);
 		
-		core.host = getHost();
 		if (core.sessionId != null)
 			core.attemptingLogin = true;
 	}
@@ -466,15 +466,15 @@ class NG extends NGLite {
 		var url = NGLite.getUrl();
 		
 		if (url == null || url == "")
-			return "<AppView>";
+			return "AppView";
 		
-		if (url.indexOf("file") == 0)
-			return "<LocalHost>";
+		if (url.indexOf("file") == 0 || url.indexOf("127.0.0.1") != -1)
+			return "LocalHost";
 		
 		if (urlParser.match(url))
 			return urlParser.matched(1);
 		
-		return "<Unknown>";
+		return "Unknown";
 	}
 }
 #end
