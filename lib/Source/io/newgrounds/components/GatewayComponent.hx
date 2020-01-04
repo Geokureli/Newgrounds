@@ -21,5 +21,4 @@ class GatewayComponent extends Component {
 		
 		return new Call<PingResult>(_core, "Gateway.ping");
 	}
-	
 }

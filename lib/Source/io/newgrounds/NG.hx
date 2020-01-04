@@ -104,7 +104,10 @@ class NG extends NGLite {
 	/**
 	 * Creates NG.core, and tries to create a session. This is not the only way to create an instance,
 	 * nor is NG a forced singleton, but it's the only way to set the static NG.core.
-	**/
+	 * @param appId         The unique ID of your app as found in the 'API Tools' tab of your Newgrounds.com project.
+	 * @param debug         Enables debug features and verbose responses from the server
+	 * @param backupSession A unique session id used to identify the active user.
+	 */
 	static public function createAndCheckSession
 	( appId = "test"
 	, debug = false
