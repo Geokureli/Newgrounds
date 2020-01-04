@@ -62,6 +62,7 @@ class NGLite {
 	 * Iniitializes the API, call before utilizing any other component
 	 * @param appId  	The unique ID of your app as found in the 'API Tools' tab of your Newgrounds.com project.
 	 * @param sessionId A unique session id used to identify the active user.
+	 * @param debug     Enables debug features and verbose responses from the server
 	**/
 	public function new(appId = "test", ?sessionId:String, debug = false, ?onSessionFail:Error->Void) {
 		
@@ -102,7 +103,7 @@ class NGLite {
 	**/
 	static public function create(appId = "test", sessionId:String = null, ?onSessionFail:Error->Void):Void {
 		
-		core = new NGLite(appId, sessionId, onSessionFail);
+		core = new NGLite(appId, sessionId, false, onSessionFail);
 		
 		onCoreReady.dispatch();
 	}

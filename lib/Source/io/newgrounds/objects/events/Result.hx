@@ -87,7 +87,7 @@ typedef RawGetDateTimeResult = ResultBase
 abstract GetDateTimeResult(RawGetDateTimeResult) from RawGetDateTimeResult to ResultBase {
 	
 	public var datetime(get, never):String;
-	@:deprecated("Use dateTime")
+	@:deprecated("datetime is deprecated, use dateTime (captial T)")
 	inline function get_datetime() return this.datetime;
 	public var dateTime(get, never):String;
 	inline function get_dateTime() return this.datetime;
