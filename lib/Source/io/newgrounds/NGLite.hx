@@ -103,7 +103,7 @@ class NGLite {
 	**/
 	static public function create(appId = "test", sessionId:String = null, ?onSessionFail:Error->Void):Void {
 		
-		core = new NGLite(appId, sessionId, onSessionFail);
+		core = new NGLite(appId, sessionId, false, onSessionFail);
 		
 		onCoreReady.dispatch();
 	}
