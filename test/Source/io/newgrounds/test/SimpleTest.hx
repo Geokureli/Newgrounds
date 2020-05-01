@@ -1,6 +1,6 @@
 package io.newgrounds.test;
 
-import flixel.FlxG;
+import io.newgrounds.NG;
 
 class SimpleTest {
 	
@@ -8,10 +8,10 @@ class SimpleTest {
 		
 		trace("connecting to newgrounds");
 		
-		NG.createAndCheckSession(FlxG.stage, "47215:Ip8uDj9v");
+		NG.createAndCheckSession("47215:Ip8uDj9v");
 		NG.core.verbose = true;
 		// Set the encryption cipher/format to RC4/Base64. AES128 and Hex are not implemented yet
-		NG.core.initEncryption("LUp0Zg4f1lukgKgSwchZnQ==");// Found in you NG project view
+		NG.core.initEncryption("LUp0Zg4f1lukgKgSwchZnQ==");// Found in your NG project view
 		
 		if (NG.core.attemptingLogin)
 		{
