@@ -244,7 +244,7 @@ class NG extends NGLite {
 			#elseif mac
 				Sys.command("/usr/bin/open", [url]);
 			#elseif linux
-				Sys.command("/usr/bin/xdg-open", [path, "&"]);
+				Sys.command("/usr/bin/xdg-open", [url, "&"]);
 			#end
 			
 		#elseif android
