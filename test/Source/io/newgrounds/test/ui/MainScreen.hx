@@ -53,7 +53,7 @@ class MainScreen extends Sprite {
 		
 		_layout = new MainScreenSwf();
 		addChild(_layout);
-		#if html5
+		#if js
 			Input.mouseDisableText(_layout);
 		#end
 		_output = _layout.output;

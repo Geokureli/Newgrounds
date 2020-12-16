@@ -1,8 +1,8 @@
 {
     "name"        : "newgrounds",
     "description" : "Newgrounds API for haxe",
-    "version"     : "1.1.2",
-    "releasenote" : "remove OpenFL references in NG.hx",
+    "version"     : "1.1.3",
+    "releasenote" : "change html5 compile conditions to js",
     "url"         : "https://github.com/Geokureli/Newgrounds.hx",
     "classPath"   : "lib/Source",
     "license"     : "MIT",

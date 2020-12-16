@@ -235,7 +235,7 @@ class NG extends NGLite {
 		
 		#if flash
 			flash.Lib.getURL(new flash.net.URLRequest(url), window);
-		#elseif (js && html5)
+		#elseif js
 			js.Browser.window.open(url, window);
 		#elseif desktop
 			
