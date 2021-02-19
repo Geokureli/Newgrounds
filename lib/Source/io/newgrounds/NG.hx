@@ -223,7 +223,7 @@ class NG extends NGLite {
 			
 			logVerbose('loading passport: ${passportUrl}');
 			openPassportHelper(passportUrl);
-			onPassportUrlOpen();
+			dispatchPassportCallback();
 			
 		} else
 			logError("Cannot open passport");
@@ -261,13 +261,29 @@ class NG extends NGLite {
 	 */
 	public function onPassportUrlOpen():Void {
 		
-		if (_passportCallback != null)
-			_passportCallback();
-		
-		_passportCallback = null;
+		dispatchPassportCallback();
 	}
 	
-	function checkSession(response:Response<SessionResult>, onSucceess:Void->Void, onCancel:Void->Void):Void {
+	function dispatchPassportCallback():Void {
+		
+		if (_passportCallback != null) {
+			
+			logVerbose("dispatching passport callback");
+			var callback = _passportCallback;
+			_passportCallback = null;
+			callback();
+		}
+	}
+	
+	function checkSession(response:Response<SessionResult>, onSuccess:Void->Void, onCancel:Void->Void):Void {
+		
+		if (_loginCancelled)
+		{
+			log("login cancelled via cancelLoginRequest");
+			
+			endLoginAndCall(onCancel);
+			return;
+		}
 		
 		if (response != null) {
 			
@@ -279,23 +295,26 @@ class NG extends NGLite {
 				return;
 			}
 			
+			logVerbose("Session received");
 			_session = response.result.data.session;
 		}
 		
 		if (_session.status == SessionStatus.USER_LOADED) {
 			
 			loggedIn = true;
-			endLoginAndCall(onSucceess);
+			endLoginAndCall(onSuccess);
 			onLogin.dispatch();
 			
 		} else if (_session.status == SessionStatus.REQUEST_LOGIN){
 			
 			var call = calls.app.checkSession()
-				.addDataHandler(checkSession.bind(_, onSucceess, onCancel));
+				.addDataHandler(checkSession.bind(_, onSuccess, onCancel));
 			
 			// Wait 3 seconds and try again
 			timer(3.0,
 				function():Void {
+					
+					logVerbose("3s elapsed, checking session again");
 					
 					// Check if cancelLoginRequest was called
 					if (!_loginCancelled)
@@ -308,15 +327,23 @@ class NG extends NGLite {
 				}
 			);
 			
-		} else
+		} else {
+			
+			log("login cancelled via passport");
+			
 			// The user cancelled the passport
 			endLoginAndCall(onCancel);
+		}
 	}
 	
 	public function cancelLoginRequest():Void {
 		
 		if (attemptingLogin)
+		{
 			_loginCancelled = true;
+			// Pretend we opened the passport to process the client cancel.
+			dispatchPassportCallback();
+		}
 	}
 	
 	function endLoginAndCall(callback:Void->Void):Void {
