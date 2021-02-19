@@ -3,7 +3,7 @@
     "description" : "Newgrounds API for haxe",
     "version"     : "1.1.4",
     "releasenote" : "Use sys.thread and fix cancelLoginRequest case",
-    "url"         : "https://github.com/Geokureli/Newgrounds.hx",
+    "url"         : "https://github.com/Geokureli/Newgroundsgi",
     "classPath"   : "lib/Source",
     "license"     : "MIT",
     "tags"        : ["newgrounds", "ng.io", "web", "strawberryclock"],
