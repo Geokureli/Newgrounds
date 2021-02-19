@@ -5,7 +5,9 @@ import io.newgrounds.NGLite;
 import haxe.Http;
 import haxe.Timer;
 
-#if neko
+#if (target.threaded)
+import sys.thread.Thread;
+#elseif neko
 import neko.vm.Thread;
 #elseif java
 import java.vm.Thread;
@@ -32,7 +34,7 @@ class AsyncHttp {
 		
 		core.logVerbose('sending: $data');
 		
-		#if (neko || java || cpp)
+		#if (target.threaded || neko || java || cpp)
 		sendAsync(core, data, onData, onError, onStatus);
 		#else
 		sendSync(core, data, onData, onError, onStatus);
@@ -56,7 +58,7 @@ class AsyncHttp {
 		http.request(true);
 	}
 	
-	#if (neko || java || cpp)
+	#if (target.threaded || neko || java || cpp)
 	static var _deadPool:Array<AsyncHttp> = [];
 	static var _livePool:Array<AsyncHttp> = [];
 	static var _map:Map<Int, AsyncHttp> = new Map();
@@ -197,7 +199,7 @@ class AsyncHttp {
 }
 
 
-#if (neko || java || cpp)
+#if (target.threaded || neko || java || cpp)
 typedef LoaderData = { source:Thread, key:Int, args:String, core:NGLite };
 typedef ReplyData = { key:Int, ?data:String, ?error:String, ?status:Null<Int> };
 #end
