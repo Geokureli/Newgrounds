@@ -245,10 +245,11 @@ class NG extends NGLite {
 				Sys.command("/usr/bin/open", [url]);
 			#elseif linux
 				Sys.command("/usr/bin/xdg-open", [url, "&"]);
+			#end
                         #elseif hl
 				Sys.command("start", ["", url]);
 			#end
-			
+
 		#elseif android
 			JNI.createStaticMethod
 				( "org/haxe/lime/GameActivity"
