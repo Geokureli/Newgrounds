@@ -239,12 +239,14 @@ class NG extends NGLite {
 			js.Browser.window.open(url, window);
 		#elseif desktop
 
-			#if (sys && (windows || hl))
+			#if (sys && windows)
 				Sys.command("start", ["", url]);
 			#elseif mac
 				Sys.command("/usr/bin/open", [url]);
 			#elseif linux
 				Sys.command("/usr/bin/xdg-open", [url, "&"]);
+                        #elseif hl
+				Sys.command("start", ["", url]);
 			#end
 			
 		#elseif android
