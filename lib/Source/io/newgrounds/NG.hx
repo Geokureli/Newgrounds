@@ -231,15 +231,19 @@ class NG extends NGLite {
 	
 	
 	static function openPassportHelper(url:String):Void {
-		var window = "_blank";
+		// Thanks FlxG for your contribution as an open sourced so I can Yoink it >:)
 		
-		#if flash
-			flash.Lib.getURL(new flash.net.URLRequest(url), window);
-		#elseif js
+		var window = "_blank";
+		var prefix:String = '';
+		
+		#if js
 			js.Browser.window.open(url, window);
 		#elseif desktop
-			
-			#if (sys && windows)
+			#if (flash && windows && hl)
+			if (!~/^https?:\/\//.match(url))
+			prefix = "http://";
+			flash.Lib.getURL(new flash.net.URLRequest(prefix + url), window);
+			#elseif sys
 				Sys.command("start", ["", url]);
 			#elseif mac
 				Sys.command("/usr/bin/open", [url]);
