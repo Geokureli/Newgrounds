@@ -229,7 +229,6 @@ class NG extends NGLite {
 			logError("Cannot open passport");
 	}
 	
-	
 	static function openPassportHelper(url:String):Void {
 		var window = "_blank";
 		
@@ -237,22 +236,22 @@ class NG extends NGLite {
 			flash.Lib.getURL(new flash.net.URLRequest(url), window);
 		#elseif js
 			js.Browser.window.open(url, window);
-		#elseif desktop
-			
-			#if (sys && windows)
-				Sys.command("start", ["", url]);
-			#elseif mac
-				Sys.command("/usr/bin/open", [url]);
-			#elseif linux
-				Sys.command("/usr/bin/xdg-open", [url, "&"]);
-			#end
-			
 		#elseif android
 			JNI.createStaticMethod
 				( "org/haxe/lime/GameActivity"
 				, "openURL"
 				, "(Ljava/lang/String;Ljava/lang/String;)V"
 				) (url, window);
+		#elseif sys
+			switch Sys.systemName() {
+				
+				case 'Windows': Sys.command('start ${url}');
+				case 'Linux': Sys.command('xdg-open ${url}');
+				case 'Mac': Sys.command('open ${url}');
+				case name: logError("Unhandled systemName: " + name);
+			}
+		#else
+			logError("Could not open passport url, unhandled target");
 		#end
 	}
 	
