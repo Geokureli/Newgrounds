@@ -19,7 +19,7 @@ import haxe.Timer;
 
 /**
  * The Newgrounds API for Haxe.
- * Contains many things ripped from MSGhero
+ * Contains many things ripped from MSGhero and of FlxG
  *   - https://github.com/MSGhero/NG.hx
  * @author GeoKureli
  */
@@ -231,7 +231,6 @@ class NG extends NGLite {
 	
 	
 	static function openPassportHelper(url:String):Void {
-		// Thanks FlxG for your contribution as an open sourced so I can Yoink it >:)
 		
 		var window = "_blank";
 		var prefix:String = '';
@@ -239,14 +238,12 @@ class NG extends NGLite {
 		#if js
 			js.Browser.window.open(url, window);
 		#elseif desktop
-			#if (flash && windows && hl)
+			#if (flash && windows && hl && mac)
 			if (!~/^https?:\/\//.match(url))
 			prefix = "http://";
 			flash.Lib.getURL(new flash.net.URLRequest(prefix + url), window);
 			#elseif sys
 				Sys.command("start", ["", url]);
-			#elseif mac
-				Sys.command("/usr/bin/open", [url]);
 			#elseif linux
 				Sys.command("/usr/bin/xdg-open", [url, "&"]);
 			#end
