@@ -229,7 +229,7 @@ class NG extends NGLite {
 			logError("Cannot open passport");
 	}
 	
-	static function openPassportHelper(url:String):Void {
+	function openPassportHelper(url:String):Void {
 		var window = "_blank";
 		
 		#if flash
