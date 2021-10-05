@@ -11,17 +11,23 @@ class Main extends Sprite {
 	public function new() {
 		super();
 		
+		#if simple
+		// A barebones test with no flashy UI
+		new SimpleTest();
+		#else
+		// A flashy UI to showcase all the features
 		var page = new IntroScreenSwf();
 		addChild(page);
 		
-		new IntroPage(page, onStart.bind(page));
-	}
-	
-	function onStart(page:IntroScreenSwf):Void {
-		
-		removeChild(page);
-		page = null;
-		
-		addChild(new MainScreen());
+		new IntroPage(page,
+			function onStart():Void {
+				
+				removeChild(page);
+				page = null;
+				
+				addChild(new MainScreen());
+			}
+		);
+		#end
 	}
 }
