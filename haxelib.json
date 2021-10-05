@@ -1,12 +1,10 @@
-{
-    "name"        : "newgrounds",
-    "description" : "Newgrounds API for haxe",
-    "version"     : "1.1.5",
-    "releasenote" : "Fixes errors on Hashlink",
-    "url"         : "https://github.com/Geokureli/Newgrounds",
-    "classPath"   : "lib/Source",
-    "license"     : "MIT",
-    "tags"        : ["newgrounds", "ng.io", "web", "strawberryclock"],
-    "contributors": ["GeoKureli"],
-    "dependencies": { }
+{ "name"        : "newgrounds"
+, "description" : "Newgrounds API for haxe"
+, "version"     : "1.1.5"
+, "releasenote" : "Fixes errors on Hashlink"
+, "url"         : "https://newgrounds.io/"
+, "classPath"   : "lib/Source"
+, "license"     : "MIT"
+, "tags"        : ["newgrounds", "ng.io", "web", "strawberryclock"]
+, "contributors": ["GeoKureli"]
 }
