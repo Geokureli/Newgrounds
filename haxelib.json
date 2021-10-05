@@ -1,8 +1,8 @@
 {
     "name"        : "newgrounds",
     "description" : "Newgrounds API for haxe",
-    "version"     : "1.1.4",
-    "releasenote" : "Use sys.thread and fix cancelLoginRequest case",
+    "version"     : "1.1.5",
+    "releasenote" : "Fixes errors on Hashlink",
     "url"         : "https://github.com/Geokureli/Newgrounds",
     "classPath"   : "lib/Source",
     "license"     : "MIT",
