@@ -15,7 +15,7 @@ import io.newgrounds.objects.events.Result.ResultBase;
 import io.newgrounds.objects.events.Result.SessionResult;
 import io.newgrounds.utils.Dispatcher;
 
-#if !(js || flash || desktop || neko || hl)
+#if !(js || flash || cpp || neko || hl)
 	#error "Target not supported, use: Flash, JS, cpp or maybe neko or hashlink";
 #end
 
