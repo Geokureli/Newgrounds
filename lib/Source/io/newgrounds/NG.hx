@@ -13,7 +13,11 @@ import io.newgrounds.objects.User;
 import io.newgrounds.objects.Medal;
 import io.newgrounds.objects.Session;
 import io.newgrounds.objects.ScoreBoard;
-
+#if (openfl < "4.0.0")
+import openfl.utils.JNI;
+#else
+import lime.system.JNI;
+#end
 import haxe.ds.IntMap;
 import haxe.Timer;
 
