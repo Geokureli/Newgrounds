@@ -2,6 +2,7 @@ package io.newgrounds.objects;
 
 import io.newgrounds.utils.AsyncHttp;
 import io.newgrounds.objects.events.Result.SaveSlotResult;
+import io.newgrounds.objects.events.ResultType;
 import io.newgrounds.objects.events.Response;
 
 typedef RawSaveSlot = {
@@ -48,12 +49,14 @@ class SaveSlot extends Object<RawSaveSlot>
 		super(core, data);
 	}
 	
-	// override function parse(data:RawMedalData):Void {
-		
-	// 	super.parse(data);
-	// }
-	
-	public function save(data:String, ?callback:(Null<String>)->Void) {
+	/**
+	 * Saves the supplied data to the cloud save slot
+	 * @param data      The data to save to the slot
+	 * @param callback  Called when the data is saved with the new value.
+	 *                  If the save was unsuccessful
+	 * 
+	 */
+	public function save(data:String, ?callback:(SaveSlotResultType)->Void) {
 		
 		if (data == null)
 			throw "cannot save null to a SaveSlot";
@@ -63,21 +66,21 @@ class SaveSlot extends Object<RawSaveSlot>
 			.send();
 	}
 	
-	public function clear(?callback:(Null<String>)->Void) {
+	public function clear(?callback:(SaveSlotResultType)->Void) {
 		
 		_core.calls.cloudSave.clearSlot(id)
 			.addDataHandler((response)->setSaveDataOnSlotFetch(response, null, callback))
 			.send();
 	}
 	
-	public function load(?callback:(Null<String>)->Void) {
+	public function load(?callback:(SaveSlotResultType)->Void) {
 		
 		_core.calls.cloudSave.loadSlot(id)
 			.addDataHandler((response)->loadSaveDataOnSlotFetch(response, callback))
 			.send();
 	}
 	
-	function setSaveDataOnSlotFetch(response:Response<SaveSlotResult>, newSaveData:Null<String>, ?callback:(Null<String>)->Void) {
+	function setSaveDataOnSlotFetch(response:Response<SaveSlotResult>, newSaveData:Null<String>, ?callback:(SaveSlotResultType)->Void) {
 		
 		// Always have a non-null callback to avoid having to null check everywhere
 		if (callback == null)
@@ -86,20 +89,20 @@ class SaveSlot extends Object<RawSaveSlot>
 		if (response.success && response.result.success) {
 			
 			var oldTimestamp = timestamp;
-			_data = response.result.data.slot;
+			parse(response.result.data.slot);
 			saveData = newSaveData;
 		}
 		
-		callback(saveData);
+		callback(Success(saveData));
 	}
 	
 	inline function mergeSaveSlotData(response:Response<SaveSlotResult>) {
 		
 		if (response.success && response.result.success)
-			_data = response.result.data.slot;
+			parse(response.result.data.slot);
 	}
 	
-	function loadSaveDataOnSlotFetch(response:Response<SaveSlotResult>, ?callback:(Null<String>)->Void) {
+	function loadSaveDataOnSlotFetch(response:Response<SaveSlotResult>, ?callback:(SaveSlotResultType)->Void) {
 		
 		// Always have a non-null callback to avoid having to null check everywhere
 		if (callback == null)
@@ -114,14 +117,14 @@ class SaveSlot extends Object<RawSaveSlot>
 			return;
 		}
 		
-		callback(saveData);
+		callback(Success(saveData));
 	}
 	
-	function loadData(callback:(Null<String>)->Void) {
+	function loadData(callback:(SaveSlotResultType)->Void) {
 		
 		if (url == null) {
 			
-			callback(null);
+			callback(Success(null));
 			return;
 		}
 		
@@ -130,12 +133,13 @@ class SaveSlot extends Object<RawSaveSlot>
 			(s)->
 			{
 				saveData = s;
-				callback(saveData);
+				callback(Success(saveData));
 			},
-			(error)->callback(saveData),
-			(status)->{}// do nothing, TODO: optional?
+			(error)->callback(Error(error))
 		);
 	}
 	
-	static function noCallback(s:Null<String>){}
+	static function noCallback(result:SaveSlotResultType){}
 }
+
+typedef SaveSlotResultType = TypedResultType<Null<String>>;

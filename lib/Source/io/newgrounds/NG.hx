@@ -3,18 +3,20 @@ package io.newgrounds;
 #if ng_lite
 typedef NG = NGLite; //TODO: test and make lite UI
 #else
-import io.newgrounds.utils.Dispatcher;
 import io.newgrounds.objects.Error;
 import io.newgrounds.objects.events.Result.SessionResult;
 import io.newgrounds.objects.events.Result.MedalListResult;
 import io.newgrounds.objects.events.Result.ScoreBoardResult;
 import io.newgrounds.objects.events.Result.LoadSlotsResult;
+import io.newgrounds.objects.events.ResultType;
 import io.newgrounds.objects.events.Response;
 import io.newgrounds.objects.User;
 import io.newgrounds.objects.Medal;
 import io.newgrounds.objects.SaveSlot;
 import io.newgrounds.objects.ScoreBoard;
 import io.newgrounds.objects.Session;
+import io.newgrounds.utils.Dispatcher;
+import io.newgrounds.utils.SaveSlotList;
 #if (openfl < "4.0.0")
 import openfl.utils.JNI;
 #else
@@ -54,7 +56,7 @@ class NG extends NGLite {
 	}
 	public var medals(default, null):Map<Int, Medal>;
 	public var scoreBoards(default, null):Map<Int, ScoreBoard>;
-	public var saveSlots(default, null):Map<Int, SaveSlot>;
+	public var saveSlots(default, null):SaveSlotList;
 	
 	// --- EVENTS
 	
@@ -87,6 +89,8 @@ class NG extends NGLite {
 		onMedalsLoaded = new Dispatcher();
 		onScoreBoardsLoaded = new Dispatcher();
 		onSaveSlotsLoaded = new Dispatcher();
+		
+		saveSlots = new SaveSlotList(this);
 		
 		attemptingLogin = sessionId != null;
 		
@@ -486,53 +490,11 @@ class NG extends NGLite {
 	//                                     CLOUD SAVES
 	// -------------------------------------------------------------------------------------------
 	
-	public function requestSaveSlots(onSuccess:Void->Void = null, onFail:Error->Void = null):Void {
+	inline public function requestSaveSlots(?callback:ResultType->Void):Void {
 		
-		if (saveSlots != null) {
-			
-			log("aborting save slots request, all save slots are loaded. Use `NG.core.saveSlots[id]`");
-			
-			if (onSuccess != null)
-				onSuccess();
-			
-			return;
-		}
-		
-		var call = calls.cloudSave.loadSlots()
-			.addDataHandler(onSaveSlotsReceived);
-		
-		if (onSuccess != null)
-			call.addSuccessHandler(onSuccess);
-		
-		if (onFail != null)
-			call.addErrorHandler(onFail);
-		
-		call.send();
+		saveSlots.loadAll(callback);
 	}
 	
-	function onSaveSlotsReceived(response:Response<LoadSlotsResult>):Void {
-		
-		if (!response.success || !response.result.success)
-			return;
-		
-		var idList:Array<Int> = new Array<Int>();
-		
-		if (saveSlots == null) {
-			
-			saveSlots = new Map();
-			
-			for (slotData in response.result.data.slots) {
-				
-				var slot = new SaveSlot(this, slotData);
-				saveSlots.set(slot.id, slot);
-				idList.push(slot.id);
-			}
-		}
-		
-		logVerbose('${idList.length} SaveSlots received [${idList.join(", ")}]');
-		
-		onSaveSlotsLoaded.dispatch();
-	}
 	// -------------------------------------------------------------------------------------------
 	//                                       HELPERS
 	// -------------------------------------------------------------------------------------------

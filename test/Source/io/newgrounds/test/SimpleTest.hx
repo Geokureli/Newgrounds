@@ -1,6 +1,7 @@
 package io.newgrounds.test;
 
 import io.newgrounds.NG;
+import io.newgrounds.objects.events.ResultType;
 
 class SimpleTest {
 	
@@ -87,44 +88,74 @@ class SimpleTest {
 	{
 		for (score in NG.core.scoreBoards.get(7971).scores)
 		{
-			 trace('score loaded user:${score.user.name}, score:${score.formattedValue}');
+			trace('score loaded user:${score.user.name}, score:${score.formattedValue}');
 		}
 	}
 	
-	function onNGSlotsFetch():Void
-	{
-		for (k=>slot in NG.core.saveSlots)
-		{
-			trace('[$k]=>{url:${slot.url}, time:${slot.datetime}}');
+	function onNGSlotsFetch(result:ResultType) {
+		
+		switch (result) {
+			
+			case Error(e):
+				trace('Error getting saveSlots');
+				return;
+			
+			case Success:
 		}
 		
+		for (k=>slot in NG.core.saveSlots)
+			trace('[$k]=>{url:${slot.url}, time:${slot.datetime}}');
+		
 		var slot = NG.core.saveSlots[1];
-		if (slot.url == null)
-		{
+		if (slot.url == null) {
+			
 			trace("Saving default value to slot 1");
 			slot.save("default data", (s)->trace('data saved: "$s"'));
-		}
-		else
-		{
-			slot.load((saveData)->
-			{
-				function save(value:String)
-				{
+			
+		} else {
+			
+			slot.load((result)-> {
+				
+				var saveData:String;
+				switch (result) {
+					
+					case Error(e):
+						trace("Error loading slot 1: " + e);
+						return;
+					
+					case Success(s):
+						saveData = s;
+				}
+				
+				function save(value:String) {
+					
 					trace('SaveSlot[1]: "$saveData"->"$value"');
-					slot.save(value, (s)->trace('data saved: "$s"'));
+					slot.save(value, (r)->{
+						switch(r) {
+							
+							case Success(s): trace('data saved: "$s"');
+							case Error(e): trace('Error saving data: "$e"');
+						}
+					});
 				}
 				
-				function clear()
-				{
+				function clear() {
+					
 					trace('SaveSlot[1]: "$saveData"');
-					slot.clear((s)->trace('data cleared'));
+					slot.clear((r)->{
+						switch(r) {
+							case Success(_): trace('data cleared');
+							case Error(e): trace('Error clearing data: $e');
+						}
+					});
 				}
 				
-				switch(saveData)
-				{
+				switch(saveData) {
+					
 					case "default data": save("");
-					case "": save("test");
-					case "test": save("default data");
+					case ""            : save("test");
+					case "test"        : clear();
+					default: throw "unexpected save data";
 				}
 			});
 		}

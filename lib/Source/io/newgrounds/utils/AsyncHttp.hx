@@ -51,12 +51,18 @@ class AsyncNGCall {
 @:allow(io.newgrounds.utils.AsyncNGCall)
 class AsyncHttp {
 	
+	/** Loads a remote url */
+	inline static public function getText(path, onData, onError, ?onStatus) {
+		
+		send(path, null, onData, onError, onStatus);
+	}
+	
 	static public function send
 	( path:String
 	, data:String
 	, onData:String->Void
 	, onError:String->Void
-	, onStatus:Int->Void
+	, ?onStatus:Int->Void
 	) {
 		
 		// core.logVerbose('sending: $data');
@@ -73,7 +79,7 @@ class AsyncHttp {
 	, data:String
 	, onData:String->Void
 	, onError:String->Void
-	, onStatus:Int->Void
+	, ?onStatus:Int->Void
 	) {
 		
 		var http = new Http(path);
@@ -83,7 +89,8 @@ class AsyncHttp {
 		
 		http.onData   = onData;
 		http.onError  = onError;
-		http.onStatus = onStatus;
+		if (onStatus != null)
+			http.onStatus = onStatus;
 		// #if js http.async = async; #end
 		http.request(data != null);
 		return http;
