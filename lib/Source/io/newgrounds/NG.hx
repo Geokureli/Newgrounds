@@ -8,17 +8,18 @@ import io.newgrounds.objects.Error;
 import io.newgrounds.objects.events.Result.SessionResult;
 import io.newgrounds.objects.events.Result.MedalListResult;
 import io.newgrounds.objects.events.Result.ScoreBoardResult;
+import io.newgrounds.objects.events.Result.LoadSlotsResult;
 import io.newgrounds.objects.events.Response;
 import io.newgrounds.objects.User;
 import io.newgrounds.objects.Medal;
-import io.newgrounds.objects.Session;
+import io.newgrounds.objects.SaveSlot;
 import io.newgrounds.objects.ScoreBoard;
+import io.newgrounds.objects.Session;
 #if (openfl < "4.0.0")
 import openfl.utils.JNI;
 #else
 import lime.system.JNI;
 #end
-import haxe.ds.IntMap;
 import haxe.Timer;
 
 /**
@@ -51,8 +52,9 @@ class NG extends NGLite {
 		
 		return _session.passportUrl;
 	}
-	public var medals(default, null):IntMap<Medal>;
-	public var scoreBoards(default, null):IntMap<ScoreBoard>;
+	public var medals(default, null):Map<Int, Medal>;
+	public var scoreBoards(default, null):Map<Int, ScoreBoard>;
+	public var saveSlots(default, null):Map<Int, SaveSlot>;
 	
 	// --- EVENTS
 	
@@ -60,6 +62,7 @@ class NG extends NGLite {
 	public var onLogOut(default, null):Dispatcher;
 	public var onMedalsLoaded(default, null):Dispatcher;
 	public var onScoreBoardsLoaded(default, null):Dispatcher;
+	public var onSaveSlotsLoaded(default, null):Dispatcher;
 	
 	// --- MISC
 	
@@ -83,6 +86,7 @@ class NG extends NGLite {
 		onLogOut = new Dispatcher();
 		onMedalsLoaded = new Dispatcher();
 		onScoreBoardsLoaded = new Dispatcher();
+		onSaveSlotsLoaded = new Dispatcher();
 		
 		attemptingLogin = sessionId != null;
 		
@@ -404,7 +408,7 @@ class NG extends NGLite {
 		
 		if (medals == null) {
 			
-			medals = new IntMap<Medal>();
+			medals = new Map();
 			
 			for (medalData in response.result.data.medals) {
 				
@@ -463,7 +467,7 @@ class NG extends NGLite {
 		
 		if (scoreBoards == null) {
 			
-			scoreBoards = new IntMap<ScoreBoard>();
+			scoreBoards = new Map();
 			
 			for (boardData in response.result.data.scoreboards) {
 				
@@ -478,6 +482,57 @@ class NG extends NGLite {
 		onScoreBoardsLoaded.dispatch();
 	}
 	
+	// -------------------------------------------------------------------------------------------
+	//                                     CLOUD SAVES
+	// -------------------------------------------------------------------------------------------
+	
+	public function requestSaveSlots(onSuccess:Void->Void = null, onFail:Error->Void = null):Void {
+		
+		if (saveSlots != null) {
+			
+			log("aborting save slots request, all save slots are loaded. Use `NG.core.saveSlots[id]`");
+			
+			if (onSuccess != null)
+				onSuccess();
+			
+			return;
+		}
+		
+		var call = calls.cloudSave.loadSlots()
+			.addDataHandler(onSaveSlotsReceived);
+		
+		if (onSuccess != null)
+			call.addSuccessHandler(onSuccess);
+		
+		if (onFail != null)
+			call.addErrorHandler(onFail);
+		
+		call.send();
+	}
+	
+	function onSaveSlotsReceived(response:Response<LoadSlotsResult>):Void {
+		
+		if (!response.success || !response.result.success)
+			return;
+		
+		var idList:Array<Int> = new Array<Int>();
+		
+		if (saveSlots == null) {
+			
+			saveSlots = new Map();
+			
+			for (slotData in response.result.data.slots) {
+				
+				var slot = new SaveSlot(this, slotData);
+				saveSlots.set(slot.id, slot);
+				idList.push(slot.id);
+			}
+		}
+		
+		logVerbose('${idList.length} SaveSlots received [${idList.join(", ")}]');
+		
+		onSaveSlotsLoaded.dispatch();
+	}
 	// -------------------------------------------------------------------------------------------
 	//                                       HELPERS
 	// -------------------------------------------------------------------------------------------

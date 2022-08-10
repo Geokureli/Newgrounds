@@ -2,6 +2,7 @@ package io.newgrounds.objects.events;
 
 import io.newgrounds.objects.Medal.RawMedalData;
 import io.newgrounds.objects.ScoreBoard.RawScoreBoardData;
+import io.newgrounds.objects.SaveSlot.RawSaveSlot;
 
 @:noCompletion
 typedef RawResult<T:ResultBase> = {
@@ -138,4 +139,14 @@ typedef PostScoreResult = ResultBase & {
 	var tag       (default, null):String;
 	var scoreboard(default, null):RawScoreBoardData;
 	var score     (default, null):Score;
+}
+
+typedef SaveSlotResult = ResultBase & {
+	
+	var slot(default, null):RawSaveSlot;
+}
+
+typedef LoadSlotsResult = ResultBase & {
+	
+	var slots(default, null):Array<RawSaveSlot>;
 }

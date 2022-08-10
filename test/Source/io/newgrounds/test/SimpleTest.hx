@@ -37,8 +37,11 @@ class SimpleTest {
 		// Load medals then call onNGMedalFetch()
 		NG.core.requestMedals(onNGMedalFetch);
 		
-		// Load Scoreboards hten call onNGBoardsFetch()
+		// Load Scoreboards then call onNGBoardsFetch()
 		NG.core.requestScoreBoards(onNGBoardsFetch);
+		
+		// Load SaveSlots then call onNGSlotsFetch()
+		NG.core.requestSaveSlots(onNGSlotsFetch);
 	}
 	
 	// --- MEDALS
@@ -84,7 +87,46 @@ class SimpleTest {
 	{
 		for (score in NG.core.scoreBoards.get(7971).scores)
 		{
-			 trace('score loaded user:${score.user.name}, score:${score.formatted_value}');
+			 trace('score loaded user:${score.user.name}, score:${score.formattedValue}');
+		}
+	}
+	
+	function onNGSlotsFetch():Void
+	{
+		for (k=>slot in NG.core.saveSlots)
+		{
+			trace('[$k]=>{url:${slot.url}, time:${slot.datetime}}');
+		}
+		
+		var slot = NG.core.saveSlots[1];
+		if (slot.url == null)
+		{
+			trace("Saving default value to slot 1");
+			slot.save("default data", (s)->trace('data saved: "$s"'));
+		}
+		else
+		{
+			slot.load((saveData)->
+			{
+				function save(value:String)
+				{
+					trace('SaveSlot[1]: "$saveData"->"$value"');
+					slot.save(value, (s)->trace('data saved: "$s"'));
+				}
+				
+				function clear()
+				{
+					trace('SaveSlot[1]: "$saveData"');
+					slot.clear((s)->trace('data cleared'));
+				}
+				
+				switch(saveData)
+				{
+					case "default data": save("");
+					case "": save("test");
+					case "test": save("default data");
+				}
+			});
 		}
 	}
 }
