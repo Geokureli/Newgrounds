@@ -10,14 +10,16 @@
 	<source path="Source" />
 	
 	<haxelib name="openfl" />
-	<haxelib name="swf" />
+	<haxelib name="swf" unless="simple" />
 	<!--<haxelib name="flixel" />-->
 	<classpath path="../lib/Source" />
 	
 	<!-- <haxedef name="simulate_preloader" if="debug"/> -->
 	<!-- <haxedef name="ng_lite" /> -->
 	
-	<library path="Assets/Test Layout.swf" id="layout" generate="true" preload="true" />
-	<assets path="Assets/fonts" rename="fonts" embed="true" />
+	<section unless="simple">
+		<library path="Assets/Test Layout.swf" id="layout" generate="true" preload="true" />
+		<assets path="Assets/fonts" rename="fonts" embed="true" />
+	</section>
 	
 </project>

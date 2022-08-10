@@ -1,8 +1,10 @@
 package io.newgrounds.test;
 
+#if !simple
 import io.newgrounds.test.art.IntroScreenSwf;
 import io.newgrounds.test.ui.IntroPage;
 import io.newgrounds.test.ui.MainScreen;
+#end
 
 import openfl.display.Sprite;
 
