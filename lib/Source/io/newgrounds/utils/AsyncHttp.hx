@@ -3,6 +3,7 @@ package io.newgrounds.utils;
 import io.newgrounds.NGLite;
 
 import haxe.Http;
+import haxe.PosInfos;
 import haxe.Timer;
 
 #if (target.threaded)
@@ -20,7 +21,7 @@ import cpp.vm.Thread;
  * 
  * @author GeoKureli
  */
-class AsyncHttp {
+class AsyncNGCall {
 	
 	inline static var PATH:String = "https://newgrounds.io/gateway_v3.php";
 	
@@ -35,89 +36,118 @@ class AsyncHttp {
 		core.logVerbose('sending: $data');
 		
 		#if (target.threaded || neko || java || cpp)
-		sendAsync(core, data, onData, onError, onStatus);
+		AsyncHttp.sendAsync(PATH, data, onData, onError, onStatus, core.logVerbose);
 		#else
-		sendSync(core, data, onData, onError, onStatus);
+		AsyncHttp.sendSync(PATH, data, onData, onError, onStatus);
 		#end
 	}
+}
+
+/**
+ * Uses Threading to turn hxcpp's synchronous http requests into asynchronous processes
+ * 
+ * @author GeoKureli
+ */
+@:allow(io.newgrounds.utils.AsyncNGCall)
+class AsyncHttp {
 	
-	static function sendSync
-	( core:NGLite
+	static public function send
+	( path:String
 	, data:String
 	, onData:String->Void
 	, onError:String->Void
 	, onStatus:Int->Void
-	):Void {
+	) {
 		
-		var http = new Http(PATH);
-		http.setParameter("input", data);
+		// core.logVerbose('sending: $data');
+		
+		#if (target.threaded || neko || java || cpp)
+		sendAsync(path, data, onData, onError, onStatus);
+		#else
+		sendSync(path, data, onData, onError, onStatus);
+		#end
+	}
+	
+	static function sendSync
+	( path:String
+	, data:String
+	, onData:String->Void
+	, onError:String->Void
+	, onStatus:Int->Void
+	) {
+		
+		var http = new Http(path);
+		
+		if (data != null)
+			http.setParameter("input", data);
+		
 		http.onData   = onData;
 		http.onError  = onError;
 		http.onStatus = onStatus;
 		// #if js http.async = async; #end
-		http.request(true);
+		http.request(data != null);
+		return http;
 	}
 	
 	#if (target.threaded || neko || java || cpp)
-	static var _deadPool:Array<AsyncHttp> = [];
-	static var _livePool:Array<AsyncHttp> = [];
 	static var _map:Map<Int, AsyncHttp> = new Map();
 	static var _timer:Timer;
+	static var _count = 0;
 	
-	static var _count:Int = 0;
-	
-	var _core:NGLite;
 	var _key:Int;
 	var _onData:String->Void;
 	var _onError:String->Void;
-	var _onStatus:Int->Void;
+	var _onStatus:Null<Int->Void>;
 	var _worker:Thread;
 	
-	public function new (core:NGLite) {
+	public function new (?logVerbose:(String, ?PosInfos)->Void) {
 		
-		_core = core;
-		_worker = Thread.create(sendThreaded);
 		_key = _count++;
-		_map[_key] = this;
-		_core.logVerbose('async http created: $_key');
+		_worker = Thread.create(sendThreaded);
+		
+		if (logVerbose != null)
+			this.logVerbose = logVerbose;
+		this.logVerbose('async http created: $_key');
 	}
 	
-	function start(data:String, onData:String->Void, onError:String->Void, onStatus:Int->Void) {
+	function start(path:String, data:String, onData:String->Void, onError:String->Void, ?onStatus:Int->Void) {
 		
-		_core.logVerbose('async http started: $_key');
+		logVerbose('async http started: $_key');
 		
-		if (_livePool.length == 0)
+		if (_map.keys().hasNext() == false)
 			startTimer();
 		
-		_deadPool.remove(this);
-		_livePool.push(this);
+		_map[_key] = this;
 		
 		_onData = onData;
 		_onError = onError;
-		_onStatus = onStatus;
-		_worker.sendMessage({ source:Thread.current(), args:data, key:_key, core:_core });
+		if (onStatus != null)
+			_onStatus = onStatus;
+		
+		_worker.sendMessage({ path:path, source:Thread.current(), args:data, key:_key, logVerbose:logVerbose });
 	}
 	
 	function handleMessage(data:ReplyData):Void {
 		
-		_core.logVerbose('handling message: $_key');
+		logVerbose('handling message: $_key');
 		
 		if (data.status != null) {
 			
-			_core.logVerbose('\t- status: ${data.status}');
-			_onStatus(cast data.status);
+			logVerbose('\t- status: ${data.status}');
+			if (_onStatus != null)
+				_onStatus(cast data.status);
 			return;
 		}
 		
 		var tempFunc:Void->Void;
 		if (data.data != null) {
 			
-			_core.logVerbose('\t- data');
+			logVerbose('\t- data');
 			tempFunc = _onData.bind(data.data);
 			
 		} else {
 			
-			_core.logVerbose('\t- error');
+			logVerbose('\t- error');
 			tempFunc = _onError.bind(data.error);
 		}
 		
@@ -127,33 +157,30 @@ class AsyncHttp {
 		tempFunc();
 	}
 	
-	inline function cleanUp():Void {
+	dynamic function logVerbose(msg:String, ?info:PosInfos) {}
+	
+	function cleanUp():Void {
+		
+		_map.remove(_key);
 		
 		_onData = null;
 		_onError = null;
 		
-		_deadPool.push(this);
-		_livePool.remove(this);
-		
-		if (_livePool.length == 0)
+		if (_map.keys().hasNext() == false)
 			stopTimer();
 	}
 	
 	static function sendAsync
-	( core:NGLite
+	( path:String
 	, data:String
-	, onData:String->Void
-	, onError:String->Void
-	, onStatus:Int->Void
-	):Void {
+	, onData:(String)->Void
+	, onError:(String)->Void
+	, ?onStatus:(Int)->Void
+	, ?logVerbose:(String, ?PosInfos)->Void
+	) {
 		
-		var http:AsyncHttp;
-		if (_deadPool.length == 0)
-			http = new AsyncHttp(core);
-		else
-			http = _deadPool[0];
-		
-		http.start(data, onData, onError, onStatus);
+		var http = new AsyncHttp(logVerbose);
+		http.start(path, data, onData, onError, onStatus);
 	}
 	
 	static function startTimer():Void {
@@ -183,10 +210,10 @@ class AsyncHttp {
 		while(true) {
 			
 			var data:LoaderData = cast Thread.readMessage(true);
-			data.core.logVerbose('start message received: ${data.key}');
+			data.logVerbose('start message received: ${data.key}');
 			
 			sendSync
-				( data.core
+				( data.path
 				, data.args
 				, function(reply ) { data.source.sendMessage({ key:data.key, data  :reply  }); }
 				, function(error ) { data.source.sendMessage({ key:data.key, error :error  }); }
@@ -200,6 +227,6 @@ class AsyncHttp {
 
 
 #if (target.threaded || neko || java || cpp)
-typedef LoaderData = { source:Thread, key:Int, args:String, core:NGLite };
+typedef LoaderData = { path:String, source:Thread, key:Int, args:String, logVerbose:(String)->Void };
 typedef ReplyData = { key:Int, ?data:String, ?error:String, ?status:Null<Int> };
 #end

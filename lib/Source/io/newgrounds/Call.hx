@@ -166,7 +166,7 @@ class Call<T:ResultBase>
 		
 		_core.markCallPending(this);
 		
-		AsyncHttp.send(_core, Json.stringify(data), onData, onHttpError, onStatus);
+		AsyncNGCall.send(_core, Json.stringify(data), onData, onHttpError, onStatus);
 	}
 	
 	/** Adds the call to the queue */
