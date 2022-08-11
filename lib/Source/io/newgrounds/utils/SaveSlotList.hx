@@ -119,7 +119,7 @@ class RawSaveSlotList {
 			return;
 		}
 		
-		var slotsLeft = 0;
+		var slotsToLoad = 0;
 		var result:ResultType = Success;
 		function onSlotLoad(slotResult:SaveSlotResultType) {
 			
@@ -135,17 +135,31 @@ class RawSaveSlotList {
 			}
 			
 			// count the completed slots, call the callback when we're done
-			slotsLeft--;
-			if (slotsLeft == 0)
+			slotsToLoad--;
+			if (slotsToLoad == 0)
 				callback(result);
+		}
+		
+		/**
+		 * Count the slots, first, then try to load. these load calls may be threaded,
+		 * so this may be neccesary to avoid multiple callbacks.
+		**/ 
+		for (slot in map) {
+			
+			if (slot.isEmpty() == false)
+				slotsToLoad++;
+		}
+		
+		if (slotsToLoad == 0)
+		{
+			callback(Success);
+			return;
 		}
 		
 		for (slot in map) {
 			
-			// count the slots to load
-			slotsLeft++;
-			// load the slot
-			slot.load(onSlotLoad);
+			if (slot.isEmpty() == false)
+				slot.load(onSlotLoad);
 		}
 	}
 	

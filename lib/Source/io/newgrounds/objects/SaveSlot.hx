@@ -118,7 +118,7 @@ class SaveSlot extends Object<RawSaveSlot>
 	 */
 	public function load(?callback:(SaveSlotResultType)->Void) {
 		
-		if (url == null)
+		if (isEmpty())
 			throw 'Cannot load from an empty SaveSlot, id:$id';
 		
 		// TODO: load data (async)
@@ -132,6 +132,9 @@ class SaveSlot extends Object<RawSaveSlot>
 			(error)->callback(Error(error))
 		);
 	}
+	
+	/** Whether any data has been saved to this slot. */
+	inline public function isEmpty():Bool return url == null;
 }
 
 typedef SaveSlotResultType = TypedResultType<Null<String>>;
