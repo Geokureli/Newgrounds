@@ -51,8 +51,8 @@ class SaveSlot extends Object<RawSaveSlot>
 	inline function get_timestamp() return _data.timestamp;
 	inline function get_url      () return _data.url;
 	
-	/** The contents of this slot's save file. */
-	public var saveData(default, null):Null<String>;
+	/** The contents of this slot's save file. Will be null until `load` is called. **/
+	public var contents(default, null):Null<String>;
 	
 	public function new(core:NGLite, data:RawSaveSlot = null) {
 		
@@ -74,7 +74,7 @@ class SaveSlot extends Object<RawSaveSlot>
 			throw "cannot save null to a SaveSlot";
 		
 		_core.calls.cloudSave.setData(data, id)
-			.addDataHandler((response)->setSaveDataOnSlotFetch(response, data, callback))
+			.addDataHandler((response)->setContentsOnSlotFetch(response, data, callback))
 			.send();
 	}
 	
@@ -87,24 +87,15 @@ class SaveSlot extends Object<RawSaveSlot>
 	public function clear(?callback:(ResultType)->Void) {
 		
 		_core.calls.cloudSave.clearSlot(id)
-			.addDataHandler((response)->setSaveDataOnSlotFetch(response, null, callback))
+			.addDataHandler((response)->setContentsOnSlotFetch(response, null, callback))
 			.send();
 	}
 	
-	/**
-	 * Clears cloud save slot
-	 * 
-	 * @param callback  Called when the data is cleared.
-	 *                  Returns the saveData, is successful, otherwise returns an error.
-	 */
-	public function load(?callback:(SaveSlotResultType)->Void) {
-		
-		_core.calls.cloudSave.loadSlot(id)
-			.addDataHandler((response)->loadSaveDataOnSlotFetch(response, callback))
-			.send();
-	}
-	
-	function setSaveDataOnSlotFetch(response:Response<SaveSlotResult>, newSaveData:Null<String>, ?callback:(ResultType)->Void) {
+	function setContentsOnSlotFetch
+	( response:Response<SaveSlotResult>
+	, contents:Null<String>
+	, ?callback:(ResultType)->Void
+	) {
 		
 		// Always have a non-null callback to avoid having to null check everywhere
 		if (callback == null)
@@ -112,52 +103,31 @@ class SaveSlot extends Object<RawSaveSlot>
 		
 		if (response.success && response.result.success) {
 			
-			var oldTimestamp = timestamp;
+			this.contents = contents;
 			parse(response.result.data.slot);
-			saveData = newSaveData;
 		}
 		
 		callback(Success);
 	}
 	
-	inline function mergeSaveSlotData(response:Response<SaveSlotResult>) {
+	/**
+	 * Loads the save slot's file contents
+	 * 
+	 * @param callback  Called when the save file is loaded.
+	 *                  Returns the contents, is successful, otherwise returns an error.
+	 */
+	public function load(?callback:(SaveSlotResultType)->Void) {
 		
-		if (response.success && response.result.success)
-			parse(response.result.data.slot);
-	}
-	
-	function loadSaveDataOnSlotFetch(response:Response<SaveSlotResult>, ?callback:(SaveSlotResultType)->Void) {
-		
-		// Always have a non-null callback to avoid having to null check everywhere
-		if (callback == null)
-			callback = (_)->{};
-			
-		var oldTimestamp = timestamp;
-		mergeSaveSlotData(response);
-		
-		if (saveData == null || timestamp != oldTimestamp)
-		{
-			loadData(callback);
-			return;
-		}
-		
-		callback(Success(saveData));
-	}
-	
-	function loadData(callback:(SaveSlotResultType)->Void) {
-		
-		if (url == null) {
-			
-			callback(Success(null));
-			return;
-		}
+		if (url == null)
+			throw 'Cannot load from an empty SaveSlot, id:$id';
 		
 		// TODO: load data (async)
 		AsyncHttp.send(url, null,
 			(s)->
 			{
-				saveData = s;
-				callback(Success(saveData));
+				contents = s;
+				callback(Success(contents));
+				onUpdate.dispatch();
 			},
 			(error)->callback(Error(error))
 		);

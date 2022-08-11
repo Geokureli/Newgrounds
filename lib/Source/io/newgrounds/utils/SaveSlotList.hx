@@ -51,7 +51,11 @@ class RawSaveSlotList {
 			.send();
 	}
 	
-	function onSaveSlotsReceived(response:Response<LoadSlotsResult>, loadData:Bool, callback:(ResultType)->Void):Void {
+	function onSaveSlotsReceived
+	( response:Response<LoadSlotsResult>
+	, loadFiles:Bool
+	, callback:(ResultType)->Void
+	) {
 		
 		if (!response.success)
 		{
@@ -86,10 +90,10 @@ class RawSaveSlotList {
 		
 		core.logVerbose('${idList.length} SaveSlots received [${idList.join(", ")}]');
 		
-		if (loadData) {
+		if (loadFiles) {
 			
 			// delay onSaveSlotsLoaded.dispatch() until save data is loaded
-			loadAllData(function (result:ResultType) {
+			loadAllFiles(function (result:ResultType) {
 				
 				callback(result);
 				core.onSaveSlotsLoaded.dispatch();
@@ -102,7 +106,11 @@ class RawSaveSlotList {
 		}
 	}
 	
-	public function loadAllData(callback:(ResultType)->Void) {
+	/**
+	 * Loads the save file of every available slot.  If any slot info hasn't been loaded yet,
+	 * it will load that first.
+	**/
+	public function loadAllFiles(callback:(ResultType)->Void) {
 		
 		if (map == null) {
 			
