@@ -56,7 +56,7 @@ class SaveSlot extends Object<RawSaveSlot>
 	 *                  If the save was unsuccessful
 	 * 
 	 */
-	public function save(data:String, ?callback:(SaveSlotResultType)->Void) {
+	public function save(data:String, ?callback:(ResultType)->Void) {
 		
 		if (data == null)
 			throw "cannot save null to a SaveSlot";
@@ -66,7 +66,7 @@ class SaveSlot extends Object<RawSaveSlot>
 			.send();
 	}
 	
-	public function clear(?callback:(SaveSlotResultType)->Void) {
+	public function clear(?callback:(ResultType)->Void) {
 		
 		_core.calls.cloudSave.clearSlot(id)
 			.addDataHandler((response)->setSaveDataOnSlotFetch(response, null, callback))
@@ -80,11 +80,11 @@ class SaveSlot extends Object<RawSaveSlot>
 			.send();
 	}
 	
-	function setSaveDataOnSlotFetch(response:Response<SaveSlotResult>, newSaveData:Null<String>, ?callback:(SaveSlotResultType)->Void) {
+	function setSaveDataOnSlotFetch(response:Response<SaveSlotResult>, newSaveData:Null<String>, ?callback:(ResultType)->Void) {
 		
 		// Always have a non-null callback to avoid having to null check everywhere
 		if (callback == null)
-			callback = noCallback;
+			callback = (_)->{};
 		
 		if (response.success && response.result.success) {
 			
@@ -93,7 +93,7 @@ class SaveSlot extends Object<RawSaveSlot>
 			saveData = newSaveData;
 		}
 		
-		callback(Success(saveData));
+		callback(Success);
 	}
 	
 	inline function mergeSaveSlotData(response:Response<SaveSlotResult>) {
@@ -106,7 +106,7 @@ class SaveSlot extends Object<RawSaveSlot>
 		
 		// Always have a non-null callback to avoid having to null check everywhere
 		if (callback == null)
-			callback = noCallback;
+			callback = (_)->{};
 			
 		var oldTimestamp = timestamp;
 		mergeSaveSlotData(response);
@@ -138,8 +138,6 @@ class SaveSlot extends Object<RawSaveSlot>
 			(error)->callback(Error(error))
 		);
 	}
-	
-	static function noCallback(result:SaveSlotResultType){}
 }
 
 typedef SaveSlotResultType = TypedResultType<Null<String>>;

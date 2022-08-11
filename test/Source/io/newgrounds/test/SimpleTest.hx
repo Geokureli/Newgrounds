@@ -133,7 +133,7 @@ class SimpleTest {
 					slot.save(value, (r)->{
 						switch(r) {
 							
-							case Success(s): trace('data saved: "$s"');
+							case Success: trace('data saved: "$value"');
 							case Error(e): trace('Error saving data: "$e"');
 						}
 					});
@@ -144,7 +144,7 @@ class SimpleTest {
 					trace('SaveSlot[1]: "$saveData"');
 					slot.clear((r)->{
 						switch(r) {
-							case Success(_): trace('data cleared');
+							case Success: trace('data cleared');
 							case Error(e): trace('Error clearing data: $e');
 						}
 					});
