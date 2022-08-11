@@ -1,6 +1,8 @@
 package io.newgrounds.test;
 
 import io.newgrounds.NG;
+import io.newgrounds.objects.events.ResultType;
+import io.newgrounds.objects.SaveSlot;
 
 class SimpleTest {
 	
@@ -37,8 +39,12 @@ class SimpleTest {
 		// Load medals then call onNGMedalFetch()
 		NG.core.requestMedals(onNGMedalFetch);
 		
-		// Load Scoreboards hten call onNGBoardsFetch()
+		// Load Scoreboards then call onNGBoardsFetch()
 		NG.core.requestScoreBoards(onNGBoardsFetch);
+		
+		// Load SaveSlots then call onNGSlotsFetch()
+		// NG.core.requestSaveSlots(true, onNGSlotsFetch);
+		NG.core.saveSlots.loadAllFiles(onNGSlotsFetch);
 	}
 	
 	// --- MEDALS
@@ -84,7 +90,99 @@ class SimpleTest {
 	{
 		for (score in NG.core.scoreBoards.get(7971).scores)
 		{
-			 trace('score loaded user:${score.user.name}, score:${score.formatted_value}');
+			trace('score loaded user:${score.user.name}, score:${score.formattedValue}');
 		}
+	}
+	
+	function onNGSlotsFetch(result:ResultType) {
+		
+		switch (result) {
+			
+			case Error(e):
+				trace('Error getting saveSlots: $e');
+				return;
+			
+			case Success:
+		}
+		
+		for (k=>slot in NG.core.saveSlots)
+			trace('[$k]=>{url:${slot.url}, time:${slot.datetime}, size:${slot.size}}');
+		
+		advanceSong(waitForClick);
+	}
+	
+	function advanceSong(callback)
+	{
+		var slot = NG.core.saveSlots[1];
+		if (slot.url == null) {
+			
+			trace("Saving default value to slot 1");
+			buySomeMore(slot, callback);
+			
+		} else
+			takeOneDown(slot, callback);
+	}
+	
+	function waitForClick(slot:SaveSlot) {
+		
+		#if openfl
+		openfl.Lib.current.stage.addEventListener(openfl.events.MouseEvent.CLICK, onClick);
+		#end
+	}
+	
+	#if openfl
+	function onClick(e:openfl.events.MouseEvent) {
+		
+		openfl.Lib.current.stage.removeEventListener(openfl.events.MouseEvent.CLICK, onClick);
+		
+		advanceSong(waitForClick);
+	}
+	#end
+	
+	function buySomeMore(slot:SaveSlot, callback:(SaveSlot)->Void) {
+		
+		saveSlot(slot, "99 bottles of beer", callback);
+	}
+	
+	function takeOneDown(slot:SaveSlot, callback:(SaveSlot)->Void) {
+		
+		var bottles = Std.parseInt(slot.contents.split(" ")[0]);
+		switch(slot.contents) {
+			
+			case "0 bottles of beer":
+				// no more
+				clearSlot(slot, callback);
+			case data if(bottles > 0):
+				// pass it around
+				saveSlot(slot, '${bottles - 1} bottles of beer', callback);
+			case data:
+				trace('Unexpected save contents "$data"');
+				clearSlot(slot, callback);
+		}
+	}
+	
+	function saveSlot(slot:SaveSlot, value:String, callback:(SaveSlot)->Void) {
+		
+		trace('Saving slot[${slot.id}]: "${slot.contents}"->"$value"');
+		slot.save(value, (r)->{
+			switch(r) {
+				
+				case Success: trace('data saved: "$value"');
+				case Error(e): trace('Error saving data: "$e"');
+			}
+			callback(slot);
+		});
+	}
+	
+	function clearSlot(slot:SaveSlot, callback:(SaveSlot)->Void) {
+		
+		trace('Clearing slot[${slot.id}]: "${slot.contents}"');
+		slot.clear((r)->{
+			switch(r) {
+				case Success: trace('data cleared');
+				case Error(e): trace('Error clearing data: $e');
+			}
+			callback(slot);
+		});
 	}
 }

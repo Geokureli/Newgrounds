@@ -3,22 +3,25 @@ package io.newgrounds;
 #if ng_lite
 typedef NG = NGLite; //TODO: test and make lite UI
 #else
-import io.newgrounds.utils.Dispatcher;
 import io.newgrounds.objects.Error;
 import io.newgrounds.objects.events.Result.SessionResult;
 import io.newgrounds.objects.events.Result.MedalListResult;
 import io.newgrounds.objects.events.Result.ScoreBoardResult;
+import io.newgrounds.objects.events.Result.LoadSlotsResult;
+import io.newgrounds.objects.events.ResultType;
 import io.newgrounds.objects.events.Response;
 import io.newgrounds.objects.User;
 import io.newgrounds.objects.Medal;
-import io.newgrounds.objects.Session;
+import io.newgrounds.objects.SaveSlot;
 import io.newgrounds.objects.ScoreBoard;
+import io.newgrounds.objects.Session;
+import io.newgrounds.utils.Dispatcher;
+import io.newgrounds.utils.SaveSlotList;
 #if (openfl < "4.0.0")
 import openfl.utils.JNI;
 #else
 import lime.system.JNI;
 #end
-import haxe.ds.IntMap;
 import haxe.Timer;
 
 /**
@@ -51,8 +54,9 @@ class NG extends NGLite {
 		
 		return _session.passportUrl;
 	}
-	public var medals(default, null):IntMap<Medal>;
-	public var scoreBoards(default, null):IntMap<ScoreBoard>;
+	public var medals(default, null):Map<Int, Medal>;
+	public var scoreBoards(default, null):Map<Int, ScoreBoard>;
+	public var saveSlots(default, null):SaveSlotList;
 	
 	// --- EVENTS
 	
@@ -60,6 +64,7 @@ class NG extends NGLite {
 	public var onLogOut(default, null):Dispatcher;
 	public var onMedalsLoaded(default, null):Dispatcher;
 	public var onScoreBoardsLoaded(default, null):Dispatcher;
+	public var onSaveSlotsLoaded(default, null):Dispatcher;
 	
 	// --- MISC
 	
@@ -83,6 +88,9 @@ class NG extends NGLite {
 		onLogOut = new Dispatcher();
 		onMedalsLoaded = new Dispatcher();
 		onScoreBoardsLoaded = new Dispatcher();
+		onSaveSlotsLoaded = new Dispatcher();
+		
+		saveSlots = new SaveSlotList(this);
 		
 		attemptingLogin = sessionId != null;
 		
@@ -404,7 +412,7 @@ class NG extends NGLite {
 		
 		if (medals == null) {
 			
-			medals = new IntMap<Medal>();
+			medals = new Map();
 			
 			for (medalData in response.result.data.medals) {
 				
@@ -463,7 +471,7 @@ class NG extends NGLite {
 		
 		if (scoreBoards == null) {
 			
-			scoreBoards = new IntMap<ScoreBoard>();
+			scoreBoards = new Map();
 			
 			for (boardData in response.result.data.scoreboards) {
 				
@@ -476,6 +484,20 @@ class NG extends NGLite {
 		logVerbose('${response.result.data.scoreboards.length} ScoreBoards received [${idList.join(", ")}]');
 		
 		onScoreBoardsLoaded.dispatch();
+	}
+	
+	// -------------------------------------------------------------------------------------------
+	//                                     CLOUD SAVES
+	// -------------------------------------------------------------------------------------------
+	
+	/**
+	 * Loads the info for each cloud save slot, including the last save time and size
+	 * @param loadFiles  If true, each slot's save file is also loaded.
+	 * @param callback   Whether the request was successful, or an error message
+	**/
+	inline public function requestSaveSlots(loadFiles = false, ?callback:ResultType->Void):Void {
+		
+		saveSlots.loadList(callback);
 	}
 	
 	// -------------------------------------------------------------------------------------------
