@@ -6,8 +6,11 @@ import io.newgrounds.objects.events.ResultType;
 import io.newgrounds.objects.events.Result;
 
 /**
+ * A list of cloud save slots
  * 
+ * To use an individual slot, first call `loadList` to populate the list.
  * 
+ * @see io.newgrounds.objects.SaveSlot
 **/
 @:forward
 abstract SaveSlotList (RawSaveSlotList)

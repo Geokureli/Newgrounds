@@ -24,6 +24,9 @@ typedef RawSaveSlot = {
 
 /**
  * Contains information about a CloudSave slot.
+ * 
+ * This is helper class that lets you call methods directly on the slot object, rather than
+ * calling generic calls using the slot's id number.
 **/
 class SaveSlot extends Object<RawSaveSlot>
 {
@@ -48,7 +51,7 @@ class SaveSlot extends Object<RawSaveSlot>
 	inline function get_timestamp() return _data.timestamp;
 	inline function get_url      () return _data.url;
 	
-	/**  */
+	/** The contents of this slot's save file. */
 	public var saveData(default, null):Null<String>;
 	
 	public function new(core:NGLite, data:RawSaveSlot = null) {

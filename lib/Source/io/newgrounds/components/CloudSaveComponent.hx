@@ -4,13 +4,14 @@ import io.newgrounds.objects.events.Result.SaveSlotResult;
 import io.newgrounds.objects.events.Result.LoadSlotsResult;
 import io.newgrounds.NGLite;
 
+/** Handles loading and saving of game states. */
 class CloudSaveComponent extends Component {
 	
 	/**
 	 * Pass into the default value to allow null values.
 	 * 
 	 * TODO: find less hacky solution
-	 */
+	**/
 	static var allowNull:Dynamic = {};
 	
 	public function new (core:NGLite){ super(core); }
