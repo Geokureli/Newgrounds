@@ -490,9 +490,14 @@ class NG extends NGLite {
 	//                                     CLOUD SAVES
 	// -------------------------------------------------------------------------------------------
 	
-	inline public function requestSaveSlots(?callback:ResultType->Void):Void {
+	/**
+	 * Loads the info for each cloud save slot, including the last save time and size
+	 * @param loadFiles  If true, each slot's save file is also loaded.
+	 * @param callback   Whether the request was successful, or an error message
+	**/
+	inline public function requestSaveSlots(loadFiles = false, ?callback:ResultType->Void):Void {
 		
-		saveSlots.loadAll(callback);
+		saveSlots.loadList(callback);
 	}
 	
 	// -------------------------------------------------------------------------------------------

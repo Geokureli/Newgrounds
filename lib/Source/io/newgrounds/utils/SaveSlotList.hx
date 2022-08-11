@@ -5,6 +5,10 @@ import io.newgrounds.objects.events.Response;
 import io.newgrounds.objects.events.ResultType;
 import io.newgrounds.objects.events.Result;
 
+/**
+ * 
+ * 
+**/
 @:forward
 abstract SaveSlotList (RawSaveSlotList)
 {
@@ -18,8 +22,8 @@ abstract SaveSlotList (RawSaveSlotList)
 }
 
 /**
- * Note: `SaveSlotList` is just an abstract wrapper of `RawSaveSlotList`, to allow array access
- * Be sureto add any actual behavior to this class
+ * Note: `SaveSlotList` is just an abstract wrapper of `RawSaveSlotList`, to allow array access.
+ * Be sure to add any actual behavior to this class
 **/
 @:allow(io.newgrounds.utils.SaveSlotList)
 @:access(io.newgrounds.objects.SaveSlot)
@@ -33,7 +37,7 @@ class RawSaveSlotList {
 		this.core = core;
 	}
 	
-	public function loadAll(loadFiles = false, ?callback:(ResultType)->Void) {
+	public function loadList(loadFiles = false, ?callback:(ResultType)->Void) {
 		
 		if (callback == null)
 			callback = noCallback;
@@ -100,7 +104,7 @@ class RawSaveSlotList {
 		if (map == null) {
 			
 			// populate the save slots first
-			loadAll(true, callback);
+			loadList(true, callback);
 			return;
 		}
 		

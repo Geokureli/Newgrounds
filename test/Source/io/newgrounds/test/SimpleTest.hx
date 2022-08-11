@@ -104,7 +104,7 @@ class SimpleTest {
 		}
 		
 		for (k=>slot in NG.core.saveSlots)
-			trace('[$k]=>{url:${slot.url}, time:${slot.datetime}}');
+			trace('[$k]=>{url:${slot.url}, time:${slot.datetime}, size:${slot.size}}');
 		
 		var slot = NG.core.saveSlots[1];
 		if (slot.url == null) {

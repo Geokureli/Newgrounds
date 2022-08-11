@@ -13,7 +13,9 @@ class ComponentList {
 	public var gateway   : GatewayComponent;
 	/** This class handles loading various URLs and tracking referral stats. */
 	public var loader    : LoaderComponent;
+	/** Handles loading and unlocking of medals. */
 	public var medal     : MedalComponent;
+	/** Handles loading and posting of high scores and scoreboards. */
 	public var scoreBoard: ScoreBoardComponent;
 	
 	public function new(core:NGLite) {

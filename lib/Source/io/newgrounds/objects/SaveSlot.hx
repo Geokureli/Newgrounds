@@ -5,6 +5,9 @@ import io.newgrounds.objects.events.Result.SaveSlotResult;
 import io.newgrounds.objects.events.ResultType;
 import io.newgrounds.objects.events.Response;
 
+/**
+ * Contains information about a CloudSave slot.
+**/
 typedef RawSaveSlot = {
 	
 	/** A date and time (in ISO 8601 format) representing when this slot was last saved. */
@@ -19,6 +22,9 @@ typedef RawSaveSlot = {
 	var url      :Null<String>;
 }
 
+/**
+ * Contains information about a CloudSave slot.
+**/
 class SaveSlot extends Object<RawSaveSlot>
 {
 	/** A date and time (in ISO 8601 format) representing when this slot was last saved. */
@@ -42,6 +48,7 @@ class SaveSlot extends Object<RawSaveSlot>
 	inline function get_timestamp() return _data.timestamp;
 	inline function get_url      () return _data.url;
 	
+	/**  */
 	public var saveData(default, null):Null<String>;
 	
 	public function new(core:NGLite, data:RawSaveSlot = null) {
@@ -51,10 +58,12 @@ class SaveSlot extends Object<RawSaveSlot>
 	
 	/**
 	 * Saves the supplied data to the cloud save slot
+	 * 
 	 * @param data      The data to save to the slot
 	 * @param callback  Called when the data is saved with the new value.
-	 *                  If the save was unsuccessful
+	 *                  Tells whether the server call was successful.
 	 * 
+	 * @throws Exception if data is null
 	 */
 	public function save(data:String, ?callback:(ResultType)->Void) {
 		
@@ -66,6 +75,12 @@ class SaveSlot extends Object<RawSaveSlot>
 			.send();
 	}
 	
+	/**
+	 * Clears cloud save slot
+	 * 
+	 * @param callback  Called when the data is cleared.
+	 *                  Tells whether the server call was successful.
+	 */
 	public function clear(?callback:(ResultType)->Void) {
 		
 		_core.calls.cloudSave.clearSlot(id)
@@ -73,6 +88,12 @@ class SaveSlot extends Object<RawSaveSlot>
 			.send();
 	}
 	
+	/**
+	 * Clears cloud save slot
+	 * 
+	 * @param callback  Called when the data is cleared.
+	 *                  Returns the saveData, is successful, otherwise returns an error.
+	 */
 	public function load(?callback:(SaveSlotResultType)->Void) {
 		
 		_core.calls.cloudSave.loadSlot(id)
