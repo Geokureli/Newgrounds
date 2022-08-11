@@ -135,6 +135,16 @@ which allows you make postScore and getScores calls directly on the board.
 
 **Note:** ScoreBoard instances persist across multiple requestScoreBoards calls, but a ScoreBoard's score instances do not
 
+### CloudSaves
+Similarly to medals and scoreboards CloudSaves have `NG.core.saveSlots` which is populated by `NG.core.requestSaveSlots`.  
+On top of the normal [SaveSlot properties](http://www.newgrounds.io/help/objects/#SaveSlot), each saveSlot will have a
+readonly `contents` field that is null until you call `load` on that SaveSlot instance (`load()` will throw an error
+if there is no save in that slot, check this using `isEmpty()`). You can also call `save(mySaveContents)` or `clear()` on
+SaveSlots.
+
+**Note:** `NG.core.requestSaveSlots` has an optional `loadFiles` arg that will load all the SaveSlot's contents as well
+as the slot info. Additionally, you can call `NG.core.saveSlots.loadList` instead of `NG.core.requestSaveSlots`.
+
 ## Calling Components and Handling Results
 You can talk to the NG.io server directly, but NG.core won't automatically handle 
 the response for you (unlike NG.core.requestMedals()). All of the component calls are 
