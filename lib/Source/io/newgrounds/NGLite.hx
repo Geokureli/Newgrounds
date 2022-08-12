@@ -270,20 +270,17 @@ class NGLite {
 	
 	function encryptRc4(key:String, format:EncryptionFormat, data:String):String {
 		
-		if (format == EncryptionFormat.HEX)
-			throw "hex format not yet implemented";
-		
 		var keyBytes:Bytes;
 		if (format == EncryptionFormat.BASE_64)
 			keyBytes = Base64.decode(key);
 		else
-			keyBytes = null;//TODO
+			keyBytes = Bytes.ofHex(key);
 		
 		var dataBytes = new Rc4(keyBytes).crypt(Bytes.ofString(data));
 		
 		if (format == EncryptionFormat.BASE_64)
 			return Base64.encode(dataBytes);
 		
-		return null;
+		return dataBytes.toHex();
 	}
 }
