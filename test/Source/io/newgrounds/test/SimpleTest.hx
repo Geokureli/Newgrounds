@@ -1,8 +1,8 @@
 package io.newgrounds.test;
 
 import io.newgrounds.NG;
-import io.newgrounds.objects.events.ResultType;
 import io.newgrounds.objects.SaveSlot;
+import io.newgrounds.objects.events.ResultType;
 
 class SimpleTest {
 	
@@ -10,21 +10,28 @@ class SimpleTest {
 		
 		trace("connecting to newgrounds");
 		
-		NG.createAndCheckSession("47215:Ip8uDj9v");
+		// Use debug so medal unlocks and scoreboards reset after this session
+		var debug = true;
+		NG.createAndCheckSession("47215:Ip8uDj9v", debug);
 		NG.core.verbose = true;
 		// Set the encryption cipher/format to RC4/Base64. AES128 and Hex are not implemented yet
-		NG.core.initEncryption("LUp0Zg4f1lukgKgSwchZnQ==");// Found in your NG project view
+		// Found in your NG project view
+		NG.core.setupEncryption("LrnXpr/ogBf+GmU97IzF7Q==");
+		// NG.core.setupEncryption("LrnXpr/ogBf+GmU97IzF7Q==", HEX);
+		// NG.core.setupEncryption("LrnXpr/ogBf+GmU97IzF7Q==", NONE);
+		// NG.core.setupEncryption("LUp0Zg4f1lukgKgSwchZnQ==", RC4, BASE_64);
+		// NG.core.setupEncryption("2d4a74660e1fd65ba480a812c1c8599d", RC4, HEX);// Found in your NG project view
 		
-		if (NG.core.attemptingLogin)
-		{
+		if (NG.core.attemptingLogin) {
+			
 			/* a session_id was found in the loadervars, this means the user is playing on newgrounds.com
 			 * and we should login shortly. lets wait for that to happen
 			 */
 			
 			NG.core.onLogin.add(onNGLogin);
-		}
-		else
-		{
+			
+		} else {
+			
 			/* They are NOT playing on newgrounds.com, no session id was found. We must start one manually, if we want to.
 			 * Note: This will cause a new browser window to pop up where they can log in to newgrounds
 			 */
@@ -32,8 +39,8 @@ class SimpleTest {
 		}
 	}
 	
-	function onNGLogin():Void
-	{
+	function onNGLogin() {
+		
 		trace ('logged in! user:${NG.core.user.name}');
 		
 		// Load medals then call onNGMedalFetch()
@@ -48,11 +55,11 @@ class SimpleTest {
 	}
 	
 	// --- MEDALS
-	function onNGMedalFetch():Void
-	{
+	function onNGMedalFetch() {
+		
 		// Reading medal info
-		for (id in NG.core.medals.keys())
-		{
+		for (id in NG.core.medals.keys()) {
+			
 			var medal = NG.core.medals.get(id);
 			trace('loaded medal id:$id, name:${medal.name}, description:${medal.description}');
 		}
@@ -64,11 +71,11 @@ class SimpleTest {
 	}
 	
 	// --- SCOREBOARDS
-	function onNGBoardsFetch():Void
-	{
+	function onNGBoardsFetch() {
+		
 		// Reading medal info
-		for (id in NG.core.scoreBoards.keys())
-		{
+		for (id in NG.core.scoreBoards.keys()) {
+			
 			var board = NG.core.scoreBoards.get(id);
 			trace('loaded scoreboard id:$id, name:${board.name}');
 		}
@@ -86,12 +93,10 @@ class SimpleTest {
 		// more info on scores --- http://www.newgrounds.io/help/components/#scoreboard-getscores
 	}
 	
-	function onNGScoresFetch():Void
-	{
+	function onNGScoresFetch() {
+		
 		for (score in NG.core.scoreBoards.get(7971).scores)
-		{
 			trace('score loaded user:${score.user.name}, score:${score.formattedValue}');
-		}
 	}
 	
 	function onNGSlotsFetch(result:ResultType) {
@@ -111,8 +116,8 @@ class SimpleTest {
 		advanceSong(waitForClick);
 	}
 	
-	function advanceSong(callback)
-	{
+	function advanceSong(callback) {
+		
 		var slot = NG.core.saveSlots[1];
 		if (slot.url == null) {
 			

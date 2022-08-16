@@ -62,17 +62,17 @@ if (NG.core.loggedIn == false)
 Setting the encryption method is easy, just call:
 
 ```haxe
-NG.core.initEncryption("encryption key", someEncryptionCipher, someEncryptionFormat);
+NG.core.setupEncryption("encryption key", AES_128, BASE_64);
 ```
 
 Encryption Ciphers:
 - **io.newgrounds.crypto.Cipher.NONE**
-- **io.newgrounds.crypto.Cipher.AES-128** (not implemented)
-- **io.newgrounds.crypto.Cipher.RC4** (default)
+- **io.newgrounds.crypto.Cipher.AES-128**(default)
+- **io.newgrounds.crypto.Cipher.RC4**
 
 Encryption Ciphers:
 - **io.newgrounds.crypto.EncryptionFormat.BASE_64** (default)
-- **io.newgrounds.crypto.EncryptionFormat.HEX** (not implemented)
+- **io.newgrounds.crypto.EncryptionFormat.HEX**
 
 You can also use your own encryption method - if you're some kind of crypto-god from The Matrix -
 by directly setting NG.core.encryptionHandler
@@ -228,8 +228,11 @@ NG.core.medal.unlock(id).queue();
 ```
 
 ## TODO
- - AES-128 encryption
- - Hex encoding
+ - ~~AES-128 encryption~~
+ - ~~Hex encoding~~
+ - Enable AES-128 and Hex in the GUI test project
+ - Pretty up the GUI test project in general
+ - Replace successCallbacks and failCallbacks with resultCallbacks (2.0.0)
  - kill all humans
  - flash API assets
      - ad viewer - not supported in ng.io v3
