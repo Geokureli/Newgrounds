@@ -1,14 +1,12 @@
 package io.newgrounds;
 
-import haxe.crypto.Base64;
 import haxe.io.Bytes;
 import haxe.PosInfos;
 
 import io.newgrounds.Call.ICallable;
 import io.newgrounds.components.ComponentList;
-import io.newgrounds.crypto.EncryptionFormat;
+import io.newgrounds.crypto.EncodingFormat;
 import io.newgrounds.crypto.Cipher;
-import io.newgrounds.crypto.Rc4;
 import io.newgrounds.objects.Error;
 import io.newgrounds.objects.events.Response;
 import io.newgrounds.objects.events.Result.ResultBase;
@@ -251,39 +249,30 @@ class NGLite {
 	
 	// -------------------------------------------------------------------------------------------
 	//                                       ENCRYPTION
-    // -------------------------------------------------------------------------------------------
+	// -------------------------------------------------------------------------------------------
 	
-	/** Sets */
-	public function initEncryption
+	
+	public function setupEncryption
 	( key   :String
-	, cipher:Cipher = Cipher.RC4
-	, format:EncryptionFormat = EncryptionFormat.BASE_64
-	):Void {
+	, cipher:Cipher         = AES_128
+	, format:EncodingFormat = BASE_64
+	) {
 		
-		if (cipher == Cipher.NONE)
-			encryptionHandler = null;
-		else if (cipher == Cipher.RC4)
-			encryptionHandler = encryptRc4.bind(key, format);
-		else
-			throw "aes not yet implemented";
+		encryptionHandler = null;
+		
+		var encrypt = cipher.generateEncrypter(format.decode(key));
+		if (encrypt != null) {
+			
+			encryptionHandler = function (data) {
+				
+				return format.encode(encrypt(Bytes.ofString(data)));
+			}
+		}
 	}
 	
-	function encryptRc4(key:String, format:EncryptionFormat, data:String):String {
+	@:deprecated("initEncryption is deprecated, use `setupEncryption`, now that AES-128 is the default")
+	inline public function initEncryption(key, cipher = RC4, format = BASE_64) {
 		
-		if (format == EncryptionFormat.HEX)
-			throw "hex format not yet implemented";
-		
-		var keyBytes:Bytes;
-		if (format == EncryptionFormat.BASE_64)
-			keyBytes = Base64.decode(key);
-		else
-			keyBytes = null;//TODO
-		
-		var dataBytes = new Rc4(keyBytes).crypt(Bytes.ofString(data));
-		
-		if (format == EncryptionFormat.BASE_64)
-			return Base64.encode(dataBytes);
-		
-		return null;
+		setupEncryption(key, cipher, format);
 	}
 }
