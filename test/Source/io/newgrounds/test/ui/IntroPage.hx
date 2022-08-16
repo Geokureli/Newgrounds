@@ -3,7 +3,7 @@ package io.newgrounds.test.ui;
 import io.newgrounds.test.art.IntroScreenSwf;
 import io.newgrounds.components.Component;
 import io.newgrounds.crypto.Cipher;
-import io.newgrounds.crypto.EncryptionFormat;
+import io.newgrounds.crypto.EncodingFormat;
 import io.newgrounds.swf.common.Button;
 
 import openfl.display.Stage;
@@ -56,13 +56,10 @@ class IntroPage extends Page<Component> {
 		_encryptionKey = target.encryptionKey;
 		
 		_format = new RadioGroup(target.format);
-		_format.selected = EncryptionFormat.BASE_64;
-		_format.disableChoice(EncryptionFormat.HEX);
+		_format.selected = EncodingFormat.BASE_64;
 		
 		_cipher = new RadioGroup(target.cipher, onCipherChange);
-		_cipher.selected = Cipher.RC4;
-		_cipher.disableChoice(Cipher.AES_128);
-		
+		_cipher.selected = Cipher.AES_128;
 	}
 	
 	function onAutoConnectToggle():Void {
