@@ -97,7 +97,7 @@ class IntroPage extends Page<Component> {
 			NG.create(fieldString(_appId), fieldString(_sessionId), _debug.on);
 		#end
 		if (_cipher.selected != Cipher.NONE)
-			NG.core.initEncryption(fieldString(_encryptionKey), cast _cipher.selected, cast _format.selected);
+			NG.core.setupEncryption(fieldString(_encryptionKey), cast _cipher.selected, cast _format.selected);
 		
 		NG.core.verbose = true;
 		

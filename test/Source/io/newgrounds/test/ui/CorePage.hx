@@ -246,43 +246,13 @@ class CorePage extends CorePageLite {
 	
 	inline function initBoards():Void {
 		
-		_loadBoards.onClick = loadBoards;
-		NG.core.onScoreBoardsLoaded.add(onBoardsLoaded);
-		_scoreBrowser.boardId = -1;
+		// _loadBoards.onClick = loadBoards;
+		// NG.core.onScoreBoardsLoaded.add(onBoardsLoaded);
 	}
 	
 	function loadBoards():Void {
 		
 		NG.core.requestScoreBoards();
-	}
-	
-	function onBoardsLoaded():Void {
-		
-		_loadBoards.enabled = false;
-		_scoreBoardList.visible = true;
-		
-		var i:Int = 0;
-		var spacing = 22;
-		_displayBoards = new Map<ScoreBoardSwf, ScoreBoard>();
-		_boardPages = new IntMap<Int>();
-		
-		for (boardData in NG.core.scoreBoards) {
-			
-			var board = new ScoreBoardSwf();
-			board.y = i * spacing;
-			board.id.text = Std.string(boardData.id);
-			board.boardName.text = boardData.name;
-			_scoreBoardList.addChild(board);
-			
-			_displayBoards.set(board, boardData);
-			_boardPages.set(boardData.id, -1);
-			
-			new Button(board, getScores.bind(boardData));
-			
-			i++;
-			if (i == 10)
-				break;
-		}
 	}
 	
 	function getScores(board:ScoreBoard = null):Void {
@@ -312,9 +282,7 @@ class CorePageLite extends Page<Component> {
 	var _loadMedals:Button;
 	var _medalList:MedalListSwf;
 	
-	var _loadBoards:Button;
 	var _scoreBoardList:ScoreBoardListSwf;
-	var _displayBoards:Map<ScoreBoardSwf, ScoreBoard>;
 	var _scoreBrowser:ScoreBrowserSlim;
 	
 	public function new (target:CorePageSwf) {
@@ -343,11 +311,10 @@ class CorePageLite extends Page<Component> {
 		_medalList = cast target.medalList;
 		_medalList.visible = false;
 		
-		_loadBoards = new Button(target.loadBoards);
+		// _loadBoards = new Button(target.loadBoards);
 		_scoreBoardList = cast target.scoreBoardList;
-		_scoreBoardList.visible = false;
+		// _scoreBoardList.visible = false;
 		_scoreBrowser = cast _scoreBoardList.scoreBrowser;
-		_scoreBrowser.boardId = -1;
 		
 		#if ng_lite
 		_login.enabled = false;

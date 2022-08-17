@@ -49,7 +49,9 @@ class MainScreen extends Sprite {
 		, SCOREBOARD => ScoreboardPage
 		];
 		
-		NG.core.log = logOutput;
+		// cache log messages that happen before initialization
+		var queuedOutput = new Array<{msg:String, pos:PosInfos}>();
+		NG.core.log = function (msg, ?pos) queuedOutput.push({msg:msg, pos:pos});
 		
 		_layout = new MainScreenSwf();
 		addChild(_layout);
@@ -58,6 +60,13 @@ class MainScreen extends Sprite {
 		#end
 		_output = _layout.output;
 		_output.text = "";
+		NG.core.log = logOutput;
+		// log the early messages
+		while (queuedOutput.length > 0) {
+			
+			var next = queuedOutput.shift();
+			logOutput(next.msg, next.pos);
+		}
 		
 		addEventListener(Event.ADDED_TO_STAGE, onAdded);
 	}

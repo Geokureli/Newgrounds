@@ -93,6 +93,7 @@ class ScoreBrowser extends BaseAsset {
 	override function setDefaults():Void {
 		super.setDefaults();
 		
+		@:bypassAccessor
 		boardId = -1;
 		_boardIDSet = false;
 		
