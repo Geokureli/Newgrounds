@@ -24,11 +24,24 @@ class DropDown {
 		return v;
 	}
 	
+	public var enabled(get, set):Bool;
+	inline function get_enabled():Bool return _expandButton.enabled;
+	function set_enabled(v:Bool):Bool {
+		
+		_expandButton.enabled = v;
+		_currentItemButton.enabled = v;
+		
+		return v;
+	}
+	
 	var _choiceContainer:Sprite;
 	var _selectedLabel:TextField;
 	var _onChange:Void->Void;
-	var _values:StringMap<String>;
+	var _values:Map<String, String>;
 	var _unusedChoices:Array<MovieClip>;
+	var _choices:Map<String, Button>;
+	var _expandButton:Button;
+	var _currentItemButton:Button;
 	
 	public function new(target:MovieClip, label:String = "", onChange:Void->Void = null) {
 		
@@ -37,10 +50,11 @@ class DropDown {
 		_selectedLabel = cast cast(target.getChildByName("currentItem"), MovieClip).getChildByName("label");
 		_selectedLabel.text = label;
 		
-		_values = new StringMap<String>();
+		_values = new Map();
+		_choices = new Map();
 		
-		new Button(cast target.getChildByName("button"), onClickExpand);
-		new Button(cast target.getChildByName("currentItem"), onClickExpand);
+		_expandButton = new Button(cast target.getChildByName("button"), onClickExpand);
+		_currentItemButton = new Button(cast target.getChildByName("currentItem"), onClickExpand);
 		_choiceContainer = new Sprite();
 		_choiceContainer.visible = false;
 		target.addChild(_choiceContainer);
@@ -68,10 +82,40 @@ class DropDown {
 		}
 		
 		var button = _unusedChoices.shift();
-		cast(button.getChildByName("label"), TextField).text = name;
 		_choiceContainer.addChild(button);
 		
-		new Button(button, onChoiceClick.bind(value));
+		_choices[name] = new Button(button, onChoiceClick.bind(value));
+		_choices[name].setLabel(name);
+	}
+	
+	public function editItem(oldName:String, newName:String, newValue:String) {
+		
+		if (_choices.exists(oldName) == false)
+			throw 'could not find button: $oldName';
+		
+		var button = _choices[oldName];
+		_choices.remove(oldName);
+		_choices[newName] = button;
+		button.setLabel(newName);
+		button.onClick = onChoiceClick.bind(newValue);
+		
+		var oldValue:String = null;
+		for (value in _values) {
+			
+			if (_values[value] == oldName)
+				oldValue = value;
+		}
+		
+		_values[newName] = newValue;
+		
+		// reselect choice
+		if (this.value == oldValue)
+		{
+			@:bypassAccessor
+			this.value = newValue;
+			
+			_selectedLabel.text = newName;
+		}
 	}
 	
 	function onClickExpand():Void {
@@ -84,5 +128,5 @@ class DropDown {
 		value = name;
 		
 		_choiceContainer.visible = false;
-	} 
+	}
 }
