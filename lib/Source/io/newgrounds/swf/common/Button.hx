@@ -4,12 +4,13 @@ import openfl.display.Stage;
 import openfl.events.Event;
 import openfl.events.MouseEvent;
 import openfl.display.MovieClip;
+import openfl.text.TextField;
 
 class Button {
 	
 	var _enabled:Bool;
 	public var enabled(get, set):Bool;
-	function get_enabled():Bool { return _enabled; }
+	function get_enabled():Bool return _enabled;
 	function set_enabled(value:Bool):Bool {
 		
 		if (value != _enabled) {
@@ -20,6 +21,10 @@ class Button {
 		
 		return value;
 	}
+	
+	public var visible(get, set):Bool;
+	inline function get_visible():Bool return _target.visible;
+	inline function set_visible(value:Bool):Bool return _target.visible = value;
 	
 	public var onClick:Void->Void;
 	public var onOver:Void->Void;
@@ -47,6 +52,15 @@ class Button {
 			onAdded(null);
 		
 		enabled = true;
+	}
+	
+	public function setLabel(label:String) {
+		
+		var field:TextField = cast _target.getChildByName("label");
+		if (field == null)
+			throw 'Missing expected child: "label"';
+		
+		field.text = label;
 	}
 	
 	function onAdded(e:Event):Void {
