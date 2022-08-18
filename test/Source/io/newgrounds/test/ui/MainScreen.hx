@@ -11,6 +11,7 @@ import openfl.display.MovieClip;
 
 import io.newgrounds.test.art.MainScreenSwf;
 import io.newgrounds.test.ui.Page;
+import io.newgrounds.test.ui.CloudSavePage;
 import io.newgrounds.NG;
 
 class MainScreen extends Sprite {
@@ -23,6 +24,7 @@ class MainScreen extends Sprite {
 	static inline var LOADER    :String = "loader";
 	static inline var MEDAL     :String = "medal";
 	static inline var SCOREBOARD:String = "scoreboard";
+	static inline var CLOUDSAVES:String = "cloudSaves";
 	
 	static var _pageWrappers:StringMap<Class<Dynamic>>;
 	
@@ -47,6 +49,7 @@ class MainScreen extends Sprite {
 		, LOADER     => LoaderPage
 		, MEDAL      => MedalPage
 		, SCOREBOARD => ScoreboardPage
+		, CLOUDSAVES => CloudSavePage
 		];
 		
 		// cache log messages that happen before initialization
