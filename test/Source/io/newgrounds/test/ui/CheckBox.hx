@@ -35,6 +35,7 @@ class CheckBox extends Button {
 	}
 
 	override function updateState():Void {
+		super.updateState();
 		
 		_check.visible = on;
 	}
