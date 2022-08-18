@@ -1,5 +1,6 @@
 package io.newgrounds.test.ui;
 
+import io.newgrounds.objects.SaveSlot;
 import io.newgrounds.test.swf.ScoreBrowserSlim;
 import haxe.ds.IntMap;
 
@@ -19,6 +20,7 @@ import io.newgrounds.objects.ScoreBoard;
 import io.newgrounds.components.Component;
 
 import openfl.net.URLRequest;
+import openfl.display.MovieClip;
 import openfl.display.Loader;
 import openfl.geom.Point;
 import openfl.text.TextField;
@@ -39,6 +41,7 @@ class CorePage extends CorePageLite {
 		initLogInOut();
 		initMedals();
 		initBoards();
+		initSlots();
 	}
 	
 	// -------------------------------------------------------------------------------------------
@@ -193,7 +196,7 @@ class CorePage extends CorePageLite {
 			
 			var medal = new MedalSwf();
 			medal.x = (i % 13) * spacing.x;
-			medal.y = Math.floor(i / 13) * spacing.y;
+			medal.y = Math.floor(i / 13) * spacing.y + 20;
 			_medalList.addChild(medal);
 			var loader = new Loader();
 			loader.load(new URLRequest(medalData.icon));
@@ -264,6 +267,16 @@ class CorePage extends CorePageLite {
 		_scoreBrowser.boardId = board.id;
 		_scoreBrowser.page = page;
 	}
+	
+	// -------------------------------------------------------------------------------------------
+	//                                       Cloud Saves
+	// -------------------------------------------------------------------------------------------
+	
+	inline function initSlots() {
+		
+		NG.core.onSaveSlotsLoaded.add(_slotsList.onSlotsLoaded);
+	}
+	
 }
 #end
 	
@@ -284,6 +297,8 @@ class CorePageLite extends Page<Component> {
 	
 	var _scoreBoardList:ScoreBoardListSwf;
 	var _scoreBrowser:ScoreBrowserSlim;
+	
+	var _slotsList:SlotsList;
 	
 	public function new (target:CorePageSwf) {
 		super(target);
@@ -316,6 +331,8 @@ class CorePageLite extends Page<Component> {
 		// _scoreBoardList.visible = false;
 		_scoreBrowser = cast _scoreBoardList.scoreBrowser;
 		
+		_slotsList = new SlotsList(target.slotList);
+		
 		#if ng_lite
 		_login.enabled = false;
 		_openPassport.enabled = false;
@@ -334,5 +351,79 @@ class CorePageLite extends Page<Component> {
 	function onSessionIdChange(value:String):Void {
 		
 		NG.core.sessionId = value;
+	}
+}
+
+private class SlotsList {
+	
+	var _target:MovieClip;
+	
+	public function new (slotList:MovieClip) {
+		
+		_target = slotList;
+		_target.visible = false;
+	}
+	
+	public function onSlotsLoaded() {
+		
+		_target.visible = true;
+		
+		var saveSlots = NG.core.saveSlots;
+		var numSlots = saveSlots.length;
+		
+		if (numSlots == 0)
+			throw 'Server returned no slots';
+		
+		if (numSlots > _target.numChildren)
+			throw 'Save slot count exceeded expectations, slots: $numSlots, buttons: ${_target.numChildren}';
+		
+		for (i in 0...numSlots) {
+			
+			var slot = saveSlots.getOrdered(i);
+			var slotMc:MovieClip = cast _target.getChildByName('slot$i');
+			
+			if (slotMc == null)
+				throw 'missing slot$i';
+			
+			new Slot(slotMc, slot);
+		}
+		
+		// remove the rest
+		for (i in numSlots..._target.numChildren) {
+			
+			var slotMc:MovieClip = cast _target.getChildByName('slot$i');
+			
+			if (slotMc == null)
+				throw 'missing slot$i';
+			
+			_target.removeChild(slotMc);
+		}
+	}
+}
+
+abstract Slot(MovieClip) {
+	
+	public function new (target:MovieClip, data:SaveSlot) {
+		
+		this = target;
+		
+		assertField("idField").text = Std.string(data.id);
+		assertField("timeField").text = data.datetime == null ? "Empty" : data.datetime;
+		assertField("sizeField").text = data.prettyPrintSize();
+	}
+	
+	@:generic
+	function assertChild<T>(name:String) {
+		
+		var child:T = cast this.getChildByName(name);
+		if (child == null)
+			throw "Missing child: " + name;
+		
+		return child;
+	}
+	
+	inline function assertField(name:String):TextField {
+		
+		return assertChild(name);
 	}
 }

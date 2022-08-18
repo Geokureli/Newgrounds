@@ -19,12 +19,12 @@ class MainScreen extends Sprite {
 	static inline var CORE      :String = "core";
 	static inline var APP       :String = "app";
 	static inline var ASSETS    :String = "assets";
-	static inline var EVENT     :String = "event";     
+	static inline var EVENT     :String = "event";
 	static inline var GATEWAY   :String = "gateway";
 	static inline var LOADER    :String = "loader";
 	static inline var MEDAL     :String = "medal";
 	static inline var SCOREBOARD:String = "scoreboard";
-	static inline var CLOUDSAVES:String = "cloudSaves";
+	static inline var CLOUD_SAVE:String = "cloudSave";
 	
 	static var _pageWrappers:StringMap<Class<Dynamic>>;
 	
@@ -49,7 +49,7 @@ class MainScreen extends Sprite {
 		, LOADER     => LoaderPage
 		, MEDAL      => MedalPage
 		, SCOREBOARD => ScoreboardPage
-		, CLOUDSAVES => CloudSavePage
+		, CLOUD_SAVE => CloudSavePage
 		];
 		
 		// cache log messages that happen before initialization

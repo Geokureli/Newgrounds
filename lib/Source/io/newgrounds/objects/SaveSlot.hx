@@ -135,6 +135,18 @@ class SaveSlot extends Object<RawSaveSlot>
 	
 	/** Whether any data has been saved to this slot. */
 	inline public function isEmpty():Bool return url == null;
+	
+	inline static var MB = KB * 1000;
+	inline static var KB = 1000;
+	/** Displays the slot's size in either bytes, kB or MB */
+	public function prettyPrintSize() {
+		
+		if (size > MB) return Std.string(Math.ceil(size / MB * 10) / 10) + " MB";
+		
+		if (size > KB) return Std.string(Math.ceil(size / KB * 10) / 10) + " kB";
+		
+		return Std.string(size) + " bytes";
+	}
 }
 
 typedef SaveSlotResultType = TypedResultType<Null<String>>;
