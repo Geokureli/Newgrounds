@@ -147,6 +147,11 @@ class SaveSlot extends Object<RawSaveSlot>
 		
 		return Std.string(size) + " bytes";
 	}
+	
+	public function getDate() {
+		
+		return Date.fromTime(timestamp * 1000);
+	}
 }
 
 typedef SaveSlotResultType = TypedResultType<Null<String>>;
