@@ -118,7 +118,7 @@ class CloudSavePage extends Page<CloudSaveComponent> {
 			
 		} else {
 			
-			_slotData.text = 'ID: ${slot.id} Last Saved: ${slot.datetime} Size: ${slot.size} bytes';
+			_slotData.text = 'ID: ${slot.id} Last Saved: ${slot.getDate())} Size: ${slot.size} bytes';
 			
 			if (slot.contents == null)
 				setContents(false, "Press LOAD to fetch the save contents.");
