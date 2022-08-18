@@ -68,10 +68,10 @@ class NG extends NGLite {
 	
 	// --- MISC
 	
-	public var loggedIn(default, null):Bool;
-	public var attemptingLogin(default, null):Bool;
+	public var loggedIn(default, null) = false;
+	public var attemptingLogin(default, null) = false;
 	
-	var _loginCancelled:Bool;
+	var _loginCancelled = false;
 	var _passportCallback:Void->Void;
 	
 	var _session:Session;
