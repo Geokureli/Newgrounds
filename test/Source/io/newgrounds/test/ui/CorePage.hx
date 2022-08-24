@@ -408,7 +408,7 @@ abstract Slot(MovieClip) {
 		this = target;
 		
 		assertField("idField").text = Std.string(data.id);
-		assertField("timeField").text = data.datetime == null ? "Empty" : data.datetime;
+		assertField("timeField").text = data.url == null ? "Empty" : data.getDate().toString();
 		assertField("sizeField").text = data.prettyPrintSize();
 	}
 	
