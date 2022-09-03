@@ -44,6 +44,8 @@ class ScoreBrowserSlim extends ScoreBrowser {
 				_nameDropDown.editItem("Loading", board.name, Std.string(board.id));
 			else
 				_nameDropDown.addItem(board.name, Std.string(board.id));
+			
+			first = false;
 		}
 		
 		super.onBoardsLoaded();
