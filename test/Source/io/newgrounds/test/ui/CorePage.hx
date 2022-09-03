@@ -1,5 +1,6 @@
 package io.newgrounds.test.ui;
 
+import openfl.display.Bitmap;
 import io.newgrounds.objects.SaveSlot;
 import io.newgrounds.test.swf.ScoreBrowserSlim;
 import haxe.ds.IntMap;
@@ -19,11 +20,13 @@ import io.newgrounds.objects.Medal;
 import io.newgrounds.objects.ScoreBoard;
 import io.newgrounds.components.Component;
 
-import openfl.net.URLRequest;
 import openfl.display.MovieClip;
 import openfl.display.Loader;
+import openfl.events.IOErrorEvent;
 import openfl.geom.Point;
+import openfl.net.URLRequest;
 import openfl.text.TextField;
+import openfl.utils.Assets;
 
 #if ng_lite
 typedef CorePage = CorePageLite;
@@ -186,7 +189,7 @@ class CorePage extends CorePageLite {
 			createDisplayMedals();
 	}
 	
-	inline function createDisplayMedals():Void {
+	function createDisplayMedals():Void {
 		
 		var i:Int = 0;
 		var spacing = new Point(50, 65);
@@ -199,8 +202,26 @@ class CorePage extends CorePageLite {
 			medal.y = Math.floor(i / 13) * spacing.y + 20;
 			_medalList.addChild(medal);
 			var loader = new Loader();
-			loader.load(new URLRequest(medalData.icon));
 			medal.icon.addChild(loader);
+			final NG_FILE = "https://img.ngfiles.com/";
+			if (medalData.icon.indexOf(NG_FILE) != -1)
+			{
+				final path = "assets/" + medalData.icon.substring(NG_FILE.length);
+				if (Assets.exists(path))
+				{
+					loader.contentLoaderInfo.addEventListener(IOErrorEvent.IO_ERROR, (e)->
+						{
+							final icon = medal.icon;
+							icon.removeChild(loader);
+							final bitmap = new Bitmap(Assets.getBitmapData(path), true);
+							bitmap.width = icon.width / icon.scaleX;
+							bitmap.height = icon.height / icon.scaleY;
+							icon.addChild(bitmap);
+						}
+					);
+				}
+			}
+			loader.load(new URLRequest(medalData.icon));
 			
 			_displayMedals.set(medal, medalData);
 			
