@@ -46,6 +46,7 @@ class IntroPage extends Page<Component> {
 		#else
 		_autoConnect = new CheckBox(target.autoConnect, onAutoConnectToggle);
 		_debug = new CheckBox(target.debug);
+		_debug.on = true;
 		if (NGLite.getSessionId() != null){
 			
 			_autoConnect.on = true;
