@@ -94,8 +94,8 @@ class CloudSavePage extends Page<CloudSaveComponent> {
 	}
 	#end
 	
-	function setMessage(msg:Null<String>)
-	{
+	function setMessage(msg:Null<String>) {
+		
 		_loading.visible = msg != null;
 		_clearButton.enabled = msg == null;
 		_saveButton.enabled  = msg == null;
@@ -144,16 +144,16 @@ class CloudSavePage extends Page<CloudSaveComponent> {
 		_contents.text = text;
 	}
 	
-	function reselectSlot()
-	{
+	function reselectSlot() {
+		
 		if (_slotList.selectedId == -1)
 			throw "No slot selected, cannot redraw";
 		
 		onSlotSelect(_slotList.selectedId);
 	}
 	
-	function assertCurrentSlot():SaveSlot
-	{
+	function assertCurrentSlot():SaveSlot {
+		
 		if (_slotList.selectedId == -1)
 			throw "Assertion Fail: No current slot selected";
 		
@@ -176,24 +176,24 @@ class CloudSavePage extends Page<CloudSaveComponent> {
 	}
 }
 
-private class SlotList
-{
+private class SlotList {
+	
 	public var selectedId(default, null):Int = -1;
 	
 	var _target:MovieClip;
 	var _callback:(Int)->Void;
 	var _buttons = new Map<Int, CheckBox>();
 	
-	public function new (slotList:MovieClip, callback:(Int)->Void)
-	{
+	public function new (slotList:MovieClip, callback:(Int)->Void) {
+		
 		_target = slotList;
 		_callback = callback;
 		
 		_target.visible = false;
 	}
 	
-	public function onSlotsRecieved()
-	{
+	public function onSlotsRecieved() {
+		
 		_target.visible = true;
 		var saveSlots = NG.core.saveSlots;
 		var numSlots = saveSlots.length;
@@ -240,8 +240,8 @@ private class SlotList
 		_buttons[firstSlot].on = true;
 	}
 	
-	function onSelect(id)
-	{
+	function onSelect(id) {
+		
 		if (selectedId != -1)
 			_buttons[selectedId].on = false;
 		

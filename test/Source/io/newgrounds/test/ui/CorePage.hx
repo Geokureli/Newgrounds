@@ -204,21 +204,20 @@ class CorePage extends CorePageLite {
 			var loader = new Loader();
 			medal.icon.addChild(loader);
 			final NG_FILE = "https://img.ngfiles.com/";
-			if (medalData.icon.indexOf(NG_FILE) != -1)
-			{
+			if (medalData.icon.indexOf(NG_FILE) != -1) {
+				
 				final path = "assets/" + medalData.icon.substring(NG_FILE.length);
-				if (Assets.exists(path))
-				{
-					loader.contentLoaderInfo.addEventListener(IOErrorEvent.IO_ERROR, (e)->
-						{
-							final icon = medal.icon;
-							icon.removeChild(loader);
-							final bitmap = new Bitmap(Assets.getBitmapData(path), true);
-							bitmap.width = icon.width / icon.scaleX;
-							bitmap.height = icon.height / icon.scaleY;
-							icon.addChild(bitmap);
-						}
-					);
+				if (Assets.exists(path)) {
+					
+					loader.contentLoaderInfo.addEventListener(IOErrorEvent.IO_ERROR, (e)-> {
+						
+						final icon = medal.icon;
+						icon.removeChild(loader);
+						final bitmap = new Bitmap(Assets.getBitmapData(path), true);
+						bitmap.width = icon.width / icon.scaleX;
+						bitmap.height = icon.height / icon.scaleY;
+						icon.addChild(bitmap);
+					});
 				}
 			}
 			loader.load(new URLRequest(medalData.icon));

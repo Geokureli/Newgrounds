@@ -69,11 +69,10 @@ class MedalPopup extends BaseAsset {
 			return;
 		
 		var loader = new Loader();
-		loader.contentLoaderInfo.addEventListener(Event.COMPLETE, (e)->
-			{
-				loader.width = loader.height = 50;
-			}
-		);
+		loader.contentLoaderInfo.addEventListener(Event.COMPLETE, (e)-> {
+			
+			loader.width = loader.height = 50;
+		});
 		loader.load(new URLRequest(medal.icon));
 		
 		playAnim(loader, medal.name, medal.value);

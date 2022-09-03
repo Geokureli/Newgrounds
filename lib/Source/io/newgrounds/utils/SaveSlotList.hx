@@ -14,10 +14,10 @@ import io.newgrounds.utils.Dispatcher;
  * @see io.newgrounds.objects.SaveSlot
 **/
 @:forward
-abstract SaveSlotList (RawSaveSlotList)
-{
-	inline public function new (core:NG)
-	{
+abstract SaveSlotList (RawSaveSlotList) {
+	
+	inline public function new (core:NG) {
+		
 		this = new RawSaveSlotList(core);
 	}
 	
@@ -50,8 +50,8 @@ class RawSaveSlotList {
 	}
 	
 	/** return the slot with the specified 0-based order that was sent from the server. */
-	inline public function getOrdered(i:Int)
-	{
+	inline public function getOrdered(i:Int) {
+		
 		return ordered[i];
 	}
 	
@@ -65,8 +65,8 @@ class RawSaveSlotList {
 			return;
 		}
 		
-		switch(state)
-		{
+		switch(state) {
+			
 			case Loaded:
 				
 				if (callback != null)
@@ -102,14 +102,14 @@ class RawSaveSlotList {
 	
 	function onSaveSlotsReceived(response:Response<LoadSlotsResult>, loadFiles:Bool) {
 		
-		if (!response.success)
-		{
+		if (!response.success) {
+			
 			fireCallbacks(Error(response.error.toString()));
 			return;
 		}
 		
-		if (!response.result.success)
-		{
+		if (!response.result.success) {
+			
 			fireCallbacks(Error(response.result.error.toString()));
 			return;
 		}

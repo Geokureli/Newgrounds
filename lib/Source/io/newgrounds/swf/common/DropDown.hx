@@ -109,8 +109,8 @@ class DropDown {
 		_values[newName] = newValue;
 		
 		// reselect choice
-		if (this.value == oldValue)
-		{
+		if (this.value == oldValue) {
+			
 			@:bypassAccessor
 			this.value = newValue;
 			
