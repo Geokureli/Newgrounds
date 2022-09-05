@@ -47,6 +47,7 @@ class ScoreBoardComponent extends Component {
 	 *                       will be included. Otherwise, only scores for this user will be loaded.
 	 *                       If this param is missing and there is a valid session id, that user
 	 *                       will be used by default.
+	 * @param externalAppId  Leave blank unless you which to fetch from an separate app.
 	 */
 	public function getScores
 	( id           :Int
@@ -56,6 +57,7 @@ class ScoreBoardComponent extends Component {
 	, social       :Bool    = false
 	, tag          :String  = null
 	, user         :Dynamic = null
+	, externalAppId:String  = null
 	):Call<GetScoresResult> {
 		
 		if (user != null && !Std.isOfType(user, String) && !Std.isOfType(user, Int))
@@ -68,7 +70,8 @@ class ScoreBoardComponent extends Component {
 			.addComponentParameter("period", period, Period.DAY)
 			.addComponentParameter("social", social, false)
 			.addComponentParameter("tag"   , tag   , null)
-			.addComponentParameter("user"  , user  , null);
+			.addComponentParameter("user"  , user  , null)
+			.addComponentParameter("app_id", externalAppId);
 	}
 	
 	// -------------------------------------------------------------------------------------------

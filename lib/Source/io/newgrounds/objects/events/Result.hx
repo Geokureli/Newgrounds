@@ -36,6 +36,12 @@ typedef SessionResult = ResultBase & {
 	var session(default, null):Session;
 }
 
+typedef ResultExternalApp = {
+	
+	/** The App ID of another, approved app to load medals from. */
+	var app_id(default, null):String;
+}
+
 @:noCompletion
 typedef RawGetHostResult = ResultBase
 	& { host_approved:Bool }
@@ -121,9 +127,18 @@ typedef PingResult = ResultBase & {
 	var pong(default, null):String;
 }
 
-typedef MedalListResult = ResultBase & {
+typedef RawMedalListResult = ResultExternalApp & ResultBase
+	& { medals:Array<RawMedalData> }
+@:forward
+abstract MedalListResult(RawMedalListResult) from RawMedalListResult to ResultBase {
 	
-	var medals(default, null):Array<RawMedalData>;
+	/** The App ID of another, approved app to load medals from. */
+	public var externalAppId(get, never):String;
+	inline function get_externalAppId():String return this.app_id;
+	
+	/* Hidden, use externalAppId instead. */
+	var app_id(get, never):String;
+	inline function get_app_id():String return this.app_id;
 }
 
 typedef RawMedalScoreResult = ResultBase
@@ -162,7 +177,7 @@ typedef ScoreBoardResult = ResultBase & {
 	var scoreboards(default, null):Array<RawScoreBoardData>;
 }
 
-typedef RawGetScoresResult = ResultBase & {
+typedef RawGetScoresResult = ResultExternalApp & ResultBase & {
 	
 	/* An array of Score objects. */
 	var scores    (default, null):Array<Score>;
@@ -214,7 +229,7 @@ typedef SaveSlotResult = ResultBase & {
 	var slot(default, null):RawSaveSlot;
 }
 
-typedef LoadSlotsResult = ResultBase & {
+typedef LoadSlotsResult = ResultExternalApp & ResultBase & {
 	
 	/** An array of SaveSlot objects. */
 	var slots(default, null):Array<RawSaveSlot>;

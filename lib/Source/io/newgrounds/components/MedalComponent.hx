@@ -21,8 +21,10 @@ class MedalComponent extends Component {
 	
 	/**
 	 * Fetches a list of Medal objects.
+	 * 
+	 * @param externalAppId  Leave blank unless you which to fetch from an separate app.
 	**/
-	public function getList():Call<MedalListResult> {
+	public function getList(externalAppId:String = null):Call<MedalListResult> {
 		
 		return new Call<MedalListResult>(_core, "Medal.getList");
 	}
