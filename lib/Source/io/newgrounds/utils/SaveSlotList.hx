@@ -57,12 +57,6 @@ class RawSaveSlotList {
 		return _ordered[i];
 	}
 	
-	/** return the slot with the specified 0-based order that was sent from the server. */
-	inline public function getOrdered(i:Int) {
-		
-		return ordered[i];
-	}
-	
 	public function loadList(loadFiles = false, ?callback:(ResultType)->Void) {
 		
 		if (NG.core.loggedIn == false) {
