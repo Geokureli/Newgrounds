@@ -43,7 +43,6 @@ class CorePage extends CorePageLite {
 		
 		initLogInOut();
 		initMedals();
-		initBoards();
 		initSlots();
 	}
 	
@@ -261,32 +260,6 @@ class CorePage extends CorePageLite {
 		_medalList.info.text = NG.core.loggedIn ? MEDAL_INFO_LOGGED_IN : MEDAL_INFO_LOGGED_OUT;
 	}
 	
-	// -------------------------------------------------------------------------------------------
-	//                                       SCOREBOARDS
-	// -------------------------------------------------------------------------------------------
-	
-	var _boardPages:IntMap<Int>;
-	
-	inline function initBoards():Void {
-		
-		// _loadBoards.onClick = loadBoards;
-		// NG.core.onScoreBoardsLoaded.add(onBoardsLoaded);
-	}
-	
-	function loadBoards():Void {
-		
-		NG.core.requestScoreBoards();
-	}
-	
-	function getScores(board:ScoreBoard = null):Void {
-		
-		var page:Int = _boardPages.get(board.id);
-		if (page == -1)
-			page = 0;
-		
-		_scoreBrowser.boardId = board.id;
-		_scoreBrowser.page = page;
-	}
 	
 	// -------------------------------------------------------------------------------------------
 	//                                       Cloud Saves
@@ -346,9 +319,7 @@ class CorePageLite extends Page<Component> {
 		_medalList = cast target.medalList;
 		_medalList.visible = false;
 		
-		// _loadBoards = new Button(target.loadBoards);
 		_scoreBoardList = cast target.scoreBoardList;
-		// _scoreBoardList.visible = false;
 		_scoreBrowser = cast _scoreBoardList.scoreBrowser;
 		
 		_slotsList = new SlotsList(target.slotList);

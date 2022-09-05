@@ -171,7 +171,7 @@ abstract MedalUnlockResult(RawMedalUnlockResult) from RawMedalUnlockResult to Re
 	inline function get_medal_score() return this.medal_score;
 }
 
-typedef ScoreBoardResult = ResultBase & {
+typedef GetBoardsResult = ResultBase & {
 	
 	/** An array of ScoreBoard objects. */
 	var scoreboards(default, null):Array<RawScoreBoardData>;

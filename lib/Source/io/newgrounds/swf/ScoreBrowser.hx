@@ -3,7 +3,7 @@ package io.newgrounds.swf;
 import openfl.events.Event;
 import io.newgrounds.swf.common.DropDown;
 import io.newgrounds.objects.Score;
-import io.newgrounds.objects.events.Result.ScoreBoardResult;
+import io.newgrounds.objects.events.Result.GetBoardsResult;
 import io.newgrounds.objects.events.Result.GetScoresResult;
 import io.newgrounds.objects.events.Response;
 import io.newgrounds.swf.common.BaseAsset;
@@ -13,6 +13,8 @@ import io.newgrounds.components.ScoreBoardComponent.Period;
 import openfl.display.MovieClip;
 import openfl.text.TextField;
 
+// TODO: show score order relative to amount skipped
+// TODO: fix misaligned score order
 class ScoreBrowser extends BaseAsset {
 	
 	public var prevButton    (default, null):MovieClip;

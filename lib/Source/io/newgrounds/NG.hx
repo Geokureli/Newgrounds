@@ -6,7 +6,7 @@ typedef NG = NGLite; //TODO: test and make lite UI
 import io.newgrounds.objects.Error;
 import io.newgrounds.objects.events.Result.SessionResult;
 import io.newgrounds.objects.events.Result.MedalListResult;
-import io.newgrounds.objects.events.Result.ScoreBoardResult;
+import io.newgrounds.objects.events.Result.GetBoardsResult;
 import io.newgrounds.objects.events.Result.LoadSlotsResult;
 import io.newgrounds.objects.events.ResultType;
 import io.newgrounds.objects.events.Response;
@@ -462,7 +462,7 @@ class NG extends NGLite {
 		call.send();
 	}
 	
-	function onBoardsReceived(response:Response<ScoreBoardResult>):Void {
+	function onBoardsReceived(response:Response<GetBoardsResult>):Void {
 		
 		if (!response.success || !response.result.success)
 			return;
