@@ -16,14 +16,14 @@ import io.newgrounds.utils.Dispatcher;
 @:forward
 abstract SaveSlotList (RawSaveSlotList) {
 	
-	inline public function new (core:NG) {
+	inline public function new (core:NG, ?externalAppId:String) {
 		
-		this = new RawSaveSlotList(core);
+		this = new RawSaveSlotList(core, externalAppId);
 	}
 	
 	/** Typically the id is the slot's 1-based order that was sent from the server. */
 	@:arrayAccess
-	inline public function getById(id:Int) return this.map.get(id);
+	inline public function getById(id:Int) return this._map.get(id);
 }
 
 /**
@@ -36,23 +36,25 @@ class RawSaveSlotList {
 	
 	public var state(default, null):SaveSlotListState = Empty;
 	public var length(get, never):Int;
-	inline function get_length() return ordered == null ? 0 : ordered.length;
+	inline function get_length() return _ordered == null ? 0 : _ordered.length;
 	
-	var core:NG;
-	var map:Map<Int, SaveSlot>;
-	var ordered:Array<SaveSlot>;
+	var _core:NG;
+	var _externalAppId:String;
+	var _map:Map<Int, SaveSlot>;
+	var _ordered:Array<SaveSlot>;
 	
-	var callbacks = new TypedDispatcher<ResultType>();
+	var _callbacks = new TypedDispatcher<ResultType>();
 	
-	public function new (core:NG) {
+	public function new (core:NG, externalAppId:String = null) {
 		
-		this.core = core;
+		_core = core;
+		_externalAppId = externalAppId;
 	}
 	
 	/** return the slot with the specified 0-based order that was sent from the server. */
 	inline public function getOrdered(i:Int) {
 		
-		return ordered[i];
+		return _ordered[i];
 	}
 	
 	public function loadList(loadFiles = false, ?callback:(ResultType)->Void) {
@@ -79,9 +81,9 @@ class RawSaveSlotList {
 		}
 		
 		if (callback != null)
-			callbacks.add(callback);
+			_callbacks.add(callback);
 		
-		core.calls.cloudSave.loadSlots()
+		_core.calls.cloudSave.loadSlots(_externalAppId)
 			.addDataHandler((response)->onSaveSlotsReceived(response, loadFiles))
 			.addErrorHandler((e)->fireCallbacks(Error(e.toString())))
 			.send();
@@ -94,10 +96,10 @@ class RawSaveSlotList {
 		else
 			state = Loaded;
 		
-		callbacks.dispatch(result);
+		_callbacks.dispatch(result);
 		
 		if (result.match(Success))
-			core.onSaveSlotsLoaded.dispatch();
+			_core.onSaveSlotsLoaded.dispatch();
 	}
 	
 	function onSaveSlotsReceived(response:Response<LoadSlotsResult>, loadFiles:Bool) {
@@ -116,28 +118,28 @@ class RawSaveSlotList {
 		
 		var idList:Array<Int> = new Array<Int>();
 		
-		if (map == null) {
+		if (_map == null) {
 			
-			map = new Map();
-			ordered = [];
+			_map = new Map();
+			_ordered = [];
 		}
 		
 		for (slotData in response.result.data.slots) {
 			
 			var id = slotData.id;
-			if (map.exists(id) == false) {
+			if (_map.exists(id) == false) {
 				
-				var slot = new SaveSlot(core, slotData);
-				map.set(id, slot);
-				ordered.push(slot);
+				var slot = new SaveSlot(_core, slotData);
+				_map.set(id, slot);
+				_ordered.push(slot);
 				
 			} else
-				map[id].parse(slotData);
+				_map[id].parse(slotData);
 			
 			idList.push(id);
 		}
 		
-		core.logVerbose('${idList.length} SaveSlots received [${idList.join(", ")}]');
+		_core.logVerbose('${idList.length} SaveSlots received [${idList.join(", ")}]');
 		
 		if (loadFiles) {
 			
@@ -156,7 +158,7 @@ class RawSaveSlotList {
 	**/
 	public function loadAllFiles(callback:(ResultType)->Void) {
 		
-		if (map == null) {
+		if (_map == null) {
 			
 			// populate the save slots first
 			loadList(true, callback);
@@ -188,7 +190,7 @@ class RawSaveSlotList {
 		 * Count the slots, first, then try to load. these load calls may be threaded,
 		 * so this may be neccesary to avoid multiple callbacks.
 		**/ 
-		for (slot in map) {
+		for (slot in _map) {
 			
 			if (slot.isEmpty() == false)
 				slotsToLoad++;
@@ -200,7 +202,7 @@ class RawSaveSlotList {
 			return;
 		}
 		
-		for (slot in map) {
+		for (slot in _map) {
 			
 			if (slot.isEmpty() == false)
 				slot.load(onSlotLoad);
@@ -212,21 +214,21 @@ class RawSaveSlotList {
 	 * 
 	 * The order of ids is undefined.
 	**/
-	public inline function keys() return map.keys();
+	public inline function keys() return _map.keys();
 	
 	/**
 	 * Returns an Iterator over the values of `this` list.
 	 * 
 	 * The order of values is undefined.
 	**/
-	public inline function iterator() return ordered.iterator();
+	public inline function iterator() return _ordered.iterator();
 
 	/**
 	 * Returns an Iterator over the ids and values of `this` list.
 	 * 
 	 * The order is undefined.
 	**/
-	public inline function keyValueIterator() return map.keyValueIterator();
+	public inline function keyValueIterator() return _map.keyValueIterator();
 	
 	static function noCallback(r:ResultType){}
 }
