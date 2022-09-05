@@ -114,10 +114,16 @@ class Call<T:ResultBase>
 	 * Sends the call to the server, do not modify this object after calling this
 	 * @param secure    If encryption is enabled, it will encrypt the call.
 	**/
-	public function send():Void {
+	inline public function send() sendHelper();
+	
+	inline public function sendExternal(appId:String) sendHelper(appId);
+	
+	function sendHelper(?externalAppId:String):Void {
+		
+		final isExternal = externalAppId != null;
 		
 		var data:Dynamic = {};
-		data.app_id = _core.appId;
+		data.app_id = isExternal ? externalAppId : _core.appId;
 		data.call = {};
 		data.call.component  = component;
 		
@@ -127,15 +133,21 @@ class Call<T:ResultBase>
 		if (_properties == null || !_properties.exists("session_id")) {
 			// --- HAS NO SESSION ID
 			
-			if (_core.sessionId != null) {
-				// --- AUTO ADD SESSION ID
+			if (_requireSession) {
+				
+				if (isExternal) {
+					
+					_core.logError(new Error('cannot send "$component" call to an external app that requires a sessionId'));
+					return;
+				}
+				
+				if (_core.sessionId == null) {
+					
+					_core.logError(new Error('cannot send "$component" call without a sessionId'));
+					return;
+				}
 				
 				addProperty("session_id", _core.sessionId);
-				
-			} else if (_requireSession){
-				
-				_core.logError(new Error('cannot send "$component" call without a sessionId'));
-				return;
 			}
 		}
 		
@@ -156,6 +168,12 @@ class Call<T:ResultBase>
 		_core.logVerbose('Post  - ${Json.stringify(data)}');
 		
 		if (_isSecure) {
+			
+			if (isExternal) {
+				
+				_core.logError(new Error('cannot send "$component" call to an external app that requires encryption'));
+				return;
+			}
 			
 			var secureData = _core.encryptionHandler(Json.stringify(data.call));
 			data.call = {};
