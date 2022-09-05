@@ -54,8 +54,11 @@ class SaveSlot extends Object<RawSaveSlot>
 	/** The contents of this slot's save file. Will be null until `load` is called. **/
 	public var contents(default, null):Null<String>;
 	
-	public function new(core:NGLite, data:RawSaveSlot = null) {
+	var _externalAppId(default, null):String;
+	
+	public function new(core:NGLite, data:RawSaveSlot = null, externalAppId:String = null) {
 		
+		_externalAppId = externalAppId;
 		super(core, data);
 	}
 	
@@ -73,6 +76,9 @@ class SaveSlot extends Object<RawSaveSlot>
 		if (data == null)
 			throw "cannot save null to a SaveSlot";
 		
+		if (_externalAppId != null)
+			throw "cannot save to an external app";
+		
 		_core.calls.cloudSave.setData(data, id)
 			.addDataHandler((response)->setContentsOnSlotFetch(response, data, callback))
 			.send();
@@ -85,6 +91,9 @@ class SaveSlot extends Object<RawSaveSlot>
 	 *                  Tells whether the server call was successful.
 	 */
 	public function clear(?callback:(ResultType)->Void) {
+		
+		if (_externalAppId != null)
+			throw "cannot clear an external app's save slot";
 		
 		_core.calls.cloudSave.clearSlot(id)
 			.addDataHandler((response)->setContentsOnSlotFetch(response, null, callback))

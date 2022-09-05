@@ -141,7 +141,7 @@ class ScoreBrowser extends BaseAsset {
 				.addDataHandler(onBoardsRecieved)
 				.queue();
 			#else
-			if (NG.core.scoreBoards != null)
+			if (NG.core.scoreBoards.state == Loaded)
 				onBoardsLoaded();
 			else
 				NG.core.requestScoreBoards(onBoardsLoaded);

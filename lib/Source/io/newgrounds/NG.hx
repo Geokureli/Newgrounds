@@ -16,7 +16,10 @@ import io.newgrounds.objects.SaveSlot;
 import io.newgrounds.objects.ScoreBoard;
 import io.newgrounds.objects.Session;
 import io.newgrounds.utils.Dispatcher;
+import io.newgrounds.utils.ExternalAppList;
+import io.newgrounds.utils.MedalList;
 import io.newgrounds.utils.SaveSlotList;
+import io.newgrounds.utils.ScoreBoardList;
 #if (openfl < "4.0.0")
 import openfl.utils.JNI;
 #else
@@ -54,17 +57,27 @@ class NG extends NGLite {
 		
 		return _session.passportUrl;
 	}
-	public var medals(default, null):Map<Int, Medal>;
-	public var scoreBoards(default, null):Map<Int, ScoreBoard>;
+	public var medals(default, null):MedalList;
+	public var scoreBoards(default, null):ScoreBoardList;
 	public var saveSlots(default, null):SaveSlotList;
+	public var externalApps(default, null):ExternalAppList;
 	
 	// --- EVENTS
 	
 	public var onLogin(default, null):Dispatcher;
 	public var onLogOut(default, null):Dispatcher;
-	public var onMedalsLoaded(default, null):Dispatcher;
-	public var onScoreBoardsLoaded(default, null):Dispatcher;
-	public var onSaveSlotsLoaded(default, null):Dispatcher;
+	
+	@:deprecated("Use medals.onLoad")
+	public var onMedalsLoaded(get, never):Dispatcher;
+	inline function get_onMedalsLoaded()  return medals.onLoaded;
+	
+	@:deprecated("Use scoreBoards.onLoad")
+	public var onScoreBoardsLoaded(get, never):Dispatcher;
+	inline function get_onScoreBoardsLoaded()  return scoreBoards.onLoaded;
+	
+	@:deprecated("Use saveSlots.onLoad")
+	public var onSaveSlotsLoaded(get, never):Dispatcher;
+	inline function get_onSaveSlotsLoaded()  return saveSlots.onLoaded;
 	
 	// --- MISC
 	
@@ -78,6 +91,7 @@ class NG extends NGLite {
 	
 	/** 
 	 * Iniitializes the API, call before utilizing any other component
+	 * 
 	 * @param appId     The unique ID of your app as found in the 'API Tools' tab of your Newgrounds.com project.
 	 * @param sessionId A unique session id used to identify the active user.
 	**/
@@ -86,11 +100,11 @@ class NG extends NGLite {
 		host = getHost();
 		onLogin = new Dispatcher();
 		onLogOut = new Dispatcher();
-		onMedalsLoaded = new Dispatcher();
-		onScoreBoardsLoaded = new Dispatcher();
-		onSaveSlotsLoaded = new Dispatcher();
 		
+		medals = new MedalList(this);
 		saveSlots = new SaveSlotList(this);
+		scoreBoards = new ScoreBoardList(this);
+		externalApps = new ExternalAppList(this);
 		
 		attemptingLogin = sessionId != null;
 		
@@ -385,119 +399,37 @@ class NG extends NGLite {
 		loggedIn = false;
 	}
 	
-	// -------------------------------------------------------------------------------------------
-	//                                       MEDALS
-	// -------------------------------------------------------------------------------------------
-	
-	public function requestMedals(onSuccess:Void->Void = null, onFail:Error->Void = null):Void {
+	/**
+	 * Loads the info for each medal
+	 *
+	 * @param callback   Whether the request was successful, or an error message
+	**/
+	public function requestMedals(?callback:ResultType->Void):Void {
 		
-		var call = calls.medal.getList()
-			.addDataHandler(onMedalsReceived);
-		
-		if (onSuccess != null)
-			call.addSuccessHandler(onSuccess);
-		
-		if (onFail != null)
-			call.addErrorHandler(onFail);
-		
-		call.send();
+		medals.loadList(callback);
 	}
 	
-	function onMedalsReceived(response:Response<MedalListResult>):Void {
+	/**
+	 * Loads the info for each score board, but not the scores
+	 *
+	 * @param callback   Whether the request was successful, or an error message
+	**/
+	@:deprecated("use scoreBoards.loadList")
+	public function requestScoreBoards(?callback:ResultType->Void):Void {
 		
-		if (!response.success || !response.result.success)
-			return;
-		
-		var idList:Array<Int> = new Array<Int>();
-		
-		if (medals == null) {
-			
-			medals = new Map();
-			
-			for (medalData in response.result.data.medals) {
-				
-				var medal = new Medal(this, medalData);
-				medals.set(medal.id, medal);
-				idList.push(medal.id);
-			}
-		} else {
-			
-			for (medalData in response.result.data.medals) {
-				
-				medals.get(medalData.id).parse(medalData);
-				idList.push(medalData.id);
-			}
-		}
-		
-		logVerbose('${response.result.data.medals.length} Medals received [${idList.join(", ")}]');
-		
-		onMedalsLoaded.dispatch();
+		scoreBoards.loadList(callback);
 	}
-	
-	// -------------------------------------------------------------------------------------------
-	//                                       SCOREBOARDS
-	// -------------------------------------------------------------------------------------------
-	
-	public function requestScoreBoards(onSuccess:Void->Void = null, onFail:Error->Void = null):Void {
-		
-		if (scoreBoards != null) {
-			
-			log("aborting scoreboard request, all scoreboards are loaded");
-			
-			if (onSuccess != null)
-				onSuccess();
-			
-			return;
-		}
-		
-		var call = calls.scoreBoard.getBoards()
-			.addDataHandler(onBoardsReceived);
-		
-		if (onSuccess != null)
-			call.addSuccessHandler(onSuccess);
-		
-		if (onFail != null)
-			call.addErrorHandler(onFail);
-		
-		call.send();
-	}
-	
-	function onBoardsReceived(response:Response<GetBoardsResult>):Void {
-		
-		if (!response.success || !response.result.success)
-			return;
-		
-		var idList:Array<Int> = new Array<Int>();
-		
-		if (scoreBoards == null) {
-			
-			scoreBoards = new Map();
-			
-			for (boardData in response.result.data.scoreboards) {
-				
-				var board = new ScoreBoard(this, boardData);
-				scoreBoards.set(board.id, board);
-				idList.push(board.id);
-			}
-		}
-		
-		logVerbose('${response.result.data.scoreboards.length} ScoreBoards received [${idList.join(", ")}]');
-		
-		onScoreBoardsLoaded.dispatch();
-	}
-	
-	// -------------------------------------------------------------------------------------------
-	//                                     CLOUD SAVES
-	// -------------------------------------------------------------------------------------------
 	
 	/**
 	 * Loads the info for each cloud save slot, including the last save time and size
+	 *
 	 * @param loadFiles  If true, each slot's save file is also loaded.
 	 * @param callback   Whether the request was successful, or an error message
 	**/
+	@:deprecated("use saveSlots.loadList")
 	inline public function requestSaveSlots(loadFiles = false, ?callback:ResultType->Void):Void {
 		
-		saveSlots.loadList(callback);
+		saveSlots.loadList(loadFiles, callback);
 	}
 	
 	// -------------------------------------------------------------------------------------------

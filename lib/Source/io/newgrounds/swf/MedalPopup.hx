@@ -51,7 +51,7 @@ class MedalPopup extends BaseAsset {
 	override function onReady():Void {
 		super.onReady();
 		
-		if (NG.core.medals != null)
+		if (NG.core.medals.state == Loaded)
 			onMedalsLoaded();
 		else
 			NG.core.onLogin.addOnce(NG.core.requestMedals.bind(onMedalsLoaded));
