@@ -1,7 +1,6 @@
 package io.newgrounds.test.ui;
 
 import io.newgrounds.swf.common.Button;
-import io.newgrounds.test.art.RadioButtonSwf;
 
 import openfl.display.MovieClip;
 
@@ -36,8 +35,8 @@ class RadioButton extends Button {
 	
 	var _dot:MovieClip;
 	
-	public function new(target:RadioButtonSwf, onClick:Void->Void) {
-		_dot = target.dot;
+	public function new(target:MovieClip, onClick:Void->Void) {
+		_dot = cast target.getChildByName("dot");
 		
 		super(target, onClick);
 		

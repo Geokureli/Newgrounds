@@ -11,6 +11,7 @@ import openfl.display.MovieClip;
 
 import io.newgrounds.test.art.MainScreenSwf;
 import io.newgrounds.test.ui.Page;
+import io.newgrounds.test.ui.CloudSavePage;
 import io.newgrounds.NG;
 
 class MainScreen extends Sprite {
@@ -18,11 +19,12 @@ class MainScreen extends Sprite {
 	static inline var CORE      :String = "core";
 	static inline var APP       :String = "app";
 	static inline var ASSETS    :String = "assets";
-	static inline var EVENT     :String = "event";     
+	static inline var EVENT     :String = "event";
 	static inline var GATEWAY   :String = "gateway";
 	static inline var LOADER    :String = "loader";
 	static inline var MEDAL     :String = "medal";
 	static inline var SCOREBOARD:String = "scoreboard";
+	static inline var CLOUD_SAVE:String = "cloudSave";
 	
 	static var _pageWrappers:StringMap<Class<Dynamic>>;
 	
@@ -47,9 +49,12 @@ class MainScreen extends Sprite {
 		, LOADER     => LoaderPage
 		, MEDAL      => MedalPage
 		, SCOREBOARD => ScoreboardPage
+		, CLOUD_SAVE => CloudSavePage
 		];
 		
-		NG.core.log = logOutput;
+		// cache log messages that happen before initialization
+		var queuedOutput = new Array<{msg:String, pos:PosInfos}>();
+		NG.core.log = function (msg, ?pos) queuedOutput.push({msg:msg, pos:pos});
 		
 		_layout = new MainScreenSwf();
 		addChild(_layout);
@@ -58,6 +63,13 @@ class MainScreen extends Sprite {
 		#end
 		_output = _layout.output;
 		_output.text = "";
+		NG.core.log = logOutput;
+		// log the early messages
+		while (queuedOutput.length > 0) {
+			
+			var next = queuedOutput.shift();
+			logOutput(next.msg, next.pos);
+		}
 		
 		addEventListener(Event.ADDED_TO_STAGE, onAdded);
 	}

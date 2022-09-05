@@ -1,5 +1,7 @@
 package io.newgrounds.test.ui;
 
+import openfl.display.Bitmap;
+import io.newgrounds.objects.SaveSlot;
 import io.newgrounds.test.swf.ScoreBrowserSlim;
 import haxe.ds.IntMap;
 
@@ -18,10 +20,13 @@ import io.newgrounds.objects.Medal;
 import io.newgrounds.objects.ScoreBoard;
 import io.newgrounds.components.Component;
 
-import openfl.net.URLRequest;
+import openfl.display.MovieClip;
 import openfl.display.Loader;
+import openfl.events.IOErrorEvent;
 import openfl.geom.Point;
+import openfl.net.URLRequest;
 import openfl.text.TextField;
+import openfl.utils.Assets;
 
 #if ng_lite
 typedef CorePage = CorePageLite;
@@ -39,6 +44,7 @@ class CorePage extends CorePageLite {
 		initLogInOut();
 		initMedals();
 		initBoards();
+		initSlots();
 	}
 	
 	// -------------------------------------------------------------------------------------------
@@ -134,7 +140,7 @@ class CorePage extends CorePageLite {
 		_profileButton.enabled = false;
 		for (i in 0 ... _profile.numChildren) {
 			
-			if (Std.is(_profile.getChildAt(i), Loader)) {
+			if (_profile.getChildAt(i) is Loader) {
 				
 				_profile.removeChildAt(i);
 				break;
@@ -183,7 +189,7 @@ class CorePage extends CorePageLite {
 			createDisplayMedals();
 	}
 	
-	inline function createDisplayMedals():Void {
+	function createDisplayMedals():Void {
 		
 		var i:Int = 0;
 		var spacing = new Point(50, 65);
@@ -193,11 +199,28 @@ class CorePage extends CorePageLite {
 			
 			var medal = new MedalSwf();
 			medal.x = (i % 13) * spacing.x;
-			medal.y = Math.floor(i / 13) * spacing.y;
+			medal.y = Math.floor(i / 13) * spacing.y + 20;
 			_medalList.addChild(medal);
 			var loader = new Loader();
-			loader.load(new URLRequest(medalData.icon));
 			medal.icon.addChild(loader);
+			final NG_FILE = "https://img.ngfiles.com/";
+			if (medalData.icon.indexOf(NG_FILE) != -1) {
+				
+				final path = "assets/" + medalData.icon.substring(NG_FILE.length);
+				if (Assets.exists(path)) {
+					
+					loader.contentLoaderInfo.addEventListener(IOErrorEvent.IO_ERROR, (e)-> {
+						
+						final icon = medal.icon;
+						icon.removeChild(loader);
+						final bitmap = new Bitmap(Assets.getBitmapData(path), true);
+						bitmap.width = icon.width / icon.scaleX;
+						bitmap.height = icon.height / icon.scaleY;
+						icon.addChild(bitmap);
+					});
+				}
+			}
+			loader.load(new URLRequest(medalData.icon));
 			
 			_displayMedals.set(medal, medalData);
 			
@@ -246,43 +269,13 @@ class CorePage extends CorePageLite {
 	
 	inline function initBoards():Void {
 		
-		_loadBoards.onClick = loadBoards;
-		NG.core.onScoreBoardsLoaded.add(onBoardsLoaded);
-		_scoreBrowser.boardId = -1;
+		// _loadBoards.onClick = loadBoards;
+		// NG.core.onScoreBoardsLoaded.add(onBoardsLoaded);
 	}
 	
 	function loadBoards():Void {
 		
 		NG.core.requestScoreBoards();
-	}
-	
-	function onBoardsLoaded():Void {
-		
-		_loadBoards.enabled = false;
-		_scoreBoardList.visible = true;
-		
-		var i:Int = 0;
-		var spacing = 22;
-		_displayBoards = new Map<ScoreBoardSwf, ScoreBoard>();
-		_boardPages = new IntMap<Int>();
-		
-		for (boardData in NG.core.scoreBoards) {
-			
-			var board = new ScoreBoardSwf();
-			board.y = i * spacing;
-			board.id.text = Std.string(boardData.id);
-			board.boardName.text = boardData.name;
-			_scoreBoardList.addChild(board);
-			
-			_displayBoards.set(board, boardData);
-			_boardPages.set(boardData.id, -1);
-			
-			new Button(board, getScores.bind(boardData));
-			
-			i++;
-			if (i == 10)
-				break;
-		}
 	}
 	
 	function getScores(board:ScoreBoard = null):Void {
@@ -294,6 +287,16 @@ class CorePage extends CorePageLite {
 		_scoreBrowser.boardId = board.id;
 		_scoreBrowser.page = page;
 	}
+	
+	// -------------------------------------------------------------------------------------------
+	//                                       Cloud Saves
+	// -------------------------------------------------------------------------------------------
+	
+	inline function initSlots() {
+		
+		NG.core.onSaveSlotsLoaded.add(_slotsList.onSlotsLoaded);
+	}
+	
 }
 #end
 	
@@ -312,10 +315,10 @@ class CorePageLite extends Page<Component> {
 	var _loadMedals:Button;
 	var _medalList:MedalListSwf;
 	
-	var _loadBoards:Button;
 	var _scoreBoardList:ScoreBoardListSwf;
-	var _displayBoards:Map<ScoreBoardSwf, ScoreBoard>;
 	var _scoreBrowser:ScoreBrowserSlim;
+	
+	var _slotsList:SlotsList;
 	
 	public function new (target:CorePageSwf) {
 		super(target);
@@ -343,11 +346,12 @@ class CorePageLite extends Page<Component> {
 		_medalList = cast target.medalList;
 		_medalList.visible = false;
 		
-		_loadBoards = new Button(target.loadBoards);
+		// _loadBoards = new Button(target.loadBoards);
 		_scoreBoardList = cast target.scoreBoardList;
-		_scoreBoardList.visible = false;
+		// _scoreBoardList.visible = false;
 		_scoreBrowser = cast _scoreBoardList.scoreBrowser;
-		_scoreBrowser.boardId = -1;
+		
+		_slotsList = new SlotsList(target.slotList);
 		
 		#if ng_lite
 		_login.enabled = false;
@@ -367,5 +371,79 @@ class CorePageLite extends Page<Component> {
 	function onSessionIdChange(value:String):Void {
 		
 		NG.core.sessionId = value;
+	}
+}
+
+private class SlotsList {
+	
+	var _target:MovieClip;
+	
+	public function new (slotList:MovieClip) {
+		
+		_target = slotList;
+		_target.visible = false;
+	}
+	
+	public function onSlotsLoaded() {
+		
+		_target.visible = true;
+		
+		var saveSlots = NG.core.saveSlots;
+		var numSlots = saveSlots.length;
+		
+		if (numSlots == 0)
+			throw 'Server returned no slots';
+		
+		if (numSlots > _target.numChildren)
+			throw 'Save slot count exceeded expectations, slots: $numSlots, buttons: ${_target.numChildren}';
+		
+		for (i in 0...numSlots) {
+			
+			var slot = saveSlots.getOrdered(i);
+			var slotMc:MovieClip = cast _target.getChildByName('slot$i');
+			
+			if (slotMc == null)
+				throw 'missing slot$i';
+			
+			new Slot(slotMc, slot);
+		}
+		
+		// remove the rest
+		for (i in numSlots..._target.numChildren) {
+			
+			var slotMc:MovieClip = cast _target.getChildByName('slot$i');
+			
+			if (slotMc == null)
+				throw 'missing slot$i';
+			
+			_target.removeChild(slotMc);
+		}
+	}
+}
+
+abstract Slot(MovieClip) {
+	
+	public function new (target:MovieClip, data:SaveSlot) {
+		
+		this = target;
+		
+		assertField("idField").text = Std.string(data.id);
+		assertField("timeField").text = data.url == null ? "Empty" : data.getDate().toString();
+		assertField("sizeField").text = data.prettyPrintSize();
+	}
+	
+	@:generic
+	function assertChild<T>(name:String) {
+		
+		var child:T = cast this.getChildByName(name);
+		if (child == null)
+			throw "Missing child: " + name;
+		
+		return child;
+	}
+	
+	inline function assertField(name:String):TextField {
+		
+		return assertChild(name);
 	}
 }

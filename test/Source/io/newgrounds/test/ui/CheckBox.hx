@@ -24,6 +24,12 @@ class CheckBox extends Button {
 		this.onToggle = onToggle;
 		_check = cast target.getChildByName("check");
 		
+		if (_check == null)
+			_check = cast target.getChildByName("dot");
+		
+		if (_check == null)
+			throw 'Missing child: "check"';
+		
 		super(target, handleClick, onOver, onOut);
 	}
 	
@@ -35,6 +41,7 @@ class CheckBox extends Button {
 	}
 
 	override function updateState():Void {
+		super.updateState();
 		
 		_check.visible = on;
 	}

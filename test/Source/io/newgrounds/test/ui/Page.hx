@@ -3,15 +3,14 @@ package io.newgrounds.test.ui;
 import openfl.display.MovieClip;
 import openfl.text.TextField;
 
-import io.newgrounds.swf.common.Button;
 import io.newgrounds.Call.ICallable;
-import io.newgrounds.components.EventComponent;
-import io.newgrounds.components.ScoreBoardComponent;
-import io.newgrounds.components.MedalComponent;
-import io.newgrounds.components.LoaderComponent;
-import io.newgrounds.components.GatewayComponent;
 import io.newgrounds.components.AppComponent;
 import io.newgrounds.components.Component;
+import io.newgrounds.components.EventComponent;
+import io.newgrounds.components.GatewayComponent;
+import io.newgrounds.components.LoaderComponent;
+import io.newgrounds.components.MedalComponent;
+import io.newgrounds.components.ScoreBoardComponent;
 #if ng_lite
 	import io.newgrounds.objects.events.Response;
 	import io.newgrounds.objects.events.Result.ScoreBoardResult;
@@ -19,11 +18,13 @@ import io.newgrounds.components.Component;
 
 import io.newgrounds.test.art.AppPageSwf;
 import io.newgrounds.test.art.AssetsPageSwf;
-import io.newgrounds.test.art.ScoreboardPageSwf;
-import io.newgrounds.test.art.MedalPageSwf;
-import io.newgrounds.test.art.LoaderPageSwf;
-import io.newgrounds.test.art.GatewayPageSwf;
 import io.newgrounds.test.art.EventPageSwf;
+import io.newgrounds.test.art.GatewayPageSwf;
+import io.newgrounds.test.art.LoaderPageSwf;
+import io.newgrounds.test.art.MedalPageSwf;
+import io.newgrounds.test.art.ScoreboardPageSwf;
+
+import io.newgrounds.swf.common.Button;
 
 class Page<T:Component> {
 	
