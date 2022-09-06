@@ -458,10 +458,8 @@ class NG extends NGLite {
 					
 					if (response.hasError())
 						callback(Error(response.getError().toString()));
-					else {
-						
+					else
 						callback(Success(response.result.data.dateTime));
-					}
 				}
 			)
 			.addErrorHandler((e)->callback(Error(e.toString())))
@@ -477,7 +475,7 @@ class NG extends NGLite {
 	 *                       is -4:00 it adds an hour. 
 	 *                       Note: this is a hack to show the date-time at the NG headquarters.
 	 */
-	public function requestServerTime(callback:(TypedResultType<Date>)->Void, offsetToServerTime = false) {
+	public function requestServerTime(callback:(TypedResultType<Date>)->Void, useServerTime = false) {
 		
 		calls.gateway.getDatetime()
 			.addDataHandler(
