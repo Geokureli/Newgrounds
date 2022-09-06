@@ -10,6 +10,10 @@ class ObjectList<K, V> {
 	
 	public var state(default, null):ListState = Empty;
 	
+	// TODO: rename to onLoad
+	/**
+	 * Called after `loadList` successfully populates this list
+	 */
 	public var onLoaded(default, null) = new Dispatcher();
 	
 	var _core:NG;
@@ -116,6 +120,7 @@ class ObjectList<K, V> {
 
 enum ListState {
 	
+	// TODO: UPPER CASE
 	Empty;
 	Loading;
 	Loaded;
