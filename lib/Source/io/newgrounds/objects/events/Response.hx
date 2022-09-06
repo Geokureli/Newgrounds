@@ -41,4 +41,20 @@ abstract Response<T:ResultBase>(RawResponse<T>) {
 		else if(!result.success)
 			core.logError('${result.component} fail: ${result.error}');
 	}
+	
+	public function hasError() {
+		
+		return success == false || result.success == false;
+	}
+	
+	public function getError() {
+		
+		if (success == false)
+			return error;
+		
+		if (result.success == false)
+			return result.error;
+		
+		return null;
+	}
 }
