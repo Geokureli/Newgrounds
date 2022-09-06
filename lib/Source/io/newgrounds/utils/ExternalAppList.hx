@@ -25,13 +25,14 @@ abstract ExternalAppList (RawExternalAppList) {
 	}
 	
 	@:arrayAccess
-	inline public function get(appId:Int) return this.map.get(appId);
+	inline public function get(appId:String) return this._map.get(appId);
 }
 
 /**
  * Note: `ExternalAppList` is just an abstract wrapper of `RawExternalAppList`, to allow array access.
  * Be sure to add any actual behavior to this class
 **/
+@:allow(io.newgrounds.utils.ExternalAppList)
 class RawExternalAppList {
 	
 	var _core:NG;
@@ -66,16 +67,16 @@ class ExternalApp {
 	
 	public var appId(default, null):String;
 	
-	public var saveSlots(default, null):SaveSlotList;
+	public var saveSlots(default, null):ExternalSaveSlotList;
 	public var medals(default, null):ExternalMedalList;
 	public var scoreBoard(default, null):ExternalScoreBoardList;
 	
-	public function new (core:NGLite, appId:String) {
+	public function new (core:NG, appId:String) {
 		
 		this.appId = appId;
 		
-		saveSlots = new SaveSlotList(_core, appId);
-		medals = new ExternalMedalList(_core, appId);
-		scoreBoard = new ExternalScoreBoardList(_core, appId);
+		saveSlots = new ExternalSaveSlotList(core, appId);
+		medals = new ExternalMedalList(core, appId);
+		scoreBoard = new ExternalScoreBoardList(core, appId);
 	}
 }

@@ -113,7 +113,7 @@ class NG extends NGLite {
 		
 		attemptingLogin = sessionId != null;
 		
-		super(appId, sessionId, debug, onSessionFail);
+		super(appId, sessionId, debug, callback);
 	}
 	
 	/**
@@ -165,25 +165,22 @@ class NG extends NGLite {
 	, response:Response<SessionResult>
 	):Void {
 		
-		onSessionReceive(response, null, null, failHandler);
+		onSessionReceive(response, callback, null);
 	}
 	
 	/**
 	 * Begins the login process
 	 * 
-	 * @param onSuccess Called when the login is a success
-	 * @param onPending Called when the passportUrl has been identified, call NG.core.openPassportLink 
-	 *                  to open the link continue the process. Leave as null to open the url automatically
-	 *                  NOTE: Browser games must open links on click events or else it will be blocked by
-	 *                  the popup blocker.
-	 * @param onFail    
-	 * @param onCancel  Called when the user denies the passport connection.
+	 * @param callback          Called when the login is a success.
+	 * @param passportCallback  Called when the passportUrl has been identified, call
+	 *                          NG.core.openPassportLink to open the link continue the process.
+	 *                          Leave as null to open the url automatically NOTE: Browser games
+	 *                          must open links on click events or else it will be blocked by the
+	 *                          popup blocker.
 	 */
 	public function requestLogin
-	( onSuccess:Void->Void  = null
-	, onPending:Void->Void  = null
-	, onFail   :Error->Void = null
-	, onCancel :Void->Void  = null
+	( callback:(ResultType)->Void  = null
+	, passportHandler:String->Void = null
 	):Void {
 		
 		if (attemptingLogin) {
@@ -203,29 +200,28 @@ class NG extends NGLite {
 		_passportCallback = null;
 		
 		var call = calls.app.startSession(true)
-			.addDataHandler(onSessionReceive.bind(_, onSuccess, onPending, onFail, onCancel));
+			.addDataHandler(onSessionReceive.bind(_, callback, passportHandler));
 		
-		if (onFail != null)
-			call.addErrorHandler(onFail);
+		if (callback != null)
+			call.addErrorHandler((e)->callback(Error(e.toString())));
 		
 		call.send();
 	}
 	
 	function onSessionReceive
 	( response :Response<SessionResult>
-	, onSuccess:Void->Void = null
-	, onPending:Void->Void = null
-	, onFail   :Error->Void = null
-	, onCancel :Void->Void = null
+	, callback:(ResultType)->Void
+	, passportHandler:String->Void
 	):Void {
 		
-		if (!response.success || !response.result.success) {
+		final result = response.result;
+		if (!response.success || !result.success) {
 			
 			sessionId = null;
-			endLoginAndCall(null);
+			endLogin();
 			
-			if (onFail != null)
-				onFail(!response.success ? response.error : response.result.error);
+			if (callback != null)
+				callback(Error((!response.success ? response.error : result.error).toString()));
 			
 			return;
 		}
@@ -237,14 +233,14 @@ class NG extends NGLite {
 		
 		if (_session.status == SessionStatus.REQUEST_LOGIN) {
 			
-			_passportCallback = checkSession.bind(null, onSuccess, onCancel);
-			if (onPending != null)
-				onPending();
+			_passportCallback = checkSession.bind(null, callback);
+			if (passportHandler != null)
+				passportHandler(passportUrl);
 			else
 				openPassportUrl();
 			
 		} else
-			checkSession(null, onSuccess, onCancel);
+			checkSession(null, callback);
 	}
 	
 	/**
@@ -308,13 +304,13 @@ class NG extends NGLite {
 		}
 	}
 	
-	function checkSession(response:Response<SessionResult>, onSuccess:Void->Void, onCancel:Void->Void):Void {
+	function checkSession(response:Response<SessionResult>, callback:(ResultType)->Void):Void {
 		
 		if (_loginCancelled)
 		{
 			log("login cancelled via cancelLoginRequest");
 			
-			endLoginAndCall(onCancel);
+			endLoginAndCall(callback, Error("login cancelled via cancelLoginRequest"));
 			return;
 		}
 		
@@ -324,7 +320,7 @@ class NG extends NGLite {
 				
 				log("login cancelled via passport");
 				
-				endLoginAndCall(onCancel);
+				endLoginAndCall(callback, Error("login cancelled via passport"));
 				return;
 			}
 			
@@ -335,13 +331,13 @@ class NG extends NGLite {
 		if (_session.status == SessionStatus.USER_LOADED) {
 			
 			loggedIn = true;
-			endLoginAndCall(onSuccess);
+			endLoginAndCall(callback, Success);
 			onLogin.dispatch();
 			
 		} else if (_session.status == SessionStatus.REQUEST_LOGIN){
 			
 			var call = calls.app.checkSession()
-				.addDataHandler(checkSession.bind(_, onSuccess, onCancel));
+				.addDataHandler(checkSession.bind(_, callback));
 			
 			// Wait 3 seconds and try again
 			timer(3.0,
@@ -355,7 +351,7 @@ class NG extends NGLite {
 					else {
 						
 						log("login cancelled via cancelLoginRequest");
-						endLoginAndCall(onCancel);
+						endLoginAndCall(callback, Error("login cancelled via cancelLoginRequest"));
 					}
 				}
 			);
@@ -365,7 +361,7 @@ class NG extends NGLite {
 			log("login cancelled via passport");
 			
 			// The user cancelled the passport
-			endLoginAndCall(onCancel);
+			endLoginAndCall(callback, Error("login cancelled via passport"));
 		}
 	}
 	
@@ -379,13 +375,18 @@ class NG extends NGLite {
 		}
 	}
 	
-	function endLoginAndCall(callback:Void->Void):Void {
+	function endLogin():Void {
 		
 		attemptingLogin = false;
 		_loginCancelled = false;
+	}
+	
+	function endLoginAndCall(callback:ResultType->Void, result:ResultType):Void {
+		
+		endLogin();
 		
 		if (callback != null)
-			callback();
+			callback(result);
 	}
 	
 	public function logOut(onComplete:Void->Void = null):Void {

@@ -35,7 +35,7 @@ class SimpleTest {
 			/* They are NOT playing on newgrounds.com, no session id was found. We must start one manually, if we want to.
 			 * Note: This will cause a new browser window to pop up where they can log in to newgrounds
 			 */
-			NG.core.requestLogin(onNGLogin);
+			NG.core.requestLogin((r)->{ if (r.match(Success)) onNGLogin(); } );
 		}
 	}
 	
@@ -44,10 +44,10 @@ class SimpleTest {
 		trace ('logged in! user:${NG.core.user.name}');
 		
 		// Load medals then call onNGMedalFetch()
-		NG.core.requestMedals(onNGMedalFetch);
+		NG.core.medals.loadList(onNGMedalFetch);
 		
 		// Load Scoreboards then call onNGBoardsFetch()
-		NG.core.requestScoreBoards(onNGBoardsFetch);
+		NG.core.scoreBoards.loadList(onNGBoardsFetch);
 		
 		// Load SaveSlots then call onNGSlotsFetch()
 		// NG.core.requestSaveSlots(true, onNGSlotsFetch);
@@ -55,32 +55,42 @@ class SimpleTest {
 	}
 	
 	// --- MEDALS
-	function onNGMedalFetch() {
+	function onNGMedalFetch(result:ResultType) {
+		
+		switch (result) {
+			case Error(error): throw 'Error loading medals: $error';
+			case Success:
+		}
 		
 		// Reading medal info
 		for (id in NG.core.medals.keys()) {
 			
-			var medal = NG.core.medals.get(id);
+			var medal = NG.core.medals[id];
 			trace('loaded medal id:$id, name:${medal.name}, description:${medal.description}');
 		}
 		
 		// Unlocking medals
-		var unlockingMedal = NG.core.medals.get(54001);// medal ids are listed in your NG project viewer 
+		var unlockingMedal = NG.core.medals[54001];// medal ids are listed in your NG project viewer 
 		if (!unlockingMedal.unlocked)
 			unlockingMedal.sendUnlock();
 	}
 	
 	// --- SCOREBOARDS
-	function onNGBoardsFetch() {
+	function onNGBoardsFetch(result:ResultType) {
+		
+		switch (result) {
+			case Error(error): throw 'Error loading score boards: $error';
+			case Success:
+		}
 		
 		// Reading medal info
 		for (id in NG.core.scoreBoards.keys()) {
 			
-			var board = NG.core.scoreBoards.get(id);
+			var board = NG.core.scoreBoards[id];
 			trace('loaded scoreboard id:$id, name:${board.name}');
 		}
 		
-		var board = NG.core.scoreBoards.get(7971);// ID found in NG project view
+		var board = NG.core.scoreBoards[7971];// ID found in NG project view
 		
 		// Posting a score thats OVER 9000!
 		board.postScore(9001);
@@ -95,7 +105,7 @@ class SimpleTest {
 	
 	function onNGScoresFetch() {
 		
-		for (score in NG.core.scoreBoards.get(7971).scores)
+		for (score in NG.core.scoreBoards[7971].scores)
 			trace('score loaded user:${score.user.name}, score:${score.formattedValue}');
 	}
 	
@@ -104,7 +114,7 @@ class SimpleTest {
 		switch (result) {
 			
 			case Error(e):
-				trace('Error getting saveSlots: $e');
+				throw 'Error getting saveSlots: $e';
 				return;
 			
 			case Success:

@@ -97,7 +97,7 @@ class NGLite {
 		sessionId = null;
 		
 		if (callback != null)
-			callback(error.toString());
+			callback(Error(error.toString()));
 	}
 	
 	/**

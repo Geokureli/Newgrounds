@@ -24,6 +24,8 @@ class ObjectList<K, V> {
 		_externalAppId = externalAppId;
 	}
 	
+	inline public function get(id:K):V return _map.get(id);
+	
 	function checkState(callback:Null<(ResultType)->Void>, requireLogin = false):Bool
 	{
 		if (requireLogin && NG.core.loggedIn == false) {

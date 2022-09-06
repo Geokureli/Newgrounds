@@ -1,20 +1,18 @@
 package io.newgrounds.swf;
 
 import openfl.events.Event;
-import io.newgrounds.swf.common.DropDown;
 import io.newgrounds.objects.Score;
+import io.newgrounds.objects.events.Response;
 import io.newgrounds.objects.events.Result.GetBoardsResult;
 import io.newgrounds.objects.events.Result.GetScoresResult;
-import io.newgrounds.objects.events.Response;
 import io.newgrounds.swf.common.BaseAsset;
 import io.newgrounds.swf.common.Button;
+import io.newgrounds.swf.common.DropDown;
 import io.newgrounds.components.ScoreBoardComponent.Period;
 
 import openfl.display.MovieClip;
 import openfl.text.TextField;
 
-// TODO: show score order relative to amount skipped
-// TODO: fix misaligned score order
 class ScoreBrowser extends BaseAsset {
 	
 	public var prevButton    (default, null):MovieClip;
@@ -143,8 +141,11 @@ class ScoreBrowser extends BaseAsset {
 			#else
 			if (NG.core.scoreBoards.state == Loaded)
 				onBoardsLoaded();
-			else
-				NG.core.requestScoreBoards(onBoardsLoaded);
+			else {
+				
+				NG.core.scoreBoards.onLoaded.addOnce(onBoardsLoaded);
+				NG.core.scoreBoards.loadList();
+			}
 			#end
 		}
 		
@@ -195,13 +196,14 @@ class ScoreBrowser extends BaseAsset {
 			
 			loadingIcon.visible = true;
 			
-			NG.core.calls.scoreBoard.getScores(boardId, _limit, _limit * page, period, social, tag)
-				.addDataHandler(onScoresReceive)
+			final skip = _limit * page;
+			NG.core.calls.scoreBoard.getScores(boardId, _limit, skip, period, social, tag)
+				.addDataHandler(onScoresReceive.bind(skip, _))
 				.send();
 		}
 	}
 	
-	function onScoresReceive(response:Response<GetScoresResult>):Void {
+	function onScoresReceive(skip:Int, response:Response<GetScoresResult>):Void {
 		
 		loadingIcon.visible = false;
 		
@@ -214,9 +216,9 @@ class ScoreBrowser extends BaseAsset {
 				i--;
 				
 				if (i < response.result.data.scores.length)
-					drawScore(i, response.result.data.scores[i], _scores[i]);
+					drawScore(i + skip + 1, response.result.data.scores[i], _scores[i]);
 				else
-					drawScore(i, null, _scores[i]);
+					drawScore(i + skip + 1, null, _scores[i]);
 			}
 			
 		} else {
@@ -236,7 +238,7 @@ class ScoreBrowser extends BaseAsset {
 			asset.visible = true;
 			cast (asset.getChildByName("nameField" ), TextField).text = score.user.name;
 			cast (asset.getChildByName("scoreField"), TextField).text = score.formattedValue;
-			cast (asset.getChildByName("rankField" ), TextField).text = Std.string(rank + 1);
+			cast (asset.getChildByName("rankField" ), TextField).text = Std.string(rank);
 		}
 	}
 	

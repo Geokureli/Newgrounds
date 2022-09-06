@@ -53,8 +53,14 @@ to NG.io.
 If no session ID was found, you will need to start one.
 
 ```haxe
-if (NG.core.loggedIn == false)
-    NG.core.requestLogin(function():Void { trace("logged on"): });
+if (NG.core.loggedIn == false) {
+    NG.core.requestLogin(
+        function(result:ResultType):Void {
+            if (result.match(Success)
+                trace("logged on");
+        }
+    );
+}
 ```
 
 ### Encryption
