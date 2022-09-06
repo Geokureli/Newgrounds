@@ -95,7 +95,12 @@ class NG extends NGLite {
 	 * @param appId     The unique ID of your app as found in the 'API Tools' tab of your Newgrounds.com project.
 	 * @param sessionId A unique session id used to identify the active user.
 	**/
-	public function new(appId = "test", ?sessionId:String, debug = false, ?onSessionFail:Error->Void) {
+	public function new
+	( appId = "test"
+	, ?sessionId:String
+	, debug = false
+	, ?callback:(ResultType)->Void
+	) {
 		
 		host = getHost();
 		onLogin = new Dispatcher();
@@ -119,10 +124,10 @@ class NG extends NGLite {
 	( appId = "test"
 	, ?sessionId:String
 	, debug = false
-	, ?onSessionFail:Error->Void
+	, ?callback:(ResultType)->Void
 	):Void {
 		
-		core = new NG(appId, sessionId, debug, onSessionFail);
+		core = new NG(appId, sessionId, debug, callback);
 		
 		onCoreReady.dispatch();
 	}
@@ -137,15 +142,15 @@ class NG extends NGLite {
 	static public function createAndCheckSession
 	( appId = "test"
 	, debug = false
-	, backupSession:String = null
-	, ?onSessionFail:Error->Void
+	, ?backupSession:String
+	, ?callback:(ResultType)->Void
 	):Void {
 		
 		var session = NGLite.getSessionId();
 		if (session == null)
 			session = backupSession;
 		
-		create(appId, session, debug, onSessionFail);
+		create(appId, session, debug, callback);
 		
 		if (core.sessionId != null)
 			core.attemptingLogin = true;
@@ -155,7 +160,10 @@ class NG extends NGLite {
 	//                                         APP
 	// -------------------------------------------------------------------------------------------
 	
-	override function checkInitialSession(failHandler:Error->Void, response:Response<SessionResult>):Void {
+	override function checkInitialSession
+	( callback:(ResultType)->Void
+	, response:Response<SessionResult>
+	):Void {
 		
 		onSessionReceive(response, null, null, failHandler);
 	}

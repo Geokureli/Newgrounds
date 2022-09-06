@@ -1,10 +1,12 @@
 package io.newgrounds.utils;
 
-import io.newgrounds.objects.SaveSlot;
 import io.newgrounds.objects.events.Response;
 import io.newgrounds.objects.events.ResultType;
 import io.newgrounds.objects.events.Result;
 import io.newgrounds.utils.Dispatcher;
+import io.newgrounds.utils.MedalList;
+import io.newgrounds.utils.SaveSlotList;
+import io.newgrounds.utils.ScoreBoardList;
 
 /**
  * A list of external apps. In the NG project manager you can give other apps access to certain
@@ -66,15 +68,14 @@ class ExternalApp {
 	
 	public var saveSlots(default, null):SaveSlotList;
 	public var medals(default, null):ExternalMedalList;
-	
-	var _core:NGLite;
+	public var scoreBoard(default, null):ExternalScoreBoardList;
 	
 	public function new (core:NGLite, appId:String) {
 		
-		_core = core;
 		this.appId = appId;
 		
 		saveSlots = new SaveSlotList(_core, appId);
 		medals = new ExternalMedalList(_core, appId);
+		scoreBoard = new ExternalScoreBoardList(_core, appId);
 	}
 }

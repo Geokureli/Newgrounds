@@ -32,7 +32,7 @@ abstract ScoreBoardList (RawScoreBoardList) {
  * Be sure to add any actual behavior to this class
 **/
 @:access(io.newgrounds.objects.ScoreBoard)
-class RawScoreBoardList extends ObjectList<Int, ScoreBoard> {
+private class RawScoreBoardList extends ObjectList<Int, ScoreBoard> {
 	
 	public function loadList(?callback:(ResultType)->Void) {
 		

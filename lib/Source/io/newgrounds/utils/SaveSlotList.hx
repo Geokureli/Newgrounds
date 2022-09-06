@@ -32,7 +32,7 @@ abstract SaveSlotList (RawSaveSlotList) {
  * Be sure to add any actual behavior to this class
 **/
 @:access(io.newgrounds.objects.SaveSlot)
-class RawSaveSlotList extends ObjectList<Int, SaveSlot> {
+private class RawSaveSlotList extends ObjectList<Int, SaveSlot> {
 	
 	public var length(get, never):Int;
 	inline function get_length() return _ordered == null ? 0 : _ordered.length;

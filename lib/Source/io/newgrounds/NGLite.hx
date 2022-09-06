@@ -11,6 +11,7 @@ import io.newgrounds.objects.Error;
 import io.newgrounds.objects.events.Response;
 import io.newgrounds.objects.events.Result.ResultBase;
 import io.newgrounds.objects.events.Result.SessionResult;
+import io.newgrounds.objects.events.ResultType;
 import io.newgrounds.utils.Dispatcher;
 
 #if !(js || flash || cpp || neko || hl)
@@ -62,7 +63,7 @@ class NGLite {
 	 * @param sessionId A unique session id used to identify the active user.
 	 * @param debug     Enables debug features and verbose responses from the server
 	**/
-	public function new(appId = "test", ?sessionId:String, debug = false, ?onSessionFail:Error->Void) {
+	public function new(appId = "test", ?sessionId:String, debug = false, ?callback:(ResultType)->Void) {
 		
 		this.appId = appId;
 		this.sessionId = sessionId;
@@ -73,35 +74,43 @@ class NGLite {
 		if (this.sessionId != null) {
 			
 			calls.app.checkSession()
-				.addDataHandler(checkInitialSession.bind(onSessionFail))
-				.addErrorHandler(initialSessionFail.bind(onSessionFail))
+				.addDataHandler(checkInitialSession.bind(callback))
+				.addErrorHandler(initialSessionFail.bind(callback))
 				.send();
 		}
 	}
 	
-	function checkInitialSession(onFail:Error->Void, response:Response<SessionResult>):Void {
+	function checkInitialSession(callback:(ResultType)->Void, response:Response<SessionResult>):Void {
 		
 		if (!response.success || !response.result.success || response.result.data.session.expired) {
 			
-			initialSessionFail(onFail, response.success ? response.result.error : response.error);
+			initialSessionFail(callback, response.success ? response.result.error : response.error);
+		
+		} else {
+			
+			callback(Success);
 		}
 	}
 	
-	function initialSessionFail(onFail:Error->Void, error:Error):Void {
+	function initialSessionFail(callback:(ResultType)->Void, error:Error):Void {
 		
 		sessionId = null;
 		
-		if (onFail != null)
-			onFail(error);
+		if (callback != null)
+			callback(error.toString());
 	}
 	
 	/**
 	 * Creates NG.core, the heart and soul of the API. This is not the only way to create an instance,
 	 * nor is NG a forced singleton, but it's the only way to set the static NG.core.
 	**/
-	static public function create(appId = "test", sessionId:String = null, ?onSessionFail:Error->Void):Void {
+	static public function create
+	( appId            = "test"
+	, sessionId:String = null
+	, ?callback:(ResultType)->Void
+	):Void {
 		
-		core = new NGLite(appId, sessionId, false, onSessionFail);
+		core = new NGLite(appId, sessionId, false, callback);
 		
 		onCoreReady.dispatch();
 	}
@@ -113,14 +122,14 @@ class NGLite {
 	static public function createAndCheckSession
 	( appId = "test"
 	, backupSession:String = null
-	, ?onSessionFail:Error->Void
+	, ?callback:(ResultType)->Void
 	):Void {
 		
 		var session = getSessionId();
 		if (session == null)
 			session = backupSession;
 		
-		create(appId, session, onSessionFail);
+		create(appId, session, callback);
 	}
 	
 	inline static public function getUrl():String {
