@@ -433,7 +433,7 @@ class NG extends NGLite {
 	 * Loads the info for each cloud save slot, including the last save time and size
 	 *
 	 * @param loadFiles  If true, each slot's save file is also loaded.
-	 * @param callback   Whether the request was successful, or an error message
+	 * @param callback   Whether the request was successful, or an error message.
 	**/
 	@:deprecated("use saveSlots.loadList")
 	inline public function requestSaveSlots(loadFiles = false, ?callback:ResultType->Void):Void {
@@ -444,6 +444,59 @@ class NG extends NGLite {
 	// -------------------------------------------------------------------------------------------
 	//                                       HELPERS
 	// -------------------------------------------------------------------------------------------
+	
+	/**
+	 * Fetches the server's current date-time in ISO 8601 format.
+	 * 
+	 * @param callback       The handler for the server response.
+	 */
+	public function requestServerIsoTime(callback:(TypedResultType<String>)->Void) {
+		
+		calls.gateway.getDatetime()
+			.addDataHandler(
+				function(response) {
+					
+					if (response.hasError())
+						callback(Error(response.getError().toString()));
+					else {
+						
+						callback(Success(response.result.data.dateTime));
+					}
+				}
+			)
+			.addErrorHandler((e)->callback(Error(e.toString())))
+			.send();
+	}
+	
+	/**
+	 * Fetches a timestamp from the server and creates a Date object based on the UNIX timestamp.
+	 * 
+	 * @param callback       The handler for the server response.
+	 * @param useServerTime  If true, the unix timestamp is offset by the difference the user's
+	 *                       timezone and the server's. Ex: If the user is -5:00 and the server
+	 *                       is -4:00 it adds an hour. 
+	 *                       Note: this is a hack to show the date-time at the NG headquarters.
+	 */
+	public function requestServerTime(callback:(TypedResultType<Date>)->Void, offsetToServerTime = false) {
+		
+		calls.gateway.getDatetime()
+			.addDataHandler(
+				function(response) {
+					
+					if (response.hasError())
+						callback(Error(response.getError().toString()));
+					else {
+						
+						if (useServerTime)
+							callback(Success(response.result.data.getServerDate()));
+						else
+							callback(Success(response.result.data.getDate()));
+					}
+				}
+			)
+			.addErrorHandler((e)->callback(Error(e.toString())))
+			.send();
+	}
 	
 	function timer(delay:Float, callback:Void->Void):Void {
 		
