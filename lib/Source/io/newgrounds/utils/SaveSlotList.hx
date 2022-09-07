@@ -114,13 +114,11 @@ private class RawSaveSlotList extends ObjectList<Int, SaveSlot> {
 				
 				switch (result) {
 					
-					case SUCCESS: // continue
-					case FAIL(error):
-						
-						callback(FAIL(error.toString()));
-						return;
+					case SUCCESS    : loadAllFiles(callback);
+					case FAIL(error): callback(FAIL(error.toString()));
 				}
 			});
+			return;
 		}
 		
 		var slotsToLoad = 0;
