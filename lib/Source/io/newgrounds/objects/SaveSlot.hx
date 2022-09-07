@@ -71,7 +71,7 @@ class SaveSlot extends Object<RawSaveSlot>
 	 * 
 	 * @throws Exception if data is null
 	 */
-	public function save(data:String, ?callback:(ResultType)->Void) {
+	public function save(data:String, ?callback:(ResultType<Error>)->Void) {
 		
 		if (data == null)
 			throw "cannot save null to a SaveSlot";
@@ -79,8 +79,12 @@ class SaveSlot extends Object<RawSaveSlot>
 		if (_externalAppId != null)
 			throw "cannot save to an external app";
 		
+		if (callback == null)
+			callback = (_)->{};
+		
 		_core.calls.cloudSave.setData(data, id)
 			.addDataHandler((response)->setContentsOnSlotFetch(response, data, callback))
+			.addErrorHandler((error)->callback(FAIL(error)))
 			.send();
 	}
 	
@@ -90,33 +94,34 @@ class SaveSlot extends Object<RawSaveSlot>
 	 * @param callback  Called when the data is cleared.
 	 *                  Tells whether the server call was successful.
 	 */
-	public function clear(?callback:(ResultType)->Void) {
+	public function clear(?callback:(ResultType<Error>)->Void) {
 		
 		if (_externalAppId != null)
 			throw "cannot clear an external app's save slot";
 		
+		if (callback == null)
+			callback = (_)->{};
+		
 		_core.calls.cloudSave.clearSlot(id)
 			.addDataHandler((response)->setContentsOnSlotFetch(response, null, callback))
+			.addErrorHandler((error)->callback(FAIL(error)))
 			.send();
 	}
 	
 	function setContentsOnSlotFetch
 	( response:Response<SaveSlotResult>
 	, contents:Null<String>
-	, ?callback:(ResultType)->Void
+	, ?callback:(ResultType<Error>)->Void
 	) {
-		
-		// Always have a non-null callback to avoid having to null check everywhere
-		if (callback == null)
-			callback = (_)->{};
-		
-		if (response.success && response.result.success) {
+		if (response.hasError()) {
 			
-			this.contents = contents;
-			parse(response.result.data.slot);
+			callback(FAIL(response.getError()));
+			return;
 		}
 		
-		callback(Success);
+		this.contents = contents;
+		parse(response.result.data.slot);
+		callback(SUCCESS);
 	}
 	
 	/**
@@ -130,15 +135,14 @@ class SaveSlot extends Object<RawSaveSlot>
 		if (isEmpty())
 			throw 'Cannot load from an empty SaveSlot, id:$id';
 		
-		// TODO: load data (async)
 		AsyncHttp.send(url, null,
 			(s)->
 			{
 				contents = s;
-				callback(Success(contents));
+				callback(SUCCESS(contents));
 				onUpdate.dispatch();
 			},
-			(error)->callback(Error(error))
+			(error)->callback(FAIL(error))
 		);
 	}
 	
@@ -163,4 +167,4 @@ class SaveSlot extends Object<RawSaveSlot>
 	}
 }
 
-typedef SaveSlotResultType = TypedResultType<Null<String>>;
+typedef SaveSlotResultType = TypedResultType<Null<String>, String>;

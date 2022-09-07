@@ -42,7 +42,7 @@ abstract Response<T:ResultBase>(RawResponse<T>) {
 			core.logError('${result.component} fail: ${result.error}');
 	}
 	
-	public function hasError() {
+	inline public function hasError() {
 		
 		return success == false || result.success == false;
 	}

@@ -1,6 +1,7 @@
 package io.newgrounds.test;
 
 import io.newgrounds.NG;
+import io.newgrounds.objects.Error;
 import io.newgrounds.objects.SaveSlot;
 import io.newgrounds.objects.events.ResultType;
 
@@ -35,7 +36,7 @@ class SimpleTest {
 			/* They are NOT playing on newgrounds.com, no session id was found. We must start one manually, if we want to.
 			 * Note: This will cause a new browser window to pop up where they can log in to newgrounds
 			 */
-			NG.core.requestLogin((r)->{ if (r.match(Success)) onNGLogin(); } );
+			NG.core.requestLogin((r)->{ if (r.match(SUCCESS)) onNGLogin(); } );
 		}
 	}
 	
@@ -55,11 +56,11 @@ class SimpleTest {
 	}
 	
 	// --- MEDALS
-	function onNGMedalFetch(result:ResultType) {
+	function onNGMedalFetch(result:ResultType<Error>) {
 		
 		switch (result) {
-			case Error(error): throw 'Error loading medals: $error';
-			case Success:
+			case FAIL(error): throw 'Error loading medals: $error';
+			case SUCCESS:
 		}
 		
 		// Reading medal info
@@ -76,11 +77,11 @@ class SimpleTest {
 	}
 	
 	// --- SCOREBOARDS
-	function onNGBoardsFetch(result:ResultType) {
+	function onNGBoardsFetch(result:ResultType<Error>) {
 		
 		switch (result) {
-			case Error(error): throw 'Error loading score boards: $error';
-			case Success:
+			case FAIL(error): throw 'Error loading score boards: $error';
+			case SUCCESS:
 		}
 		
 		// Reading medal info
@@ -109,15 +110,15 @@ class SimpleTest {
 			trace('score loaded user:${score.user.name}, score:${score.formattedValue}');
 	}
 	
-	function onNGSlotsFetch(result:ResultType) {
+	function onNGSlotsFetch(result:ResultType<Error>) {
 		
 		switch (result) {
 			
-			case Error(e):
+			case FAIL(e):
 				throw 'Error getting saveSlots: $e';
 				return;
 			
-			case Success:
+			case SUCCESS:
 		}
 		
 		for (k=>slot in NG.core.saveSlots)
@@ -182,8 +183,8 @@ class SimpleTest {
 		slot.save(value, (r)->{
 			switch(r) {
 				
-				case Success: trace('data saved: "$value"');
-				case Error(e): trace('Error saving data: "$e"');
+				case SUCCESS: trace('data saved: "$value"');
+				case FAIL(e): trace('Error saving data: "$e"');
 			}
 			callback(slot);
 		});
@@ -194,8 +195,8 @@ class SimpleTest {
 		trace('Clearing slot[${slot.id}]: "${slot.contents}"');
 		slot.clear((r)->{
 			switch(r) {
-				case Success: trace('data cleared');
-				case Error(e): trace('Error clearing data: $e');
+				case SUCCESS: trace('data cleared');
+				case FAIL(e): trace('Error clearing data: $e');
 			}
 			callback(slot);
 		});

@@ -1,5 +1,6 @@
 package io.newgrounds.utils;
 
+import io.newgrounds.objects.Error;
 import io.newgrounds.objects.ScoreBoard;
 import io.newgrounds.objects.events.Response;
 import io.newgrounds.objects.events.ResultType;
@@ -34,22 +35,25 @@ abstract ScoreBoardList (RawScoreBoardList) {
 @:access(io.newgrounds.objects.ScoreBoard)
 private class RawScoreBoardList extends ObjectList<Int, ScoreBoard> {
 	
-	public function loadList(?callback:(ResultType)->Void) {
+	public function loadList(?callback:(ResultType<Error>)->Void) {
 		
 		if (checkState(callback) == false)
 			return;
 		
 		_core.calls.scoreBoard.getBoards()
 			.addDataHandler((response)->onScoreBoardsReceived(response))
-			.addErrorHandler((e)->fireCallbacks(Error(e.toString())))
+			.addErrorHandler((error)->fireCallbacks(FAIL(error)))
 			.sendExternal(_externalAppId);
 	}
 	
 	
 	function onScoreBoardsReceived(response:Response<GetBoardsResult>) {
 		
-		if (fireResponseErrors(response))
+		if (response.hasError()) {
+			
+			fireCallbacks(FAIL(response.getError()));
 			return;
+		}
 		
 		var idList:Array<Int> = new Array<Int>();
 		
@@ -67,12 +71,7 @@ private class RawScoreBoardList extends ObjectList<Int, ScoreBoard> {
 		
 		_core.logVerbose('${response.result.data.scoreboards.length} ScoreBoards received [${idList.join(", ")}]');
 		
-		fireCallbacks(Success);
-	}
-	
-	override function fireCallbacks(result:ResultType)
-	{
-		super.fireCallbacks(result);
+		fireCallbacks(SUCCESS);
 	}
 }
 

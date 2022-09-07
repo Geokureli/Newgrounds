@@ -1,24 +1,20 @@
 package io.newgrounds.objects.events;
 
-// TODO: add error type to both enums
-
 /**
  * Whether some action was successful and what the resulting value was,
  * or, if not, what error occured.
 **/
-enum TypedResultType<T>
+enum TypedResultType<T, E>
 {
-	// TODO: UPPER CASE
-	Error(error:String);
-	Success(value:T);
+	SUCCESS(value:T);
+	FAIL(error:E);
 }
 
 /**
  * Whether some action was successful, or, if not, what error occured.
 **/
-enum ResultType
+enum ResultType<E>
 {
-	// TODO: UPPER CASE
-	Error(error:String);
-	Success;
+	SUCCESS;
+	FAIL(error:E);
 }

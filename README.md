@@ -148,8 +148,6 @@ readonly `contents` field that is null until you call `load` on that SaveSlot in
 if there is no save in that slot, check this using `isEmpty()`). You can also call `save(mySaveContents)` or `clear()` on
 SaveSlots.
 
-**Note:** `NG.core.saveSlots.loadList` has an optional `loadFiles` arg that will load all the SaveSlot's contents as well as the slot info.
-
 ## Calling Components and Handling Results
 You can talk to the NG.io server directly, but NG.core won't automatically handle 
 the response for you (unlike NG.core.requestMedals()). All of the component calls are 

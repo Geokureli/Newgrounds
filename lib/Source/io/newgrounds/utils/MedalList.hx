@@ -1,5 +1,6 @@
 package io.newgrounds.utils;
 
+import io.newgrounds.objects.Error;
 import io.newgrounds.objects.Medal;
 import io.newgrounds.objects.events.Response;
 import io.newgrounds.objects.events.ResultType;
@@ -43,21 +44,24 @@ abstract MedalList (RawMedalList) {
 @:access(io.newgrounds.objects.Medal)
 class RawMedalList extends ObjectList<Int, Medal> {
 	
-	public function loadList(?callback:(ResultType)->Void) {
+	public function loadList(?callback:(ResultType<Error>)->Void) {
 		
 		if (checkState(callback) == false)
 			return;
 		
 		_core.calls.medal.getList(_externalAppId)
 			.addDataHandler((response)->onMedalsReceived(response))
-			.addErrorHandler((e)->fireCallbacks(Error(e.toString())))
+			.addErrorHandler((error)->fireCallbacks(FAIL(error)))
 			.send();
 	}
 	
 	function onMedalsReceived(response:Response<MedalListResult>) {
 		
-		if (fireResponseErrors(response))
+		if (response.hasError()) {
+			
+			fireCallbacks(FAIL(response.getError()));
 			return;
+		}
 		
 		var idList:Array<Int> = new Array<Int>();
 		
@@ -82,7 +86,7 @@ class RawMedalList extends ObjectList<Int, Medal> {
 		
 		_core.logVerbose('${response.result.data.medals.length} Medals received [${idList.join(", ")}]');
 		
-		fireCallbacks(Success);
+		fireCallbacks(SUCCESS);
 	}
 }
 

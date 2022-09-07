@@ -3,6 +3,7 @@ package io.newgrounds;
 #if ng_lite
 typedef NG = NGLite; //TODO: test and make lite UI
 #else
+import io.newgrounds.NGLite;
 import io.newgrounds.objects.Error;
 import io.newgrounds.objects.events.Result.SessionResult;
 import io.newgrounds.objects.events.Result.MedalListResult;
@@ -99,7 +100,7 @@ class NG extends NGLite {
 	( appId = "test"
 	, ?sessionId:String
 	, debug = false
-	, ?callback:(ResultType)->Void
+	, ?callback:(LoginResultType)->Void
 	) {
 		
 		host = getHost();
@@ -124,7 +125,7 @@ class NG extends NGLite {
 	( appId = "test"
 	, ?sessionId:String
 	, debug = false
-	, ?callback:(ResultType)->Void
+	, ?callback:(LoginResultType)->Void
 	):Void {
 		
 		core = new NG(appId, sessionId, debug, callback);
@@ -143,7 +144,7 @@ class NG extends NGLite {
 	( appId = "test"
 	, debug = false
 	, ?backupSession:String
-	, ?callback:(ResultType)->Void
+	, ?callback:(LoginResultType)->Void
 	):Void {
 		
 		var session = NGLite.getSessionId();
@@ -161,7 +162,7 @@ class NG extends NGLite {
 	// -------------------------------------------------------------------------------------------
 	
 	override function checkInitialSession
-	( callback:(ResultType)->Void
+	( callback:(LoginResultType)->Void
 	, response:Response<SessionResult>
 	):Void {
 		
@@ -179,19 +180,24 @@ class NG extends NGLite {
 	 *                          popup blocker.
 	 */
 	public function requestLogin
-	( callback:(ResultType)->Void  = null
+	( callback:(LoginResultType)->Void  = null
 	, passportHandler:String->Void = null
 	):Void {
 		
 		if (attemptingLogin) {
 			
-			logError("cannot request another login until the previous attempt is complete");
+			final errorMsg = "cannot request another login until the previous attempt is complete";
+			logError(errorMsg);
+			if (callback != null)
+				callback(FAIL(ERROR(errorMsg)));
 			return;
 		}
 		
 		if (loggedIn) {
 			
 			logError("cannot log in, already logged in");
+			if (callback != null)
+				callback(SUCCESS);
 			return;
 		}
 		
@@ -203,25 +209,25 @@ class NG extends NGLite {
 			.addDataHandler(onSessionReceive.bind(_, callback, passportHandler));
 		
 		if (callback != null)
-			call.addErrorHandler((e)->callback(Error(e.toString())));
+			call.addErrorHandler((e)->callback(FAIL(ERROR(e.toString()))));
 		
 		call.send();
 	}
 	
 	function onSessionReceive
 	( response :Response<SessionResult>
-	, callback:(ResultType)->Void
+	, callback:(LoginResultType)->Void
 	, passportHandler:String->Void
 	):Void {
 		
 		final result = response.result;
-		if (!response.success || !result.success) {
+		if (response.hasError()) {
 			
 			sessionId = null;
 			endLogin();
 			
 			if (callback != null)
-				callback(Error((!response.success ? response.error : result.error).toString()));
+				callback(FAIL(ERROR(response.getError().toString())));
 			
 			return;
 		}
@@ -304,13 +310,13 @@ class NG extends NGLite {
 		}
 	}
 	
-	function checkSession(response:Response<SessionResult>, callback:(ResultType)->Void):Void {
+	function checkSession(response:Response<SessionResult>, callback:(LoginResultType)->Void):Void {
 		
 		if (_loginCancelled)
 		{
 			log("login cancelled via cancelLoginRequest");
 			
-			endLoginAndCall(callback, Error("login cancelled via cancelLoginRequest"));
+			endLoginAndCall(callback, FAIL(CANCELLED(MANUAL)));
 			return;
 		}
 		
@@ -320,7 +326,7 @@ class NG extends NGLite {
 				
 				log("login cancelled via passport");
 				
-				endLoginAndCall(callback, Error("login cancelled via passport"));
+				endLoginAndCall(callback, FAIL(CANCELLED(PASSPORT)));
 				return;
 			}
 			
@@ -331,7 +337,7 @@ class NG extends NGLite {
 		if (_session.status == SessionStatus.USER_LOADED) {
 			
 			loggedIn = true;
-			endLoginAndCall(callback, Success);
+			endLoginAndCall(callback, SUCCESS);
 			onLogin.dispatch();
 			
 		} else if (_session.status == SessionStatus.REQUEST_LOGIN){
@@ -351,7 +357,7 @@ class NG extends NGLite {
 					else {
 						
 						log("login cancelled via cancelLoginRequest");
-						endLoginAndCall(callback, Error("login cancelled via cancelLoginRequest"));
+						endLoginAndCall(callback, FAIL(CANCELLED(MANUAL)));
 					}
 				}
 			);
@@ -361,7 +367,7 @@ class NG extends NGLite {
 			log("login cancelled via passport");
 			
 			// The user cancelled the passport
-			endLoginAndCall(callback, Error("login cancelled via passport"));
+			endLoginAndCall(callback, FAIL(CANCELLED(PASSPORT)));
 		}
 	}
 	
@@ -381,7 +387,7 @@ class NG extends NGLite {
 		_loginCancelled = false;
 	}
 	
-	function endLoginAndCall(callback:ResultType->Void, result:ResultType):Void {
+	function endLoginAndCall( callback:(LoginResultType)->Void, result:LoginResultType):Void {
 		
 		endLogin();
 		
@@ -413,7 +419,7 @@ class NG extends NGLite {
 	 *
 	 * @param callback   Whether the request was successful, or an error message
 	**/
-	public function requestMedals(?callback:ResultType->Void):Void {
+	public function requestMedals(?callback:(ResultType<Error>)->Void):Void {
 		
 		medals.loadList(callback);
 	}
@@ -424,7 +430,7 @@ class NG extends NGLite {
 	 * @param callback   Whether the request was successful, or an error message
 	**/
 	@:deprecated("use scoreBoards.loadList")
-	public function requestScoreBoards(?callback:ResultType->Void):Void {
+	public function requestScoreBoards(?callback:(ResultType<Error>)->Void):Void {
 		
 		scoreBoards.loadList(callback);
 	}
@@ -432,13 +438,12 @@ class NG extends NGLite {
 	/**
 	 * Loads the info for each cloud save slot, including the last save time and size
 	 *
-	 * @param loadFiles  If true, each slot's save file is also loaded.
 	 * @param callback   Whether the request was successful, or an error message.
 	**/
 	@:deprecated("use saveSlots.loadList")
-	inline public function requestSaveSlots(loadFiles = false, ?callback:ResultType->Void):Void {
+	inline public function requestSaveSlots(?callback:(ResultType<Error>)->Void):Void {
 		
-		saveSlots.loadList(loadFiles, callback);
+		saveSlots.loadList(callback);
 	}
 	
 	// -------------------------------------------------------------------------------------------
@@ -450,19 +455,19 @@ class NG extends NGLite {
 	 * 
 	 * @param callback       The handler for the server response.
 	 */
-	public function requestServerIsoTime(callback:(TypedResultType<String>)->Void) {
+	public function requestServerIsoTime(callback:(TypedResultType<String, Error>)->Void) {
 		
 		calls.gateway.getDatetime()
 			.addDataHandler(
 				function(response) {
 					
 					if (response.hasError())
-						callback(Error(response.getError().toString()));
+						callback(FAIL(response.getError()));
 					else
-						callback(Success(response.result.data.dateTime));
+						callback(SUCCESS(response.result.data.dateTime));
 				}
 			)
-			.addErrorHandler((e)->callback(Error(e.toString())))
+			.addErrorHandler((error)->callback(FAIL(error)))
 			.send();
 	}
 	
@@ -475,24 +480,24 @@ class NG extends NGLite {
 	 *                       is -4:00 it adds an hour. 
 	 *                       Note: this is a hack to show the date-time at the NG headquarters.
 	 */
-	public function requestServerTime(callback:(TypedResultType<Date>)->Void, useServerTime = false) {
+	public function requestServerTime(callback:(TypedResultType<Date, Error>)->Void, useServerTime = false) {
 		
 		calls.gateway.getDatetime()
 			.addDataHandler(
 				function(response) {
 					
 					if (response.hasError())
-						callback(Error(response.getError().toString()));
+						callback(FAIL(response.getError()));
 					else {
 						
 						if (useServerTime)
-							callback(Success(response.result.data.getServerDate()));
+							callback(SUCCESS(response.result.data.getServerDate()));
 						else
-							callback(Success(response.result.data.getDate()));
+							callback(SUCCESS(response.result.data.getDate()));
 					}
 				}
 			)
-			.addErrorHandler((e)->callback(Error(e.toString())))
+			.addErrorHandler((error)->callback(FAIL(error)))
 			.send();
 	}
 	

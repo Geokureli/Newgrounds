@@ -4,14 +4,7 @@ import haxe.ds.IntMap;
 
 import flash.Lib;
 
-import io.newgrounds.test.art.ScoreBoardListSwf;
-import io.newgrounds.test.art.ScoreBoardSwf;
-import io.newgrounds.test.art.ProfileSwf;
-import io.newgrounds.test.art.MedalListSwf;
-import io.newgrounds.test.art.CorePageSwf;
-import io.newgrounds.test.art.MedalSwf;
-import io.newgrounds.test.swf.ScoreBrowserSlim;
-
+import io.newgrounds.NGLite;
 import io.newgrounds.components.Component;
 import io.newgrounds.objects.Error;
 import io.newgrounds.objects.Medal;
@@ -19,6 +12,14 @@ import io.newgrounds.objects.ScoreBoard;
 import io.newgrounds.objects.SaveSlot;
 import io.newgrounds.objects.events.ResultType;
 import io.newgrounds.swf.common.Button;
+
+import io.newgrounds.test.art.ScoreBoardListSwf;
+import io.newgrounds.test.art.ScoreBoardSwf;
+import io.newgrounds.test.art.ProfileSwf;
+import io.newgrounds.test.art.MedalListSwf;
+import io.newgrounds.test.art.CorePageSwf;
+import io.newgrounds.test.art.MedalSwf;
+import io.newgrounds.test.swf.ScoreBrowserSlim;
 
 import openfl.display.Bitmap;
 import openfl.display.Loader;
@@ -78,9 +79,9 @@ class CorePage extends CorePageLite {
 	
 	function onLoginClick():Void {
 		
-		function callback(result:ResultType) {
+		function callback(result:LoginResultType) {
 			
-			if (result.match(Error(_)))
+			if (result.match(FAIL(_)))
 				onLoginFail();
 		}
 		

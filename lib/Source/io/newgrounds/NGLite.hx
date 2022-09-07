@@ -63,7 +63,12 @@ class NGLite {
 	 * @param sessionId A unique session id used to identify the active user.
 	 * @param debug     Enables debug features and verbose responses from the server
 	**/
-	public function new(appId = "test", ?sessionId:String, debug = false, ?callback:(ResultType)->Void) {
+	public function new
+	( appId = "test"
+	, ?sessionId:String
+	, debug = false
+	, ?callback:(LoginResultType)->Void
+	) {
 		
 		this.appId = appId;
 		this.sessionId = sessionId;
@@ -80,7 +85,7 @@ class NGLite {
 		}
 	}
 	
-	function checkInitialSession(callback:(ResultType)->Void, response:Response<SessionResult>):Void {
+	function checkInitialSession(callback:(LoginResultType)->Void, response:Response<SessionResult>):Void {
 		
 		if (!response.success || !response.result.success || response.result.data.session.expired) {
 			
@@ -88,16 +93,16 @@ class NGLite {
 		
 		} else {
 			
-			callback(Success);
+			callback(SUCCESS);
 		}
 	}
 	
-	function initialSessionFail(callback:(ResultType)->Void, error:Error):Void {
+	function initialSessionFail(callback:(LoginResultType)->Void, error:Error):Void {
 		
 		sessionId = null;
 		
 		if (callback != null)
-			callback(Error(error.toString()));
+			callback(FAIL(ERROR(error.toString())));
 	}
 	
 	/**
@@ -107,7 +112,7 @@ class NGLite {
 	static public function create
 	( appId            = "test"
 	, sessionId:String = null
-	, ?callback:(ResultType)->Void
+	, ?callback:(LoginResultType)->Void
 	):Void {
 		
 		core = new NGLite(appId, sessionId, false, callback);
@@ -122,7 +127,7 @@ class NGLite {
 	static public function createAndCheckSession
 	( appId = "test"
 	, backupSession:String = null
-	, ?callback:(ResultType)->Void
+	, ?callback:(LoginResultType)->Void
 	):Void {
 		
 		var session = getSessionId();
@@ -284,4 +289,24 @@ class NGLite {
 		
 		setupEncryption(key, cipher, format);
 	}
+}
+
+typedef LoginResultType = ResultType<LoginFailType>;
+
+enum LoginFailType
+{
+	/** The login was aborted. */
+	CANCELLED(type:LoginCancelType);
+	
+	/** The login attempt failed, somewhere. */
+	ERROR(error:String);
+}
+
+enum LoginCancelType
+{
+	/** The login was cancelled in the passport web page. */
+	PASSPORT;
+	
+	/** The session was abandoned in this app. */
+	MANUAL;
 }

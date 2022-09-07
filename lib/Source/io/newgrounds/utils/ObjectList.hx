@@ -1,5 +1,6 @@
 package io.newgrounds.utils;
 
+import io.newgrounds.objects.Error;
 import io.newgrounds.objects.SaveSlot;
 import io.newgrounds.objects.events.Response;
 import io.newgrounds.objects.events.ResultType;
@@ -20,7 +21,7 @@ class ObjectList<K, V> {
 	var _externalAppId:String;
 	var _map:Map<K, V>;
 	
-	var _callbacks = new TypedDispatcher<ResultType>();
+	var _callbacks = new TypedDispatcher<ResultType<Error>>();
 	
 	public function new (core:NG, externalAppId:String = null) {
 		
@@ -30,22 +31,14 @@ class ObjectList<K, V> {
 	
 	inline public function get(id:K):V return _map.get(id);
 	
-	function checkState(callback:Null<(ResultType)->Void>, requireLogin = false):Bool
+	function checkState(callback:Null<(ResultType<Error>)->Void>):Bool
 	{
-		if (requireLogin && NG.core.loggedIn == false) {
-			
-			if (callback != null)
-				callback(Error("Must be logged in to request cloud saves"));
-			
-			return false;
-		}
-		
 		switch(state) {
 			
 			case Loaded:
 				
 				if (callback != null)
-					callback(Success);
+					callback(SUCCESS);
 				
 				return false;
 				
@@ -66,33 +59,16 @@ class ObjectList<K, V> {
 		}
 	}
 	
-	function fireResponseErrors<T:ResultBase>(response:Response<T>)
-	{
-		if (!response.success) {
-			
-			fireCallbacks(Error(response.error.toString()));
-			return true;
-		}
+	function fireCallbacks(result:ResultType<Error>) {
 		
-		if (!response.result.success) {
-			
-			fireCallbacks(Error(response.result.error.toString()));
-			return true;
-		}
-		
-		return false;
-	}
-	
-	function fireCallbacks(result:ResultType) {
-		
-		if (result.match(Error(_)))
+		if (result.match(FAIL(_)))
 			state = Empty;
 		else
 			state = Loaded;
 		
 		_callbacks.dispatch(result);
 		
-		if (result.match(Success))
+		if (result.match(SUCCESS))
 			onLoaded.dispatch();
 	}
 	

@@ -1,5 +1,6 @@
 package io.newgrounds.utils;
 
+import io.newgrounds.objects.Error;
 import io.newgrounds.objects.SaveSlot;
 import io.newgrounds.objects.events.Response;
 import io.newgrounds.objects.events.ResultType;
@@ -45,21 +46,32 @@ private class RawSaveSlotList extends ObjectList<Int, SaveSlot> {
 		return _ordered[i];
 	}
 	
-	public function loadList(loadFiles = false, ?callback:(ResultType)->Void) {
+	/**
+	 * Loads the info for each cloud save slot, including the last save time and size
+	 * 
+	 * @param callback   Whether the request was successful, or an error message.
+	 */
+	public function loadList(?callback:(ResultType<Error>)->Void) {
 		
-		if (checkState(callback, true) == false)
+		if (_core.loggedIn == false)
+			throw "Must be logged in to request cloud saves";
+		
+		if (checkState(callback) == false)
 			return;
 		
 		_core.calls.cloudSave.loadSlots(_externalAppId)
-			.addDataHandler((response)->onSaveSlotsReceived(response, loadFiles))
-			.addErrorHandler((e)->fireCallbacks(Error(e.toString())))
+			.addDataHandler((response)->onSaveSlotsReceived(response))
+			.addErrorHandler((error)->fireCallbacks(FAIL(error)))
 			.send();
 	}
 	
-	function onSaveSlotsReceived(response:Response<LoadSlotsResult>, loadFiles:Bool) {
+	function onSaveSlotsReceived(response:Response<LoadSlotsResult>) {
 		
-		if (fireResponseErrors(response))
+		if (response.hasError()) {
+			
+			fireCallbacks(FAIL(response.getError()));
 			return;
+		}
 		
 		var idList:Array<Int> = new Array<Int>();
 		
@@ -86,42 +98,43 @@ private class RawSaveSlotList extends ObjectList<Int, SaveSlot> {
 		
 		_core.logVerbose('${idList.length} SaveSlots received [${idList.join(", ")}]');
 		
-		if (loadFiles) {
-			
-			// delay onSaveSlotsLoaded.dispatch() until save data is loaded
-			loadAllFiles(fireCallbacks);
-			
-		} else { 
-			
-			fireCallbacks(Success);
-		}
+		fireCallbacks(SUCCESS);
 	}
 	
 	/**
 	 * Loads the save file of every available slot.  If any slot info hasn't been loaded yet,
 	 * it will load that first.
 	**/
-	public function loadAllFiles(callback:(ResultType)->Void) {
+	public function loadAllFiles(callback:(ResultType<String>)->Void) {
 		
 		if (_map == null) {
 			
 			// populate the save slots first
-			loadList(true, callback);
-			return;
+			loadList((result)-> {
+				
+				switch (result) {
+					
+					case SUCCESS: // continue
+					case FAIL(error):
+						
+						callback(FAIL(error.toString()));
+						return;
+				}
+			});
 		}
 		
 		var slotsToLoad = 0;
-		var result:ResultType = Success;
+		var result:ResultType<String> = SUCCESS;
 		function onSlotLoad(slotResult:SaveSlotResultType) {
 			
 			// If this is the first error, store it
-			if (result == Success) {
+			if (result == SUCCESS) {
 				
 				switch (slotResult) {
 					
-					case Success(_):
-					case Error(e):
-						result = Error(e);
+					case SUCCESS(_):
+					case FAIL(e):
+						result = FAIL(e);
 				}
 			}
 			
@@ -143,7 +156,7 @@ private class RawSaveSlotList extends ObjectList<Int, SaveSlot> {
 		
 		if (slotsToLoad == 0)
 		{
-			callback(Success);
+			callback(SUCCESS);
 			return;
 		}
 		
