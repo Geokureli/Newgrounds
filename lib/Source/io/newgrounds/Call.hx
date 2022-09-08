@@ -133,21 +133,19 @@ class Call<T:ResultBase>
 		if (_properties == null || !_properties.exists("session_id")) {
 			// --- HAS NO SESSION ID
 			
-			if (_requireSession) {
-				
-				if (isExternal) {
-					
-					_core.logError(new Error('cannot send "$component" call to an external app that requires a sessionId'));
-					return;
-				}
-				
-				if (_core.sessionId == null) {
-					
-					_core.logError(new Error('cannot send "$component" call without a sessionId'));
-					return;
-				}
+			if (_core.sessionId != null && isExternal == false) {
+				// --- AUTO ADD SESSION ID
 				
 				addProperty("session_id", _core.sessionId);
+				
+			} else if (_requireSession){
+				
+				if (isExternal)
+					_core.logError(new Error('cannot send "$component" call to an external app'));
+				else
+					_core.logError(new Error('cannot send "$component" call without a sessionId'));
+				
+				return;
 			}
 		}
 		
