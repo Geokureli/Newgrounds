@@ -36,7 +36,7 @@ abstract ExternalAppList (RawExternalAppList) {
 class RawExternalAppList {
 	
 	var _core:NG;
-	var _map:Map<String, ExternalApp>;
+	var _map = new Map<String, ExternalApp>();
 	
 	public function new (core:NG) {
 		
