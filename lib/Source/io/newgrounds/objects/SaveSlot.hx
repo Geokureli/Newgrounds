@@ -130,6 +130,34 @@ class SaveSlot extends Object<RawSaveSlot>
 	 * @param callback  Called when the save file is loaded.
 	 *                  Returns the contents, is successful, otherwise returns an error.
 	 */
+	public function update(?callback:(ResultType<Error>)->Void) {
+		
+		_core.calls.cloudSave.loadSlot(id, _externalAppId)
+			.addDataHandler((response)->onUpdateFetch(response, callback))
+			.addErrorHandler((error)->callback(FAIL(error)))
+			.send();
+	}
+	
+	function onUpdateFetch
+	( response:Response<SaveSlotResult>
+	, ?callback:(ResultType<Error>)->Void
+	) {
+		
+		if (response.hasError())
+			callback(FAIL(response.getError()));
+		else
+		{
+			parse(response.result.data.slot);
+			callback(SUCCESS);
+		}
+	}
+	
+	/**
+	 * Loads the save slot's file contents
+	 * 
+	 * @param callback  Called when the save file is loaded.
+	 *                  Returns the contents, is successful, otherwise returns an error.
+	 */
 	public function load(?callback:(SaveSlotResultType)->Void) {
 		
 		if (isEmpty())
