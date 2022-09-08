@@ -31,31 +31,40 @@ class ObjectList<K, V> {
 	
 	inline public function get(id:K):V return _map.get(id);
 	
-	function checkState(callback:Null<(Outcome<Error>)->Void>):Bool
+	function checkState(callback:Null<(Outcome<Error>)->Void>, allowReload = true):Bool
 	{
+		inline function addCallback()
+		{
+			if (callback != null)
+				_callbacks.addOnce(callback);
+		}
+		
 		switch(state) {
 			
 			case Loaded:
+			{
+				if (allowReload)
+				{
+					addCallback();
+					return true;
+				}
 				
 				if (callback != null)
 					callback(SUCCESS);
 				
 				return false;
-				
+			}
 			case Empty:
-				
+			{
 				state = Loading;
-				
-				if (callback != null)
-					_callbacks.add(callback);
-				
+				addCallback();
 				return true;
+			}
 			case Loading:
-				
-				if (callback != null)
-					_callbacks.add(callback);
-				
+			{
+				addCallback();
 				return false;
+			}
 		}
 	}
 	

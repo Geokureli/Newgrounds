@@ -37,7 +37,7 @@ private class RawScoreBoardList extends ObjectList<Int, ScoreBoard> {
 	
 	public function loadList(?callback:(Outcome<Error>)->Void) {
 		
-		if (checkState(callback) == false)
+		if (checkState(callback, false) == false)
 			return;
 		
 		_core.calls.scoreBoard.getBoards()
