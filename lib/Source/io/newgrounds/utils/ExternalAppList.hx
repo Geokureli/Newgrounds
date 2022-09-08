@@ -1,7 +1,7 @@
 package io.newgrounds.utils;
 
 import io.newgrounds.objects.events.Response;
-import io.newgrounds.objects.events.ResultType;
+import io.newgrounds.objects.events.Outcome;
 import io.newgrounds.objects.events.Result;
 import io.newgrounds.utils.Dispatcher;
 import io.newgrounds.utils.MedalList;

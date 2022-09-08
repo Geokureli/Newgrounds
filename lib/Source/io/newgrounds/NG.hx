@@ -9,7 +9,7 @@ import io.newgrounds.objects.events.Result.SessionResult;
 import io.newgrounds.objects.events.Result.MedalListResult;
 import io.newgrounds.objects.events.Result.GetBoardsResult;
 import io.newgrounds.objects.events.Result.LoadSlotsResult;
-import io.newgrounds.objects.events.ResultType;
+import io.newgrounds.objects.events.Outcome;
 import io.newgrounds.objects.events.Response;
 import io.newgrounds.objects.User;
 import io.newgrounds.objects.Medal;
@@ -100,7 +100,7 @@ class NG extends NGLite {
 	( appId = "test"
 	, ?sessionId:String
 	, debug = false
-	, ?callback:(LoginResultType)->Void
+	, ?callback:(LoginOutcome)->Void
 	) {
 		
 		host = getHost();
@@ -125,7 +125,7 @@ class NG extends NGLite {
 	( appId = "test"
 	, ?sessionId:String
 	, debug = false
-	, ?callback:(LoginResultType)->Void
+	, ?callback:(LoginOutcome)->Void
 	):Void {
 		
 		core = new NG(appId, sessionId, debug, callback);
@@ -144,7 +144,7 @@ class NG extends NGLite {
 	( appId = "test"
 	, debug = false
 	, ?backupSession:String
-	, ?callback:(LoginResultType)->Void
+	, ?callback:(LoginOutcome)->Void
 	):Void {
 		
 		var session = NGLite.getSessionId();
@@ -162,7 +162,7 @@ class NG extends NGLite {
 	// -------------------------------------------------------------------------------------------
 	
 	override function checkInitialSession
-	( callback:(LoginResultType)->Void
+	( callback:(LoginOutcome)->Void
 	, response:Response<SessionResult>
 	):Void {
 		
@@ -180,7 +180,7 @@ class NG extends NGLite {
 	 *                          popup blocker.
 	 */
 	public function requestLogin
-	( callback:(LoginResultType)->Void  = null
+	( callback:(LoginOutcome)->Void  = null
 	, passportHandler:String->Void = null
 	):Void {
 		
@@ -216,7 +216,7 @@ class NG extends NGLite {
 	
 	function onSessionReceive
 	( response :Response<SessionResult>
-	, callback:(LoginResultType)->Void
+	, callback:(LoginOutcome)->Void
 	, passportHandler:String->Void
 	):Void {
 		
@@ -310,7 +310,7 @@ class NG extends NGLite {
 		}
 	}
 	
-	function checkSession(response:Response<SessionResult>, callback:(LoginResultType)->Void):Void {
+	function checkSession(response:Response<SessionResult>, callback:(LoginOutcome)->Void):Void {
 		
 		if (_loginCancelled)
 		{
@@ -387,12 +387,12 @@ class NG extends NGLite {
 		_loginCancelled = false;
 	}
 	
-	function endLoginAndCall( callback:(LoginResultType)->Void, result:LoginResultType):Void {
+	function endLoginAndCall( callback:(LoginOutcome)->Void, outcome:LoginOutcome):Void {
 		
 		endLogin();
 		
 		if (callback != null)
-			callback(result);
+			callback(outcome);
 	}
 	
 	public function logOut(onComplete:Void->Void = null):Void {
@@ -419,7 +419,7 @@ class NG extends NGLite {
 	 *
 	 * @param callback   Whether the request was successful, or an error message
 	**/
-	public function requestMedals(?callback:(ResultType<Error>)->Void):Void {
+	public function requestMedals(?callback:(Outcome<Error>)->Void):Void {
 		
 		medals.loadList(callback);
 	}
@@ -430,7 +430,7 @@ class NG extends NGLite {
 	 * @param callback   Whether the request was successful, or an error message
 	**/
 	@:deprecated("use scoreBoards.loadList")
-	public function requestScoreBoards(?callback:(ResultType<Error>)->Void):Void {
+	public function requestScoreBoards(?callback:(Outcome<Error>)->Void):Void {
 		
 		scoreBoards.loadList(callback);
 	}
@@ -441,7 +441,7 @@ class NG extends NGLite {
 	 * @param callback   Whether the request was successful, or an error message.
 	**/
 	@:deprecated("use saveSlots.loadList")
-	inline public function requestSaveSlots(?callback:(ResultType<Error>)->Void):Void {
+	inline public function requestSaveSlots(?callback:(Outcome<Error>)->Void):Void {
 		
 		saveSlots.loadList(callback);
 	}
@@ -455,7 +455,7 @@ class NG extends NGLite {
 	 * 
 	 * @param callback       The handler for the server response.
 	 */
-	public function requestServerIsoTime(callback:(TypedResultType<String, Error>)->Void) {
+	public function requestServerIsoTime(callback:(TypedOutcome<String, Error>)->Void) {
 		
 		calls.gateway.getDatetime()
 			.addDataHandler(
@@ -480,7 +480,7 @@ class NG extends NGLite {
 	 *                       is -4:00 it adds an hour. 
 	 *                       Note: this is a hack to show the date-time at the NG headquarters.
 	 */
-	public function requestServerTime(callback:(TypedResultType<Date, Error>)->Void, useServerTime = false) {
+	public function requestServerTime(callback:(TypedOutcome<Date, Error>)->Void, useServerTime = false) {
 		
 		calls.gateway.getDatetime()
 			.addDataHandler(

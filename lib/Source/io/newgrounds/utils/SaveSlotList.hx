@@ -3,7 +3,7 @@ package io.newgrounds.utils;
 import io.newgrounds.objects.Error;
 import io.newgrounds.objects.SaveSlot;
 import io.newgrounds.objects.events.Response;
-import io.newgrounds.objects.events.ResultType;
+import io.newgrounds.objects.events.Outcome;
 import io.newgrounds.objects.events.Result;
 import io.newgrounds.utils.Dispatcher;
 
@@ -51,7 +51,7 @@ private class RawSaveSlotList extends ObjectList<Int, SaveSlot> {
 	 * 
 	 * @param callback   Whether the request was successful, or an error message.
 	 */
-	public function loadList(?callback:(ResultType<Error>)->Void) {
+	public function loadList(?callback:(Outcome<Error>)->Void) {
 		
 		if (_core.loggedIn == false)
 			throw "Must be logged in to request cloud saves";
@@ -105,14 +105,14 @@ private class RawSaveSlotList extends ObjectList<Int, SaveSlot> {
 	 * Loads the save file of every available slot.  If any slot info hasn't been loaded yet,
 	 * it will load that first.
 	**/
-	public function loadAllFiles(callback:(ResultType<String>)->Void) {
+	public function loadAllFiles(callback:(Outcome<String>)->Void) {
 		
 		if (_map == null) {
 			
 			// populate the save slots first
-			loadList((result)-> {
+			loadList((outcome)-> {
 				
-				switch (result) {
+				switch (outcome) {
 					
 					case SUCCESS    : loadAllFiles(callback);
 					case FAIL(error): callback(FAIL(error.toString()));
@@ -122,24 +122,24 @@ private class RawSaveSlotList extends ObjectList<Int, SaveSlot> {
 		}
 		
 		var slotsToLoad = 0;
-		var result:ResultType<String> = SUCCESS;
-		function onSlotLoad(slotResult:SaveSlotResultType) {
+		var outcome:Outcome<String> = SUCCESS;
+		function onSlotLoad(slotOutcome:SaveSlotOutcome) {
 			
 			// If this is the first error, store it
-			if (result == SUCCESS) {
+			if (outcome == SUCCESS) {
 				
-				switch (slotResult) {
+				switch (slotOutcome) {
 					
 					case SUCCESS(_):
 					case FAIL(e):
-						result = FAIL(e);
+						outcome = FAIL(e);
 				}
 			}
 			
 			// count the completed slots, call the callback when we're done
 			slotsToLoad--;
 			if (slotsToLoad == 0)
-				callback(result);
+				callback(outcome);
 		}
 		
 		/**

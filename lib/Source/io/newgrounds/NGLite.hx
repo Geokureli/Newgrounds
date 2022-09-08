@@ -11,7 +11,7 @@ import io.newgrounds.objects.Error;
 import io.newgrounds.objects.events.Response;
 import io.newgrounds.objects.events.Result.ResultBase;
 import io.newgrounds.objects.events.Result.SessionResult;
-import io.newgrounds.objects.events.ResultType;
+import io.newgrounds.objects.events.Outcome;
 import io.newgrounds.utils.Dispatcher;
 
 #if !(js || flash || cpp || neko || hl)
@@ -67,7 +67,7 @@ class NGLite {
 	( appId = "test"
 	, ?sessionId:String
 	, debug = false
-	, ?callback:(LoginResultType)->Void
+	, ?callback:(LoginOutcome)->Void
 	) {
 		
 		this.appId = appId;
@@ -85,7 +85,7 @@ class NGLite {
 		}
 	}
 	
-	function checkInitialSession(callback:(LoginResultType)->Void, response:Response<SessionResult>):Void {
+	function checkInitialSession(callback:(LoginOutcome)->Void, response:Response<SessionResult>):Void {
 		
 		if (!response.success || !response.result.success || response.result.data.session.expired) {
 			
@@ -97,7 +97,7 @@ class NGLite {
 		}
 	}
 	
-	function initialSessionFail(callback:(LoginResultType)->Void, error:Error):Void {
+	function initialSessionFail(callback:(LoginOutcome)->Void, error:Error):Void {
 		
 		sessionId = null;
 		
@@ -112,7 +112,7 @@ class NGLite {
 	static public function create
 	( appId            = "test"
 	, sessionId:String = null
-	, ?callback:(LoginResultType)->Void
+	, ?callback:(LoginOutcome)->Void
 	):Void {
 		
 		core = new NGLite(appId, sessionId, false, callback);
@@ -127,7 +127,7 @@ class NGLite {
 	static public function createAndCheckSession
 	( appId = "test"
 	, backupSession:String = null
-	, ?callback:(LoginResultType)->Void
+	, ?callback:(LoginOutcome)->Void
 	):Void {
 		
 		var session = getSessionId();
@@ -291,18 +291,18 @@ class NGLite {
 	}
 }
 
-typedef LoginResultType = ResultType<LoginFailType>;
+typedef LoginOutcome = Outcome<LoginFail>;
 
-enum LoginFailType
+enum LoginFail
 {
 	/** The login was aborted. */
-	CANCELLED(type:LoginCancelType);
+	CANCELLED(type:LoginCancel);
 	
 	/** The login attempt failed, somewhere. */
 	ERROR(error:String);
 }
 
-enum LoginCancelType
+enum LoginCancel
 {
 	/** The login was cancelled in the passport web page. */
 	PASSPORT;

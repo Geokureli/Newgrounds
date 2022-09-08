@@ -3,7 +3,7 @@ package io.newgrounds.utils;
 import io.newgrounds.objects.Error;
 import io.newgrounds.objects.ScoreBoard;
 import io.newgrounds.objects.events.Response;
-import io.newgrounds.objects.events.ResultType;
+import io.newgrounds.objects.events.Outcome;
 import io.newgrounds.objects.events.Result;
 import io.newgrounds.utils.Dispatcher;
 
@@ -35,7 +35,7 @@ abstract ScoreBoardList (RawScoreBoardList) {
 @:access(io.newgrounds.objects.ScoreBoard)
 private class RawScoreBoardList extends ObjectList<Int, ScoreBoard> {
 	
-	public function loadList(?callback:(ResultType<Error>)->Void) {
+	public function loadList(?callback:(Outcome<Error>)->Void) {
 		
 		if (checkState(callback) == false)
 			return;

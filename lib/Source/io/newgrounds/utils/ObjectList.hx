@@ -3,7 +3,7 @@ package io.newgrounds.utils;
 import io.newgrounds.objects.Error;
 import io.newgrounds.objects.SaveSlot;
 import io.newgrounds.objects.events.Response;
-import io.newgrounds.objects.events.ResultType;
+import io.newgrounds.objects.events.Outcome;
 import io.newgrounds.objects.events.Result;
 import io.newgrounds.utils.Dispatcher;
 
@@ -21,7 +21,7 @@ class ObjectList<K, V> {
 	var _externalAppId:String;
 	var _map:Map<K, V>;
 	
-	var _callbacks = new TypedDispatcher<ResultType<Error>>();
+	var _callbacks = new TypedDispatcher<Outcome<Error>>();
 	
 	public function new (core:NG, externalAppId:String = null) {
 		
@@ -31,7 +31,7 @@ class ObjectList<K, V> {
 	
 	inline public function get(id:K):V return _map.get(id);
 	
-	function checkState(callback:Null<(ResultType<Error>)->Void>):Bool
+	function checkState(callback:Null<(Outcome<Error>)->Void>):Bool
 	{
 		switch(state) {
 			
@@ -59,16 +59,16 @@ class ObjectList<K, V> {
 		}
 	}
 	
-	function fireCallbacks(result:ResultType<Error>) {
+	function fireCallbacks(outcome:Outcome<Error>) {
 		
-		if (result.match(FAIL(_)))
+		if (outcome.match(FAIL(_)))
 			state = Empty;
 		else
 			state = Loaded;
 		
-		_callbacks.dispatch(result);
+		_callbacks.dispatch(outcome);
 		
-		if (result.match(SUCCESS))
+		if (outcome.match(SUCCESS))
 			onLoaded.dispatch();
 	}
 	

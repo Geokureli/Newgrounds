@@ -36,6 +36,7 @@ class Call<T:ResultBase>
 	var _successHandlers:Dispatcher;
 	var _httpErrorHandlers:TypedDispatcher<Error>;
 	var _statusHandlers:TypedDispatcher<Int>;
+	// TODO: var _outcomeHandlers:TypedDispatcher<TypedOutcome<T, Error>>;
 	
 	public function new (core:NGLite, component:String, requireSession:Bool = false, isSecure:Bool = false) {
 		

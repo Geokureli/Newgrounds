@@ -3,7 +3,7 @@ package io.newgrounds.utils;
 import io.newgrounds.objects.Error;
 import io.newgrounds.objects.Medal;
 import io.newgrounds.objects.events.Response;
-import io.newgrounds.objects.events.ResultType;
+import io.newgrounds.objects.events.Outcome;
 import io.newgrounds.objects.events.Result;
 import io.newgrounds.utils.Dispatcher;
 
@@ -44,7 +44,7 @@ abstract MedalList (RawMedalList) {
 @:access(io.newgrounds.objects.Medal)
 class RawMedalList extends ObjectList<Int, Medal> {
 	
-	public function loadList(?callback:(ResultType<Error>)->Void) {
+	public function loadList(?callback:(Outcome<Error>)->Void) {
 		
 		if (checkState(callback) == false)
 			return;

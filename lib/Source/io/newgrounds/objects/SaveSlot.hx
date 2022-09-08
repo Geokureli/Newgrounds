@@ -2,7 +2,7 @@ package io.newgrounds.objects;
 
 import io.newgrounds.utils.AsyncHttp;
 import io.newgrounds.objects.events.Result.SaveSlotResult;
-import io.newgrounds.objects.events.ResultType;
+import io.newgrounds.objects.events.Outcome;
 import io.newgrounds.objects.events.Response;
 
 /**
@@ -71,7 +71,7 @@ class SaveSlot extends Object<RawSaveSlot>
 	 * 
 	 * @throws Exception if data is null
 	 */
-	public function save(data:String, ?callback:(ResultType<Error>)->Void) {
+	public function save(data:String, ?callback:(Outcome<Error>)->Void) {
 		
 		if (data == null)
 			throw "cannot save null to a SaveSlot";
@@ -94,7 +94,7 @@ class SaveSlot extends Object<RawSaveSlot>
 	 * @param callback  Called when the data is cleared.
 	 *                  Tells whether the server call was successful.
 	 */
-	public function clear(?callback:(ResultType<Error>)->Void) {
+	public function clear(?callback:(Outcome<Error>)->Void) {
 		
 		if (_externalAppId != null)
 			throw "cannot clear an external app's save slot";
@@ -111,7 +111,7 @@ class SaveSlot extends Object<RawSaveSlot>
 	function setContentsOnSlotFetch
 	( response:Response<SaveSlotResult>
 	, contents:Null<String>
-	, ?callback:(ResultType<Error>)->Void
+	, ?callback:(Outcome<Error>)->Void
 	) {
 		if (response.hasError()) {
 			
@@ -130,7 +130,7 @@ class SaveSlot extends Object<RawSaveSlot>
 	 * @param callback  Called when the save file is loaded.
 	 *                  Returns the contents, is successful, otherwise returns an error.
 	 */
-	public function update(?callback:(ResultType<Error>)->Void) {
+	public function update(?callback:(Outcome<Error>)->Void) {
 		
 		_core.calls.cloudSave.loadSlot(id, _externalAppId)
 			.addDataHandler((response)->onUpdateFetch(response, callback))
@@ -140,7 +140,7 @@ class SaveSlot extends Object<RawSaveSlot>
 	
 	function onUpdateFetch
 	( response:Response<SaveSlotResult>
-	, ?callback:(ResultType<Error>)->Void
+	, ?callback:(Outcome<Error>)->Void
 	) {
 		
 		if (response.hasError())
@@ -158,7 +158,7 @@ class SaveSlot extends Object<RawSaveSlot>
 	 * @param callback  Called when the save file is loaded.
 	 *                  Returns the contents, is successful, otherwise returns an error.
 	 */
-	public function load(?callback:(SaveSlotResultType)->Void) {
+	public function load(?callback:(SaveSlotOutcome)->Void) {
 		
 		if (isEmpty())
 			throw 'Cannot load from an empty SaveSlot, id:$id';
@@ -195,4 +195,4 @@ class SaveSlot extends Object<RawSaveSlot>
 	}
 }
 
-typedef SaveSlotResultType = TypedResultType<Null<String>, String>;
+typedef SaveSlotOutcome = TypedOutcome<Null<String>, String>;
