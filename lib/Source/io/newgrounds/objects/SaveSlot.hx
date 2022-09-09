@@ -1,7 +1,7 @@
 package io.newgrounds.objects;
 
 import io.newgrounds.utils.AsyncHttp;
-import io.newgrounds.objects.events.Result.SaveSlotResult;
+import io.newgrounds.objects.events.Result;
 import io.newgrounds.objects.events.Outcome;
 import io.newgrounds.objects.events.Response;
 
@@ -109,7 +109,7 @@ class SaveSlot extends Object<RawSaveSlot>
 	}
 	
 	function setContentsOnSlotFetch
-	( response:Response<SaveSlotResult>
+	( response:Response<SaveSlotData>
 	, contents:Null<String>
 	, ?callback:(Outcome<Error>)->Void
 	) {
@@ -139,7 +139,7 @@ class SaveSlot extends Object<RawSaveSlot>
 	}
 	
 	function onUpdateFetch
-	( response:Response<SaveSlotResult>
+	( response:Response<SaveSlotData>
 	, ?callback:(Outcome<Error>)->Void
 	) {
 		

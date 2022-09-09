@@ -47,7 +47,7 @@ private class RawScoreBoardList extends ObjectList<Int, ScoreBoard> {
 	}
 	
 	
-	function onScoreBoardsReceived(response:Response<GetBoardsResult>) {
+	function onScoreBoardsReceived(response:Response<GetBoardsData>) {
 		
 		if (response.hasError()) {
 			

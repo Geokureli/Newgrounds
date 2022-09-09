@@ -3,12 +3,11 @@ package io.newgrounds.swf;
 import openfl.events.Event;
 import io.newgrounds.objects.Score;
 import io.newgrounds.objects.events.Response;
-import io.newgrounds.objects.events.Result.GetBoardsResult;
-import io.newgrounds.objects.events.Result.GetScoresResult;
+import io.newgrounds.objects.events.Result;
 import io.newgrounds.swf.common.BaseAsset;
 import io.newgrounds.swf.common.Button;
 import io.newgrounds.swf.common.DropDown;
-import io.newgrounds.components.ScoreBoardComponent.Period;
+import io.newgrounds.components.ScoreBoardComponent;
 
 import openfl.display.MovieClip;
 import openfl.text.TextField;
@@ -203,7 +202,7 @@ class ScoreBrowser extends BaseAsset {
 		}
 	}
 	
-	function onScoresReceive(skip:Int, response:Response<GetScoresResult>):Void {
+	function onScoresReceive(skip:Int, response:Response<GetScoresData>):Void {
 		
 		loadingIcon.visible = false;
 		

@@ -55,7 +55,7 @@ class RawMedalList extends ObjectList<Int, Medal> {
 			.send();
 	}
 	
-	function onMedalsReceived(response:Response<MedalListResult>) {
+	function onMedalsReceived(response:Response<MedalListData>) {
 		
 		if (response.hasError()) {
 			

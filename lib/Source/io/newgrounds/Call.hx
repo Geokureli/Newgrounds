@@ -4,7 +4,6 @@ import io.newgrounds.utils.Dispatcher;
 import io.newgrounds.utils.AsyncHttp;
 import io.newgrounds.objects.Error;
 import io.newgrounds.objects.events.Result;
-import io.newgrounds.objects.events.Result.ResultBase;
 import io.newgrounds.objects.events.Response;
 
 import haxe.ds.StringMap;
@@ -20,7 +19,7 @@ interface ICallable {
 	public function destroy():Void;
 }
 
-class Call<T:ResultBase>
+class Call<T:BaseData>
 	implements ICallable {
 	
 	public var component(default, null):String;

@@ -1,7 +1,7 @@
 package io.newgrounds.objects;
 
 import io.newgrounds.objects.events.Response;
-import io.newgrounds.objects.events.Result.MedalUnlockResult;
+import io.newgrounds.objects.events.Result;
 import io.newgrounds.utils.Dispatcher;
 import io.newgrounds.NGLite;
 
@@ -71,7 +71,7 @@ class Medal extends Object<RawMedalData> {
 			.send();
 	}
 	
-	function onUnlockResponse(response:Response<MedalUnlockResult>):Void {
+	function onUnlockResponse(response:Response<MedalUnlockData>):Void {
 		
 		if (response.success && response.result.success) {
 			

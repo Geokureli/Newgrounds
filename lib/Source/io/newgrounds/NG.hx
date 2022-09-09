@@ -5,10 +5,7 @@ typedef NG = NGLite; //TODO: test and make lite UI
 #else
 import io.newgrounds.NGLite;
 import io.newgrounds.objects.Error;
-import io.newgrounds.objects.events.Result.SessionResult;
-import io.newgrounds.objects.events.Result.MedalListResult;
-import io.newgrounds.objects.events.Result.GetBoardsResult;
-import io.newgrounds.objects.events.Result.LoadSlotsResult;
+import io.newgrounds.objects.events.Result;
 import io.newgrounds.objects.events.Outcome;
 import io.newgrounds.objects.events.Response;
 import io.newgrounds.objects.User;
@@ -163,7 +160,7 @@ class NG extends NGLite {
 	
 	override function checkInitialSession
 	( callback:(LoginOutcome)->Void
-	, response:Response<SessionResult>
+	, response:Response<SessionData>
 	):Void {
 		
 		onSessionReceive(response, callback, null);
@@ -215,7 +212,7 @@ class NG extends NGLite {
 	}
 	
 	function onSessionReceive
-	( response :Response<SessionResult>
+	( response :Response<SessionData>
 	, callback:(LoginOutcome)->Void
 	, passportHandler:String->Void
 	):Void {
@@ -310,7 +307,7 @@ class NG extends NGLite {
 		}
 	}
 	
-	function checkSession(response:Response<SessionResult>, callback:(LoginOutcome)->Void):Void {
+	function checkSession(response:Response<SessionData>, callback:(LoginOutcome)->Void):Void {
 		
 		if (_loginCancelled)
 		{

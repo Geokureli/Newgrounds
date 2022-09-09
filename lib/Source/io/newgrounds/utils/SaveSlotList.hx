@@ -65,7 +65,7 @@ private class RawSaveSlotList extends ObjectList<Int, SaveSlot> {
 			.send();
 	}
 	
-	function onSaveSlotsReceived(response:Response<LoadSlotsResult>) {
+	function onSaveSlotsReceived(response:Response<LoadSlotsData>) {
 		
 		if (response.hasError()) {
 			
