@@ -26,7 +26,8 @@ class MedalComponent extends Component {
 	**/
 	public function getList(externalAppId:String = null):Call<MedalListResult> {
 		
-		return new Call<MedalListResult>(_core, "Medal.getList");
+		return new Call<MedalListResult>(_core, "Medal.getList")
+			.addComponentParameter("app_id", externalAppId);
 	}
 	
 	/**

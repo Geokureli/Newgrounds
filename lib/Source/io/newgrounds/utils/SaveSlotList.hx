@@ -1,8 +1,9 @@
 package io.newgrounds.utils;
 
+import io.newgrounds.objects.Error;
 import io.newgrounds.objects.SaveSlot;
 import io.newgrounds.objects.events.Response;
-import io.newgrounds.objects.events.ResultType;
+import io.newgrounds.objects.events.Outcome;
 import io.newgrounds.objects.events.Result;
 import io.newgrounds.utils.Dispatcher;
 
@@ -14,11 +15,12 @@ import io.newgrounds.utils.Dispatcher;
  * @see io.newgrounds.objects.SaveSlot
 **/
 @:forward
+@:access(io.newgrounds.utils.ObjectList)
 abstract SaveSlotList (RawSaveSlotList) {
 	
-	inline public function new (core:NG, ?externalAppId:String) {
+	inline public function new (core:NG) {
 		
-		this = new RawSaveSlotList(core, externalAppId);
+		this = new RawSaveSlotList(core);
 	}
 	
 	/** Typically the id is the slot's 1-based order that was sent from the server. */
@@ -30,26 +32,13 @@ abstract SaveSlotList (RawSaveSlotList) {
  * Note: `SaveSlotList` is just an abstract wrapper of `RawSaveSlotList`, to allow array access.
  * Be sure to add any actual behavior to this class
 **/
-@:allow(io.newgrounds.utils.SaveSlotList)
 @:access(io.newgrounds.objects.SaveSlot)
-class RawSaveSlotList {
+private class RawSaveSlotList extends ObjectList<Int, SaveSlot> {
 	
-	public var state(default, null):SaveSlotListState = Empty;
 	public var length(get, never):Int;
 	inline function get_length() return _ordered == null ? 0 : _ordered.length;
 	
-	var _core:NG;
-	var _externalAppId:String;
-	var _map:Map<Int, SaveSlot>;
 	var _ordered:Array<SaveSlot>;
-	
-	var _callbacks = new TypedDispatcher<ResultType>();
-	
-	public function new (core:NG, externalAppId:String = null) {
-		
-		_core = core;
-		_externalAppId = externalAppId;
-	}
 	
 	/** return the slot with the specified 0-based order that was sent from the server. */
 	inline public function getOrdered(i:Int) {
@@ -57,62 +46,30 @@ class RawSaveSlotList {
 		return _ordered[i];
 	}
 	
-	public function loadList(loadFiles = false, ?callback:(ResultType)->Void) {
+	/**
+	 * Loads the info for each cloud save slot, including the last save time and size
+	 * 
+	 * @param callback   Whether the request was successful, or an error message.
+	 */
+	public function loadList(?callback:(Outcome<Error>)->Void) {
 		
-		if (NG.core.loggedIn == false) {
-			
-			if (callback != null)
-				callback(Error("Must be logged in to request cloud saves"));
-			
+		if (_core.loggedIn == false)
+			throw "Must be logged in to request cloud saves";
+		
+		if (checkState(callback) == false)
 			return;
-		}
-		
-		switch(state) {
-			
-			case Loaded:
-				
-				if (callback != null)
-					callback(Success);
-				
-				return;
-				
-			case Empty: state = Loading;
-			case Loading:
-		}
-		
-		if (callback != null)
-			_callbacks.add(callback);
 		
 		_core.calls.cloudSave.loadSlots(_externalAppId)
-			.addDataHandler((response)->onSaveSlotsReceived(response, loadFiles))
-			.addErrorHandler((e)->fireCallbacks(Error(e.toString())))
+			.addDataHandler((response)->onSaveSlotsReceived(response))
+			.addErrorHandler((error)->fireCallbacks(FAIL(error)))
 			.send();
 	}
 	
-	function fireCallbacks(result:ResultType) {
+	function onSaveSlotsReceived(response:Response<LoadSlotsResult>) {
 		
-		if (result.match(Error(_)))
-			state = Empty;
-		else
-			state = Loaded;
-		
-		_callbacks.dispatch(result);
-		
-		if (result.match(Success))
-			_core.onSaveSlotsLoaded.dispatch();
-	}
-	
-	function onSaveSlotsReceived(response:Response<LoadSlotsResult>, loadFiles:Bool) {
-		
-		if (!response.success) {
+		if (response.hasError()) {
 			
-			fireCallbacks(Error(response.error.toString()));
-			return;
-		}
-		
-		if (!response.result.success) {
-			
-			fireCallbacks(Error(response.result.error.toString()));
+			fireCallbacks(FAIL(response.getError()));
 			return;
 		}
 		
@@ -141,49 +98,48 @@ class RawSaveSlotList {
 		
 		_core.logVerbose('${idList.length} SaveSlots received [${idList.join(", ")}]');
 		
-		if (loadFiles) {
-			
-			// delay onSaveSlotsLoaded.dispatch() until save data is loaded
-			loadAllFiles(fireCallbacks);
-			
-		} else { 
-			
-			fireCallbacks(Success);
-		}
+		fireCallbacks(SUCCESS);
 	}
 	
 	/**
 	 * Loads the save file of every available slot.  If any slot info hasn't been loaded yet,
 	 * it will load that first.
 	**/
-	public function loadAllFiles(callback:(ResultType)->Void) {
+	public function loadAllFiles(callback:(Outcome<String>)->Void) {
 		
 		if (_map == null) {
 			
 			// populate the save slots first
-			loadList(true, callback);
+			loadList((outcome)-> {
+				
+				switch (outcome) {
+					
+					case SUCCESS    : loadAllFiles(callback);
+					case FAIL(error): callback(FAIL(error.toString()));
+				}
+			});
 			return;
 		}
 		
 		var slotsToLoad = 0;
-		var result:ResultType = Success;
-		function onSlotLoad(slotResult:SaveSlotResultType) {
+		var outcome:Outcome<String> = SUCCESS;
+		function onSlotLoad(slotOutcome:SaveSlotOutcome) {
 			
 			// If this is the first error, store it
-			if (result == Success) {
+			if (outcome == SUCCESS) {
 				
-				switch (slotResult) {
+				switch (slotOutcome) {
 					
-					case Success(_):
-					case Error(e):
-						result = Error(e);
+					case SUCCESS(_):
+					case FAIL(e):
+						outcome = FAIL(e);
 				}
 			}
 			
 			// count the completed slots, call the callback when we're done
 			slotsToLoad--;
 			if (slotsToLoad == 0)
-				callback(result);
+				callback(outcome);
 		}
 		
 		/**
@@ -198,7 +154,7 @@ class RawSaveSlotList {
 		
 		if (slotsToLoad == 0)
 		{
-			callback(Success);
+			callback(SUCCESS);
 			return;
 		}
 		
@@ -208,34 +164,35 @@ class RawSaveSlotList {
 				slot.load(onSlotLoad);
 		}
 	}
-	
-	/**
-	 * Returns an Iterator over the ids of `this` list.
-	 * 
-	 * The order of ids is undefined.
-	**/
-	public inline function keys() return _map.keys();
-	
-	/**
-	 * Returns an Iterator over the values of `this` list.
-	 * 
-	 * The order of values is undefined.
-	**/
-	public inline function iterator() return _ordered.iterator();
-
-	/**
-	 * Returns an Iterator over the ids and values of `this` list.
-	 * 
-	 * The order is undefined.
-	**/
-	public inline function keyValueIterator() return _map.keyValueIterator();
-	
-	static function noCallback(r:ResultType){}
 }
 
-enum SaveSlotListState {
+/**
+ * A list of cloud save slots
+ * 
+ * To use an individual slot, first call `loadList` to populate the list.
+ * 
+ * @see io.newgrounds.objects.SaveSlot
+**/
+@:forward
+@:access(io.newgrounds.utils.ObjectList)
+abstract ExternalSaveSlotList (RawSaveSlotList) {
 	
-	Empty;
-	Loading;
-	Loaded;
+	inline public function new (core:NG, externalAppId:String) {
+		
+		this = new RawSaveSlotList(core, externalAppId);
+	}
+	
+	/** Typically the id is the slot's 1-based order that was sent from the server. */
+	@:arrayAccess
+	inline public function getById(id:Int):ExternalSaveSlot return this._map.get(id);
+}
+
+@:forward
+abstract ExternalSaveSlot(SaveSlot) from SaveSlot {
+	
+	/** Hides the underlying function. */
+	function save() {}
+	
+	/** Hides the underlying function. */
+	function clear() {}
 }

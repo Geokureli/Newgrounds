@@ -13,7 +13,7 @@ import io.newgrounds.components.MedalComponent;
 import io.newgrounds.components.ScoreBoardComponent;
 #if ng_lite
 	import io.newgrounds.objects.events.Response;
-	import io.newgrounds.objects.events.Result.ScoreBoardResult;
+	import io.newgrounds.objects.events.Result.GetBoardsResult;
 #end
 
 import io.newgrounds.test.art.AppPageSwf;
@@ -193,7 +193,7 @@ class ScoreboardPage extends Page<ScoreBoardComponent> {
 			.addDataHandler(onBoardsReceived)
 			.queue();
 		#else
-		NG.core.onScoreBoardsLoaded.addOnce(onBoardsReceived);
+		NG.core.scoreBoards.onLoad.addOnce(onBoardsReceived);
 		#end
 		
 		_social = new CheckBox(target.social);
@@ -230,7 +230,7 @@ class ScoreboardPage extends Page<ScoreBoardComponent> {
 	}
 	
 	#if ng_lite
-	function onBoardsReceived(response:Response<ScoreBoardResult>):Void {
+	function onBoardsReceived(response:Response<GetBoardsResult>):Void {
 		
 		if (response.success && response.result.success && response.result.data.scoreboards.length > 0) {
 			

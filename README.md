@@ -53,8 +53,14 @@ to NG.io.
 If no session ID was found, you will need to start one.
 
 ```haxe
-if (NG.core.loggedIn == false)
-    NG.core.requestLogin(function():Void { trace("logged on"): });
+if (NG.core.loggedIn == false) {
+    NG.core.requestLogin(
+        function(result:ResultType):Void {
+            if (result.match(Success)
+                trace("logged on");
+        }
+    );
+}
 ```
 
 ### Encryption
@@ -116,7 +122,7 @@ much like how `NG.core.requestLogin()` stores the resulting sessionId for future
 data is maintained from NG.core methods, but not direct `NG.core.calls` 
 
 ### Medals 
-Use `NG.core.requestMedals()` to populate `NG.core.medals`, once Medal objects are created 
+Use `NG.core.medals.loadList()` to populate `NG.core.medals`, once Medal objects are created 
 you can interface with them directly. For instance: 
 ```haxe
 var medal =  NG.core.medals.get(id);
@@ -130,20 +136,17 @@ if (!medal.unlocked) {
 ```
 
 ### ScoreBoards
-Just like Medals `NG.core.scoreBoards` is auto populated from `NG.core.requestScoreBoards` 
+Just like Medals `NG.core.scoreBoards` is populated from `NG.core.scoreBoards.loadList()` 
 which allows you make postScore and getScores calls directly on the board.
 
-**Note:** ScoreBoard instances persist across multiple requestScoreBoards calls, but a ScoreBoard's score instances do not
+**Note:** ScoreBoard instances persist across multiple scoreBoards.loadList calls, but a ScoreBoard's score instances do not
 
 ### CloudSaves
-Similarly to medals and scoreboards CloudSaves have `NG.core.saveSlots` which is populated by `NG.core.requestSaveSlots`.  
+Similarly to medals and scoreboards CloudSaves have `NG.core.saveSlots` which is populated by `NG.core.saveSlots.loadList`.
 On top of the normal [SaveSlot properties](http://www.newgrounds.io/help/objects/#SaveSlot), each saveSlot will have a
 readonly `contents` field that is null until you call `load` on that SaveSlot instance (`load()` will throw an error
 if there is no save in that slot, check this using `isEmpty()`). You can also call `save(mySaveContents)` or `clear()` on
 SaveSlots.
-
-**Note:** `NG.core.requestSaveSlots` has an optional `loadFiles` arg that will load all the SaveSlot's contents as well
-as the slot info. Additionally, you can call `NG.core.saveSlots.loadList` instead of `NG.core.requestSaveSlots`.
 
 ## Calling Components and Handling Results
 You can talk to the NG.io server directly, but NG.core won't automatically handle 
@@ -222,17 +225,17 @@ All calls can be queued so that they are sent sequentially rather than sending t
 
 ```haxe
 NG.core.session = "session id here";
-NG.core.app.checkSession().queue();
-NG.core.medal.unlock(id).queue();
-
+NG.core.calls.app.checkSession().queue();
+NG.core.calls.medal.unlock(id).queue();
 ```
 
 ## TODO
  - ~~AES-128 encryption~~
  - ~~Hex encoding~~
- - Enable AES-128 and Hex in the GUI test project
- - Pretty up the GUI test project in general
- - Replace successCallbacks and failCallbacks with resultCallbacks (2.0.0)
+ - ~~Enable AES-128 and Hex in the GUI test project~~
+ - ~~Pretty up the GUI test project in general~~
+ - ~~Replace successCallbacks and failCallbacks with resultCallbacks (2.0.0)~~
+ - Explain OutcomeTools in readme
  - kill all humans
  - flash API assets
      - ad viewer - not supported in ng.io v3

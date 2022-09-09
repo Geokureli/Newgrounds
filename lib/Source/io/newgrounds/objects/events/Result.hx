@@ -6,6 +6,8 @@ import io.newgrounds.objects.ScoreBoard.RawScoreBoardData;
 import io.newgrounds.objects.SaveSlot.RawSaveSlot;
 import io.newgrounds.objects.User;
 
+using DateTools;
+
 @:noCompletion
 typedef RawResult<T:ResultBase> = {
 	
@@ -101,18 +103,38 @@ abstract LogEventResult(RawLogEventResult) from RawLogEventResult to ResultBase 
 
 @:noCompletion
 typedef RawGetDateTimeResult = ResultBase
-	& { datetime:String }
+	& { datetime:String, timestamp:Int }
 @:forward
 abstract GetDateTimeResult(RawGetDateTimeResult) from RawGetDateTimeResult to ResultBase {
 	
+	/** The current UNIX timestamp on the server. */
+	public var timestamp(get, never):Int;
+	inline function get_timestamp() return this.timestamp;
+	
 	/** Hidden, use dateTime instead (capital T). */
-	public var datetime(get, never):String;
+	var datetime(get, never):String;
 	@:deprecated("datetime is deprecated, use dateTime (captial T)")
 	inline function get_datetime() return this.datetime;
 	
 	/** The server's date and time in ISO 8601 format. */
 	public var dateTime(get, never):String;
 	inline function get_dateTime() return this.datetime;
+	
+	/** Creates a local Date using the UNIX timestamp. */
+	inline public function getDate():Date return Date.fromTime(timestamp * 1000);
+	
+	/** Creates a local Date using the UNIX timestamp. */
+	public function getServerDate() {
+		
+		var date = Date.fromTime(timestamp * 1000);
+		
+		final splitIso = dateTime.substr(-6).split(":");
+		var serverTimeZone = Std.parseInt(splitIso[0]) * 60;
+		serverTimeZone += (serverTimeZone < 0 ? -1 : 1) * Std.parseInt(splitIso[1]);
+		final localTimeZone = date.getTimezoneOffset();
+		
+		return date.delta(localTimeZone + serverTimeZone * 60 * 1000);
+	}
 }
 
 typedef GetVersionResult = ResultBase & {
@@ -171,7 +193,7 @@ abstract MedalUnlockResult(RawMedalUnlockResult) from RawMedalUnlockResult to Re
 	inline function get_medal_score() return this.medal_score;
 }
 
-typedef ScoreBoardResult = ResultBase & {
+typedef GetBoardsResult = ResultBase & {
 	
 	/** An array of ScoreBoard objects. */
 	var scoreboards(default, null):Array<RawScoreBoardData>;

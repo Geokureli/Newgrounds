@@ -3,7 +3,7 @@ package io.newgrounds.components;
 import io.newgrounds.objects.User;
 import io.newgrounds.objects.events.Response;
 import io.newgrounds.objects.events.Result;
-import io.newgrounds.objects.events.Result.ScoreBoardResult;
+import io.newgrounds.objects.events.Result.GetBoardsResult;
 import io.newgrounds.objects.events.Result.GetScoresResult;
 import io.newgrounds.NGLite;
 
@@ -20,9 +20,9 @@ class ScoreBoardComponent extends Component {
 	/**
 	 * Fetches a list of available scoreboards.
 	 */
-	public function getBoards():Call<ScoreBoardResult> {
+	public function getBoards():Call<GetBoardsResult> {
 		
-		return new Call<ScoreBoardResult>(_core, "ScoreBoard.getBoards");
+		return new Call<GetBoardsResult>(_core, "ScoreBoard.getBoards");
 	}
 	
 	// -------------------------------------------------------------------------------------------

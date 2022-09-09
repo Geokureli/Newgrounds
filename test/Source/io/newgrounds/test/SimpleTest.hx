@@ -1,8 +1,9 @@
 package io.newgrounds.test;
 
 import io.newgrounds.NG;
+import io.newgrounds.objects.Error;
 import io.newgrounds.objects.SaveSlot;
-import io.newgrounds.objects.events.ResultType;
+import io.newgrounds.objects.events.Outcome;
 
 class SimpleTest {
 	
@@ -35,7 +36,7 @@ class SimpleTest {
 			/* They are NOT playing on newgrounds.com, no session id was found. We must start one manually, if we want to.
 			 * Note: This will cause a new browser window to pop up where they can log in to newgrounds
 			 */
-			NG.core.requestLogin(onNGLogin);
+			NG.core.requestLogin((r)->{ if (r.match(SUCCESS)) onNGLogin(); } );
 		}
 	}
 	
@@ -44,10 +45,10 @@ class SimpleTest {
 		trace ('logged in! user:${NG.core.user.name}');
 		
 		// Load medals then call onNGMedalFetch()
-		NG.core.requestMedals(onNGMedalFetch);
+		NG.core.medals.loadList(onNGMedalFetch);
 		
 		// Load Scoreboards then call onNGBoardsFetch()
-		NG.core.requestScoreBoards(onNGBoardsFetch);
+		NG.core.scoreBoards.loadList(onNGBoardsFetch);
 		
 		// Load SaveSlots then call onNGSlotsFetch()
 		// NG.core.requestSaveSlots(true, onNGSlotsFetch);
@@ -55,32 +56,39 @@ class SimpleTest {
 	}
 	
 	// --- MEDALS
-	function onNGMedalFetch() {
+	function onNGMedalFetch(outcome:Outcome<Error>) {
+		
+		switch (outcome) {
+			case FAIL(error): throw 'Error loading medals: $error';
+			case SUCCESS:
+		}
 		
 		// Reading medal info
 		for (id in NG.core.medals.keys()) {
 			
-			var medal = NG.core.medals.get(id);
+			var medal = NG.core.medals[id];
 			trace('loaded medal id:$id, name:${medal.name}, description:${medal.description}');
 		}
 		
 		// Unlocking medals
-		var unlockingMedal = NG.core.medals.get(54001);// medal ids are listed in your NG project viewer 
+		var unlockingMedal = NG.core.medals[54001];// medal ids are listed in your NG project viewer 
 		if (!unlockingMedal.unlocked)
 			unlockingMedal.sendUnlock();
 	}
 	
 	// --- SCOREBOARDS
-	function onNGBoardsFetch() {
+	function onNGBoardsFetch(outcome:Outcome<Error>) {
+		
+		outcome.assert('Error loading score boards:');
 		
 		// Reading medal info
 		for (id in NG.core.scoreBoards.keys()) {
 			
-			var board = NG.core.scoreBoards.get(id);
+			var board = NG.core.scoreBoards[id];
 			trace('loaded scoreboard id:$id, name:${board.name}');
 		}
 		
-		var board = NG.core.scoreBoards.get(7971);// ID found in NG project view
+		var board = NG.core.scoreBoards[7971];// ID found in NG project view
 		
 		// Posting a score thats OVER 9000!
 		board.postScore(9001);
@@ -95,20 +103,13 @@ class SimpleTest {
 	
 	function onNGScoresFetch() {
 		
-		for (score in NG.core.scoreBoards.get(7971).scores)
+		for (score in NG.core.scoreBoards[7971].scores)
 			trace('score loaded user:${score.user.name}, score:${score.formattedValue}');
 	}
 	
-	function onNGSlotsFetch(result:ResultType) {
+	function onNGSlotsFetch(outcome:Outcome<String>) {
 		
-		switch (result) {
-			
-			case Error(e):
-				trace('Error getting saveSlots: $e');
-				return;
-			
-			case Success:
-		}
+		outcome.assert('Error getting saveSlots:');
 		
 		for (k=>slot in NG.core.saveSlots)
 			trace('[$k]=>{url:${slot.url}, time:${slot.datetime}, size:${slot.size}}');
@@ -172,8 +173,8 @@ class SimpleTest {
 		slot.save(value, (r)->{
 			switch(r) {
 				
-				case Success: trace('data saved: "$value"');
-				case Error(e): trace('Error saving data: "$e"');
+				case SUCCESS: trace('data saved: "$value"');
+				case FAIL(e): trace('Error saving data: "$e"');
 			}
 			callback(slot);
 		});
@@ -184,8 +185,8 @@ class SimpleTest {
 		trace('Clearing slot[${slot.id}]: "${slot.contents}"');
 		slot.clear((r)->{
 			switch(r) {
-				case Success: trace('data cleared');
-				case Error(e): trace('Error clearing data: $e');
+				case SUCCESS: trace('data cleared');
+				case FAIL(e): trace('Error clearing data: $e');
 			}
 			callback(slot);
 		});

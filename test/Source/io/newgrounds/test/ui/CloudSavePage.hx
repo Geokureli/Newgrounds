@@ -4,12 +4,13 @@ import openfl.display.MovieClip;
 import openfl.text.TextField;
 
 import io.newgrounds.components.CloudSaveComponent;
+import io.newgrounds.objects.Error;
 
 #if ng_lite
 	import io.newgrounds.objects.events.Response;
 	import io.newgrounds.objects.events.Result.LoadSlotsResult;
 #else
-	import io.newgrounds.objects.events.ResultType;
+	import io.newgrounds.objects.events.Outcome;
 	import io.newgrounds.objects.SaveSlot;
 #end
 
@@ -59,12 +60,12 @@ class CloudSavePage extends Page<CloudSaveComponent> {
 					if (NG.core.saveSlots.state != Loaded)
 						setMessage("Loading...");
 					
-					NG.core.saveSlots.loadList(false, onSlotsReceived);
+					NG.core.saveSlots.loadList(onSlotsReceived);
 				});
 				
 			default:
 				
-				NG.core.saveSlots.loadList(false, onSlotsReceived);
+				NG.core.saveSlots.loadList(onSlotsReceived);
 				setMessage("Loading...");
 				
 		}
@@ -76,16 +77,16 @@ class CloudSavePage extends Page<CloudSaveComponent> {
 		
 	}
 	#else
-	function onSlotsReceived(result:ResultType):Void {
+	function onSlotsReceived(outcome:Outcome<Error>):Void {
 		
-		switch(result) {
+		switch(outcome) {
 			
-			case Error(msg):
+			case FAIL(msg):
 				
 				setMessage("Error loading save slots: " + msg);
 				return;
 				
-			case Success:
+			case SUCCESS:
 		}
 		
 		setMessage(null);

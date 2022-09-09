@@ -1,11 +1,17 @@
 package io.newgrounds.test.ui;
 
-import openfl.display.Bitmap;
-import io.newgrounds.objects.SaveSlot;
-import io.newgrounds.test.swf.ScoreBrowserSlim;
 import haxe.ds.IntMap;
 
 import flash.Lib;
+
+import io.newgrounds.NGLite;
+import io.newgrounds.components.Component;
+import io.newgrounds.objects.Error;
+import io.newgrounds.objects.Medal;
+import io.newgrounds.objects.ScoreBoard;
+import io.newgrounds.objects.SaveSlot;
+import io.newgrounds.objects.events.Outcome;
+import io.newgrounds.swf.common.Button;
 
 import io.newgrounds.test.art.ScoreBoardListSwf;
 import io.newgrounds.test.art.ScoreBoardSwf;
@@ -13,15 +19,11 @@ import io.newgrounds.test.art.ProfileSwf;
 import io.newgrounds.test.art.MedalListSwf;
 import io.newgrounds.test.art.CorePageSwf;
 import io.newgrounds.test.art.MedalSwf;
+import io.newgrounds.test.swf.ScoreBrowserSlim;
 
-import io.newgrounds.swf.common.Button;
-import io.newgrounds.objects.Error;
-import io.newgrounds.objects.Medal;
-import io.newgrounds.objects.ScoreBoard;
-import io.newgrounds.components.Component;
-
-import openfl.display.MovieClip;
+import openfl.display.Bitmap;
 import openfl.display.Loader;
+import openfl.display.MovieClip;
 import openfl.events.IOErrorEvent;
 import openfl.geom.Point;
 import openfl.net.URLRequest;
@@ -43,7 +45,6 @@ class CorePage extends CorePageLite {
 		
 		initLogInOut();
 		initMedals();
-		initBoards();
 		initSlots();
 	}
 	
@@ -69,26 +70,22 @@ class CorePage extends CorePageLite {
 			onLogin();
 	}
 	
-	function onLoginFail(error:Error):Void {
+	function onLoginPendingPassport(url:String):Void {
 		
-		onLoginCancel();
-	}
-	
-	function onLoginPendingPassport():Void {
-		
-		_passportLink.text = NG.core.passportUrl;
+		_passportLink.text = url;
 		_openPassport.enabled = true;
 		_openPassport.onClick = NG.core.openPassportUrl;
 	}
 	
 	function onLoginClick():Void {
 		
-		NG.core.requestLogin
-			( null
-			, onLoginPendingPassport
-			, onLoginFail
-			, onLoginCancel
-			);
+		function callback(outcome:LoginOutcome) {
+			
+			if (outcome.match(FAIL(_)))
+				onLoginFail();
+		}
+		
+		NG.core.requestLogin(callback, onLoginPendingPassport);
 		
 		_loginLabel.text = "CANCEL";
 		_login.onClick = onCancelClick;
@@ -101,7 +98,7 @@ class CorePage extends CorePageLite {
 		_login.enabled = false;
 	}
 	
-	function onLoginCancel():Void {
+	function onLoginFail():Void {
 		
 		_login.enabled = true;
 		_login.onClick = onLoginClick;
@@ -169,7 +166,7 @@ class CorePage extends CorePageLite {
 		
 		_loadMedals.onClick = loadMedals;
 		hideMedalInfo();
-		NG.core.onMedalsLoaded.add(onMedalsLoaded);
+		NG.core.medals.onLoad.add(onMedalsLoaded);
 	}
 	
 	function loadMedals():Void {
@@ -261,32 +258,6 @@ class CorePage extends CorePageLite {
 		_medalList.info.text = NG.core.loggedIn ? MEDAL_INFO_LOGGED_IN : MEDAL_INFO_LOGGED_OUT;
 	}
 	
-	// -------------------------------------------------------------------------------------------
-	//                                       SCOREBOARDS
-	// -------------------------------------------------------------------------------------------
-	
-	var _boardPages:IntMap<Int>;
-	
-	inline function initBoards():Void {
-		
-		// _loadBoards.onClick = loadBoards;
-		// NG.core.onScoreBoardsLoaded.add(onBoardsLoaded);
-	}
-	
-	function loadBoards():Void {
-		
-		NG.core.requestScoreBoards();
-	}
-	
-	function getScores(board:ScoreBoard = null):Void {
-		
-		var page:Int = _boardPages.get(board.id);
-		if (page == -1)
-			page = 0;
-		
-		_scoreBrowser.boardId = board.id;
-		_scoreBrowser.page = page;
-	}
 	
 	// -------------------------------------------------------------------------------------------
 	//                                       Cloud Saves
@@ -294,7 +265,7 @@ class CorePage extends CorePageLite {
 	
 	inline function initSlots() {
 		
-		NG.core.onSaveSlotsLoaded.add(_slotsList.onSlotsLoaded);
+		NG.core.saveSlots.onLoad.add(_slotsList.onSlotsLoaded);
 	}
 	
 }
@@ -346,9 +317,7 @@ class CorePageLite extends Page<Component> {
 		_medalList = cast target.medalList;
 		_medalList.visible = false;
 		
-		// _loadBoards = new Button(target.loadBoards);
 		_scoreBoardList = cast target.scoreBoardList;
-		// _scoreBoardList.visible = false;
 		_scoreBrowser = cast _scoreBoardList.scoreBrowser;
 		
 		_slotsList = new SlotsList(target.slotList);
