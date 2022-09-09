@@ -235,6 +235,7 @@ NG.core.calls.medal.unlock(id).queue();
  - ~~Enable AES-128 and Hex in the GUI test project~~
  - ~~Pretty up the GUI test project in general~~
  - ~~Replace successCallbacks and failCallbacks with resultCallbacks (2.0.0)~~
+ - Explain OutcomeTools in readme
  - kill all humans
  - flash API assets
      - ad viewer - not supported in ng.io v3
