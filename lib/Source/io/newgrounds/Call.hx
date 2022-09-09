@@ -5,6 +5,7 @@ import io.newgrounds.utils.AsyncHttp;
 import io.newgrounds.objects.Error;
 import io.newgrounds.objects.events.Result;
 import io.newgrounds.objects.events.Response;
+import io.newgrounds.objects.events.Outcome;
 
 import haxe.ds.StringMap;
 import haxe.Json;
@@ -35,7 +36,7 @@ class Call<T:BaseData>
 	var _successHandlers:Dispatcher;
 	var _httpErrorHandlers:TypedDispatcher<Error>;
 	var _statusHandlers:TypedDispatcher<Int>;
-	// TODO: var _outcomeHandlers:TypedDispatcher<TypedOutcome<T, Error>>;
+	var _outcomeHandlers:TypedDispatcher<TypedOutcome<T, Error>>;
 	
 	public function new (core:NGLite, component:String, requireSession:Bool = false, isSecure:Bool = false) {
 		
@@ -109,7 +110,17 @@ class Call<T:BaseData>
 		_statusHandlers.add(handler);
 		return this;
 	}
-
+	
+	/** Handy callback setter for chained call modifiers. Called when ng.io does not reply for any reason */
+	public function addOutcomeHandler(handler:(TypedOutcome<T, Error>)->Void):Call<T> {
+		
+		if (_httpErrorHandlers == null)
+			_outcomeHandlers = new TypedDispatcher<TypedOutcome<T, Error>>();
+		
+		_outcomeHandlers.add(handler);
+		return this;
+	}
+	
 	/** 
 	 * Sends the call to the server, do not modify this object after calling this
 	 * @param secure    If encryption is enabled, it will encrypt the call.
@@ -200,6 +211,14 @@ class Call<T:BaseData>
 		
 		var response = new Response<T>(_core, reply);
 		
+		if (_outcomeHandlers != null)
+		{
+			if (response.hasError())
+				_outcomeHandlers.dispatch(FAIL(response.getError()));
+			else
+				_outcomeHandlers.dispatch(SUCCESS(response.result.data));
+		}
+		
 		if (_dataHandlers != null)
 			_dataHandlers.dispatch(response);
 		
@@ -213,11 +232,13 @@ class Call<T:BaseData>
 		
 		_core.logError(message);
 		
-		if (_httpErrorHandlers == null)
-			return;
-		
 		var error = new Error(message);
-		_httpErrorHandlers.dispatch(error);
+		
+		if (_outcomeHandlers == null)
+			_outcomeHandlers.dispatch(FAIL(error));
+		
+		if (_httpErrorHandlers == null)
+			_httpErrorHandlers.dispatch(error);
 	}
 	
 	function onStatus(status:Int):Void {
@@ -239,5 +260,6 @@ class Call<T:BaseData>
 		_successHandlers = null;
 		_httpErrorHandlers = null;
 		_statusHandlers = null;
+		_outcomeHandlers = null;
 	}
 }
