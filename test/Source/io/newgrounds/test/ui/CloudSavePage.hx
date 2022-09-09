@@ -10,7 +10,7 @@ import io.newgrounds.objects.Error;
 	import io.newgrounds.objects.events.Response;
 	import io.newgrounds.objects.events.Result.LoadSlotsResult;
 #else
-	import io.newgrounds.objects.events.ResultType;
+	import io.newgrounds.objects.events.Outcome;
 	import io.newgrounds.objects.SaveSlot;
 #end
 
@@ -77,9 +77,9 @@ class CloudSavePage extends Page<CloudSaveComponent> {
 		
 	}
 	#else
-	function onSlotsReceived(result:ResultType<Error>):Void {
+	function onSlotsReceived(outcome:Outcome<Error>):Void {
 		
-		switch(result) {
+		switch(outcome) {
 			
 			case FAIL(msg):
 				

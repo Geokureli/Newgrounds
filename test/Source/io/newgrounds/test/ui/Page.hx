@@ -193,7 +193,7 @@ class ScoreboardPage extends Page<ScoreBoardComponent> {
 			.addDataHandler(onBoardsReceived)
 			.queue();
 		#else
-		NG.core.scoreBoards.onLoaded.addOnce(onBoardsReceived);
+		NG.core.scoreBoards.onLoad.addOnce(onBoardsReceived);
 		#end
 		
 		_social = new CheckBox(target.social);

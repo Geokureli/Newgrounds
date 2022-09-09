@@ -222,11 +222,16 @@ class OutcomeTools
 	 * 
 	 * @param outcome The outcome.
 	**/
-	inline static public function assert<E>(outcome:Outcome<E>)
+	inline static public function assert<E>(outcome:Outcome<E>, ?msgPrefix:String)
 	{
+		if (msgPrefix == null)
+			msgPrefix = "";
+		else
+			msgPrefix += " ";
+		
 		switch outcome
 		{
-			case FAIL(error): throw error;
+			case FAIL(error): throw msgPrefix + Std.string(error);
 			case SUCCESS: //nothing
 		}
 	}

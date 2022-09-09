@@ -149,6 +149,7 @@ class SaveSlot extends Object<RawSaveSlot>
 		{
 			parse(response.result.data.slot);
 			callback(SUCCESS);
+			onUpdate.dispatch();
 		}
 	}
 	

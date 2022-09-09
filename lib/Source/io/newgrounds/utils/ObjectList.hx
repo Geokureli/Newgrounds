@@ -11,11 +11,10 @@ class ObjectList<K, V> {
 	
 	public var state(default, null):ListState = Empty;
 	
-	// TODO: rename to onLoad
 	/**
-	 * Called after `loadList` successfully populates this list
+	 * Called after `loadList` successfully populates this list, for the first time.
 	 */
-	public var onLoaded(default, null) = new Dispatcher();
+	public var onLoad(default, null) = new Dispatcher();
 	
 	var _core:NG;
 	var _externalAppId:String;
@@ -70,15 +69,17 @@ class ObjectList<K, V> {
 	
 	function fireCallbacks(outcome:Outcome<Error>) {
 		
-		if (outcome.match(FAIL(_)))
+		var firstFire = state != Loaded;
+		
+		if (firstFire && outcome.match(FAIL(_)))
 			state = Empty;
 		else
 			state = Loaded;
 		
 		_callbacks.dispatch(outcome);
 		
-		if (outcome.match(SUCCESS))
-			onLoaded.dispatch();
+		if (firstFire && outcome.match(SUCCESS))
+			onLoad.dispatch();
 	}
 	
 	/**

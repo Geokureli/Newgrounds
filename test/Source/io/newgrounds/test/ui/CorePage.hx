@@ -10,7 +10,7 @@ import io.newgrounds.objects.Error;
 import io.newgrounds.objects.Medal;
 import io.newgrounds.objects.ScoreBoard;
 import io.newgrounds.objects.SaveSlot;
-import io.newgrounds.objects.events.ResultType;
+import io.newgrounds.objects.events.Outcome;
 import io.newgrounds.swf.common.Button;
 
 import io.newgrounds.test.art.ScoreBoardListSwf;
@@ -79,9 +79,9 @@ class CorePage extends CorePageLite {
 	
 	function onLoginClick():Void {
 		
-		function callback(result:LoginResultType) {
+		function callback(outcome:LoginOutcome) {
 			
-			if (result.match(FAIL(_)))
+			if (outcome.match(FAIL(_)))
 				onLoginFail();
 		}
 		
@@ -166,7 +166,7 @@ class CorePage extends CorePageLite {
 		
 		_loadMedals.onClick = loadMedals;
 		hideMedalInfo();
-		NG.core.medals.onLoaded.add(onMedalsLoaded);
+		NG.core.medals.onLoad.add(onMedalsLoaded);
 	}
 	
 	function loadMedals():Void {
@@ -265,7 +265,7 @@ class CorePage extends CorePageLite {
 	
 	inline function initSlots() {
 		
-		NG.core.saveSlots.onLoaded.add(_slotsList.onSlotsLoaded);
+		NG.core.saveSlots.onLoad.add(_slotsList.onSlotsLoaded);
 	}
 	
 }

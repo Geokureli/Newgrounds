@@ -143,7 +143,7 @@ class ScoreBrowser extends BaseAsset {
 				onBoardsLoaded();
 			else {
 				
-				NG.core.scoreBoards.onLoaded.addOnce(onBoardsLoaded);
+				NG.core.scoreBoards.onLoad.addOnce(onBoardsLoaded);
 				NG.core.scoreBoards.loadList();
 			}
 			#end

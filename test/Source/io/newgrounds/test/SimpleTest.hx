@@ -3,7 +3,7 @@ package io.newgrounds.test;
 import io.newgrounds.NG;
 import io.newgrounds.objects.Error;
 import io.newgrounds.objects.SaveSlot;
-import io.newgrounds.objects.events.ResultType;
+import io.newgrounds.objects.events.Outcome;
 
 class SimpleTest {
 	
@@ -56,9 +56,9 @@ class SimpleTest {
 	}
 	
 	// --- MEDALS
-	function onNGMedalFetch(result:ResultType<Error>) {
+	function onNGMedalFetch(outcome:Outcome<Error>) {
 		
-		switch (result) {
+		switch (outcome) {
 			case FAIL(error): throw 'Error loading medals: $error';
 			case SUCCESS:
 		}
@@ -77,12 +77,9 @@ class SimpleTest {
 	}
 	
 	// --- SCOREBOARDS
-	function onNGBoardsFetch(result:ResultType<Error>) {
+	function onNGBoardsFetch(outcome:Outcome<Error>) {
 		
-		switch (result) {
-			case FAIL(error): throw 'Error loading score boards: $error';
-			case SUCCESS:
-		}
+		outcome.assert('Error loading score boards:');
 		
 		// Reading medal info
 		for (id in NG.core.scoreBoards.keys()) {
@@ -110,16 +107,9 @@ class SimpleTest {
 			trace('score loaded user:${score.user.name}, score:${score.formattedValue}');
 	}
 	
-	function onNGSlotsFetch(result:ResultType<Error>) {
+	function onNGSlotsFetch(outcome:Outcome<String>) {
 		
-		switch (result) {
-			
-			case FAIL(e):
-				throw 'Error getting saveSlots: $e';
-				return;
-			
-			case SUCCESS:
-		}
+		outcome.assert('Error getting saveSlots:');
 		
 		for (k=>slot in NG.core.saveSlots)
 			trace('[$k]=>{url:${slot.url}, time:${slot.datetime}, size:${slot.size}}');

@@ -70,15 +70,15 @@ class NG extends NGLite {
 	
 	@:deprecated("Use medals.onLoad")
 	public var onMedalsLoaded(get, never):Dispatcher;
-	inline function get_onMedalsLoaded()  return medals.onLoaded;
+	inline function get_onMedalsLoaded()  return medals.onLoad;
 	
 	@:deprecated("Use scoreBoards.onLoad")
 	public var onScoreBoardsLoaded(get, never):Dispatcher;
-	inline function get_onScoreBoardsLoaded()  return scoreBoards.onLoaded;
+	inline function get_onScoreBoardsLoaded()  return scoreBoards.onLoad;
 	
 	@:deprecated("Use saveSlots.onLoad")
 	public var onSaveSlotsLoaded(get, never):Dispatcher;
-	inline function get_onSaveSlotsLoaded()  return saveSlots.onLoaded;
+	inline function get_onSaveSlotsLoaded()  return saveSlots.onLoad;
 	
 	// --- MISC
 	
