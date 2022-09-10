@@ -1,5 +1,6 @@
 package io.newgrounds.objects;
 
+import io.newgrounds.Call;
 import io.newgrounds.utils.AsyncHttp;
 import io.newgrounds.objects.events.Result;
 import io.newgrounds.objects.events.Outcome;
@@ -71,7 +72,7 @@ class SaveSlot extends Object<RawSaveSlot>
 	 * 
 	 * @throws Exception if data is null
 	 */
-	public function save(data:String, ?callback:(Outcome<Error>)->Void) {
+	public function save(data:String, ?callback:(Outcome<CallError>)->Void) {
 		
 		if (data == null)
 			throw "cannot save null to a SaveSlot";
@@ -79,12 +80,8 @@ class SaveSlot extends Object<RawSaveSlot>
 		if (_externalAppId != null)
 			throw "cannot save to an external app";
 		
-		if (callback == null)
-			callback = (_)->{};
-		
 		_core.calls.cloudSave.setData(data, id)
-			.addDataHandler((response)->setContentsOnSlotFetch(response, data, callback))
-			.addErrorHandler((error)->callback(FAIL(error)))
+			.addOutcomeHandler(setContentsOnSlotFetch.bind(_, data, callback))
 			.send();
 	}
 	
@@ -94,34 +91,32 @@ class SaveSlot extends Object<RawSaveSlot>
 	 * @param callback  Called when the data is cleared.
 	 *                  Tells whether the server call was successful.
 	 */
-	public function clear(?callback:(Outcome<Error>)->Void) {
+	public function clear(?callback:(Outcome<CallError>)->Void) {
 		
 		if (_externalAppId != null)
 			throw "cannot clear an external app's save slot";
 		
-		if (callback == null)
-			callback = (_)->{};
-		
 		_core.calls.cloudSave.clearSlot(id)
-			.addDataHandler((response)->setContentsOnSlotFetch(response, null, callback))
-			.addErrorHandler((error)->callback(FAIL(error)))
+			.addOutcomeHandler((outcome)->setContentsOnSlotFetch(outcome, null, callback))
 			.send();
 	}
 	
 	function setContentsOnSlotFetch
-	( response:Response<SaveSlotData>
+	( outcome:CallOutcome<SaveSlotData>
 	, contents:Null<String>
-	, ?callback:(Outcome<Error>)->Void
+	, ?callback:(Outcome<CallError>)->Void
 	) {
-		if (response.hasError()) {
-			
-			callback(FAIL(response.getError()));
-			return;
-		}
 		
-		this.contents = contents;
-		parse(response.result.data.slot);
-		callback(SUCCESS);
+		switch (outcome) {
+			
+			case FAIL(error): callback.safe(FAIL(error));
+			case SUCCESS(data):
+				
+				this.contents = contents;
+				parse(data.slot);
+				callback.safe(SUCCESS);
+				onUpdate.dispatch();
+		}
 	}
 	
 	/**
@@ -130,26 +125,26 @@ class SaveSlot extends Object<RawSaveSlot>
 	 * @param callback  Called when the save file is loaded.
 	 *                  Returns the contents, is successful, otherwise returns an error.
 	 */
-	public function update(?callback:(Outcome<Error>)->Void) {
+	public function update(?callback:(Outcome<CallError>)->Void) {
 		
 		_core.calls.cloudSave.loadSlot(id, _externalAppId)
-			.addDataHandler((response)->onUpdateFetch(response, callback))
-			.addErrorHandler((error)->callback(FAIL(error)))
+			.addOutcomeHandler(onUpdateFetch.bind(_, callback))
 			.send();
 	}
 	
 	function onUpdateFetch
-	( response:Response<SaveSlotData>
-	, ?callback:(Outcome<Error>)->Void
+	( outcome:CallOutcome<SaveSlotData>
+	, ?callback:(Outcome<CallError>)->Void
 	) {
 		
-		if (response.hasError())
-			callback(FAIL(response.getError()));
-		else
-		{
-			parse(response.result.data.slot);
-			callback(SUCCESS);
-			onUpdate.dispatch();
+		switch (outcome) { 
+			
+			case FAIL(error): callback.safe(FAIL(error));
+			case SUCCESS(data):
+				
+				parse(data.slot);
+				callback.safe(SUCCESS);
+				onUpdate.dispatch();
 		}
 	}
 	
@@ -168,10 +163,10 @@ class SaveSlot extends Object<RawSaveSlot>
 			(s)->
 			{
 				contents = s;
-				callback(SUCCESS(contents));
+				callback.safe(SUCCESS(contents));
 				onUpdate.dispatch();
 			},
-			(error)->callback(FAIL(error))
+			(error)->callback.safe(FAIL(HTTP(error)))
 		);
 	}
 	
@@ -196,4 +191,4 @@ class SaveSlot extends Object<RawSaveSlot>
 	}
 }
 
-typedef SaveSlotOutcome = TypedOutcome<Null<String>, String>;
+typedef SaveSlotOutcome = TypedOutcome<Null<String>, CallError>;

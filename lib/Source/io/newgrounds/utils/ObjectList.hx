@@ -1,5 +1,6 @@
 package io.newgrounds.utils;
 
+import io.newgrounds.Call;
 import io.newgrounds.objects.Error;
 import io.newgrounds.objects.SaveSlot;
 import io.newgrounds.objects.events.Response;
@@ -20,7 +21,7 @@ class ObjectList<K, V> {
 	var _externalAppId:String;
 	var _map:Map<K, V>;
 	
-	var _callbacks = new TypedDispatcher<Outcome<Error>>();
+	var _callbacks = new TypedDispatcher<Outcome<CallError>>();
 	
 	public function new (core:NG, externalAppId:String = null) {
 		
@@ -30,7 +31,7 @@ class ObjectList<K, V> {
 	
 	inline public function get(id:K):V return _map.get(id);
 	
-	function checkState(callback:Null<(Outcome<Error>)->Void>, allowReload = true):Bool
+	function checkState(callback:Null<(Outcome<CallError>)->Void>, allowReload = true):Bool
 	{
 		inline function addCallback()
 		{
@@ -48,8 +49,7 @@ class ObjectList<K, V> {
 					return true;
 				}
 				
-				if (callback != null)
-					callback(SUCCESS);
+				callback.safe(SUCCESS);
 				
 				return false;
 			}
@@ -67,7 +67,7 @@ class ObjectList<K, V> {
 		}
 	}
 	
-	function fireCallbacks(outcome:Outcome<Error>) {
+	function fireCallbacks(outcome:Outcome<CallError>) {
 		
 		var firstFire = state != Loaded;
 		

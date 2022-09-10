@@ -1,6 +1,8 @@
 package io.newgrounds.objects;
 
-import io.newgrounds.components.ScoreBoardComponent.Period;
+import io.newgrounds.Call;
+import io.newgrounds.components.ScoreBoardComponent;
+import io.newgrounds.objects.events.Outcome;
 import io.newgrounds.objects.events.Response;
 import io.newgrounds.objects.events.Result;
 import io.newgrounds.NGLite;
@@ -38,34 +40,35 @@ class ScoreBoard extends Object<RawScoreBoardData> {
 	, social:Bool    = false
 	, tag   :String  = null
 	, user  :Dynamic = null
-	):Void {
+	, ?callback:(Outcome<CallError>)->Void
+	) {
 		
 		_core.calls.scoreBoard.getScores(id, limit, skip, period, social, tag, user)
-			.addDataHandler(onScoresReceived)
+			.addOutcomeHandler(onScoresReceived.bind(_, callback))
 			.send();
 	}
 	
-	function onScoresReceived(response:Response<GetScoresData>):Void {
+	function onScoresReceived(outcome:CallOutcome<GetScoresData>, callback:Null<(Outcome<CallError>)->Void>):Void {
 		
-		if (!response.success || !response.result.success)
-			return;
-		
-		scores = response.result.data.scores;
-		_core.logVerbose('received ${scores.length} scores');
-		
-		onUpdate.dispatch();
+		switch(outcome) { 
+			
+			case FAIL(error): callback.safe(FAIL(error));
+			case SUCCESS(data):
+				
+				scores = data.scores;
+				_core.logVerbose('received ${scores.length} scores');
+				
+				
+				callback.safe(SUCCESS);
+				
+				onUpdate.dispatch();
+		}
 	}
 	
 	public function postScore(value :Int, tag:String = null):Void {
 		
 		_core.calls.scoreBoard.postScore(id, value, tag)
-			.addDataHandler(onScorePosted)
 			.send();
-	}
-	
-	function onScorePosted(response:Response<PostScoreData>):Void {
-		
-		
 	}
 	
 	public function toString():String {

@@ -1,5 +1,6 @@
 package io.newgrounds.utils;
 
+import io.newgrounds.Call;
 import io.newgrounds.objects.Error;
 import io.newgrounds.objects.SaveSlot;
 import io.newgrounds.objects.events.Response;
@@ -51,7 +52,7 @@ private class RawSaveSlotList extends ObjectList<Int, SaveSlot> {
 	 * 
 	 * @param callback   Whether the request was successful, or an error message.
 	 */
-	public function loadList(?callback:(Outcome<Error>)->Void) {
+	public function loadList(?callback:(Outcome<CallError>)->Void) {
 		
 		if (_core.loggedIn == false)
 			throw "Must be logged in to request cloud saves";
@@ -60,52 +61,51 @@ private class RawSaveSlotList extends ObjectList<Int, SaveSlot> {
 			return;
 		
 		_core.calls.cloudSave.loadSlots(_externalAppId)
-			.addDataHandler((response)->onSaveSlotsReceived(response))
-			.addErrorHandler((error)->fireCallbacks(FAIL(error)))
+			.addOutcomeHandler(onSaveSlotsReceived)
 			.send();
 	}
 	
-	function onSaveSlotsReceived(response:Response<LoadSlotsData>) {
+	function onSaveSlotsReceived(outcome:CallOutcome<LoadSlotsData>) {
 		
-		if (response.hasError()) {
+		switch(outcome) {
 			
-			fireCallbacks(FAIL(response.getError()));
-			return;
-		}
-		
-		var idList:Array<Int> = new Array<Int>();
-		
-		if (_map == null) {
-			
-			_map = new Map();
-			_ordered = [];
-		}
-		
-		for (slotData in response.result.data.slots) {
-			
-			var id = slotData.id;
-			if (_map.exists(id) == false) {
+			case FAIL(error): fireCallbacks(FAIL(error));
+			case SUCCESS(data):
 				
-				var slot = new SaveSlot(_core, slotData);
-				_map.set(id, slot);
-				_ordered.push(slot);
+				var idList:Array<Int> = new Array<Int>();
 				
-			} else
-				_map[id].parse(slotData);
-			
-			idList.push(id);
+				if (_map == null) {
+					
+					_map = new Map();
+					_ordered = [];
+				}
+				
+				for (slotData in data.slots) {
+					
+					var id = slotData.id;
+					if (_map.exists(id) == false) {
+						
+						var slot = new SaveSlot(_core, slotData);
+						_map.set(id, slot);
+						_ordered.push(slot);
+						
+					} else
+						_map[id].parse(slotData);
+					
+					idList.push(id);
+				}
+				
+				_core.logVerbose('${idList.length} SaveSlots received [${idList.join(", ")}]');
+				
+				fireCallbacks(SUCCESS);
 		}
-		
-		_core.logVerbose('${idList.length} SaveSlots received [${idList.join(", ")}]');
-		
-		fireCallbacks(SUCCESS);
 	}
 	
 	/**
 	 * Loads the save file of every available slot.  If any slot info hasn't been loaded yet,
 	 * it will load that first.
 	**/
-	public function loadAllFiles(callback:(Outcome<String>)->Void) {
+	public function loadAllFiles(?callback:(Outcome<CallError>)->Void) {
 		
 		if (_map == null) {
 			
@@ -115,14 +115,14 @@ private class RawSaveSlotList extends ObjectList<Int, SaveSlot> {
 				switch (outcome) {
 					
 					case SUCCESS    : loadAllFiles(callback);
-					case FAIL(error): callback(FAIL(error.toString()));
+					case FAIL(error): callback.safe(FAIL(error));
 				}
 			});
 			return;
 		}
 		
 		var slotsToLoad = 0;
-		var outcome:Outcome<String> = SUCCESS;
+		var outcome:Outcome<CallError> = SUCCESS;
 		function onSlotLoad(slotOutcome:SaveSlotOutcome) {
 			
 			// If this is the first error, store it
@@ -139,7 +139,7 @@ private class RawSaveSlotList extends ObjectList<Int, SaveSlot> {
 			// count the completed slots, call the callback when we're done
 			slotsToLoad--;
 			if (slotsToLoad == 0)
-				callback(outcome);
+				callback.safe(outcome);
 		}
 		
 		/**
@@ -154,7 +154,7 @@ private class RawSaveSlotList extends ObjectList<Int, SaveSlot> {
 		
 		if (slotsToLoad == 0)
 		{
-			callback(SUCCESS);
+			callback.safe(SUCCESS);
 			return;
 		}
 		

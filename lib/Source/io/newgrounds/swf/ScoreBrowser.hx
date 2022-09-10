@@ -1,7 +1,8 @@
 package io.newgrounds.swf;
 
-import openfl.events.Event;
+import io.newgrounds.Call;
 import io.newgrounds.objects.Score;
+import io.newgrounds.objects.events.Outcome;
 import io.newgrounds.objects.events.Response;
 import io.newgrounds.objects.events.Result;
 import io.newgrounds.swf.common.BaseAsset;
@@ -10,6 +11,7 @@ import io.newgrounds.swf.common.DropDown;
 import io.newgrounds.components.ScoreBoardComponent;
 
 import openfl.display.MovieClip;
+import openfl.events.Event;
 import openfl.text.TextField;
 
 class ScoreBrowser extends BaseAsset {
@@ -197,34 +199,36 @@ class ScoreBrowser extends BaseAsset {
 			
 			final skip = _limit * page;
 			NG.core.calls.scoreBoard.getScores(boardId, _limit, skip, period, social, tag)
-				.addDataHandler(onScoresReceive.bind(skip, _))
+				.addOutcomeHandler(onScoresReceive.bind(skip, _))
 				.send();
 		}
 	}
 	
-	function onScoresReceive(skip:Int, response:Response<GetScoresData>):Void {
+	function onScoresReceive(skip:Int, outcome:CallOutcome<GetScoresData>):Void {
 		
 		loadingIcon.visible = false;
 		
-		if (response.success && response.result.success) {
+		switch(outcome) {
 			
-			scoreContainer.visible = true;
-			
-			var i = _limit;
-			while(i > 0) {
-				i--;
+			case SUCCESS(data): 
 				
-				if (i < response.result.data.scores.length)
-					drawScore(i + skip + 1, response.result.data.scores[i], _scores[i]);
-				else
-					drawScore(i + skip + 1, null, _scores[i]);
-			}
-			
-		} else {
-			
-			errorIcon.visible = true;
-			errorIcon.gotoAndPlay(1);
-			reloadButton.visible = true;
+				scoreContainer.visible = true;
+				
+				var i = _limit;
+				while(i > 0) {
+					i--;
+					
+					if (i < data.scores.length)
+						drawScore(i + skip + 1, data.scores[i], _scores[i]);
+					else
+						drawScore(i + skip + 1, null, _scores[i]);
+				}
+				
+			case FAIL(error):
+				
+				errorIcon.visible = true;
+				errorIcon.gotoAndPlay(1);
+				reloadButton.visible = true;
 		}
 	}
 	

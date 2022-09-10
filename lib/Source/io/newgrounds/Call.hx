@@ -32,11 +32,11 @@ class Call<T:BaseData>
 	var _isSecure:Bool;
 	
 	// --- BASICALLY SIGNALS
-	var _dataHandlers:TypedDispatcher<Response<T>>;
+	var _responseHandlers:TypedDispatcher<Response<T>>;
 	var _successHandlers:Dispatcher;
 	var _httpErrorHandlers:TypedDispatcher<Error>;
 	var _statusHandlers:TypedDispatcher<Int>;
-	var _outcomeHandlers:TypedDispatcher<TypedOutcome<T, Error>>;
+	var _outcomeHandlers:TypedDispatcher<CallOutcome<T>>;
 	
 	public function new (core:NGLite, component:String, requireSession:Bool = false, isSecure:Bool = false) {
 		
@@ -71,13 +71,16 @@ class Call<T:BaseData>
 		return this;
 	}
 	
-	/** Handy callback setter for chained call modifiers. Called when ng.io replies successfully */
-	public function addDataHandler(handler:Response<T>->Void):Call<T> {
+	/**
+	 * Handy callback setter for chained call modifiers. Unlike `addOutcomeHandler` this returns
+	 * the entire server response, if one was successfuly received.
+	**/
+	public function addResponseHandler(handler:Response<T>->Void):Call<T> {
 		
-		if (_dataHandlers == null)
-			_dataHandlers = new TypedDispatcher<Response<T>>();
+		if (_responseHandlers == null)
+			_responseHandlers = new TypedDispatcher<Response<T>>();
 		
-		_dataHandlers.add(handler);
+		_responseHandlers.add(handler);
 		return this;
 	}
 	
@@ -111,13 +114,29 @@ class Call<T:BaseData>
 		return this;
 	}
 	
-	/** Handy callback setter for chained call modifiers. Called when ng.io does not reply for any reason */
-	public function addOutcomeHandler(handler:(TypedOutcome<T, Error>)->Void):Call<T> {
+	/**
+	 * Handy callback setter for chained call modifiers. This callback is always called with
+	 * The following Values:
+	 * - `SUCCESS(data:T)` - The server responded with no errors, `data` is `response.result.data`.
+	 * - `FAIL(HTTP(error:String))` - There was an error sending the request or receiving the result.
+	 * - `FAIL(RESPONSE(error:Error))` - There was an error understanding the call.
+	 * - `FAIL(RESULT(error:Error))` - There was an error executing the call.
+	**/
+	public function addOutcomeHandler(handler:(CallOutcome<T>)->Void):Call<T> {
 		
 		if (_httpErrorHandlers == null)
-			_outcomeHandlers = new TypedDispatcher<TypedOutcome<T, Error>>();
+			_outcomeHandlers = new TypedDispatcher<CallOutcome<T>>();
 		
 		_outcomeHandlers.add(handler);
+		return this;
+	}
+	
+	/** Handy callback setter for chained call modifiers. Called when ng.io does not reply for any reason */
+	public function safeAddOutcomeHandler(handler:Null<(CallOutcome<T>)->Void>):Call<T> {
+		
+		if (handler != null)
+			addOutcomeHandler(handler);
+		
 		return this;
 	}
 	
@@ -206,21 +225,23 @@ class Call<T:BaseData>
 		
 		_core.logVerbose('Reply - $reply');
 		
-		if (_dataHandlers == null && _successHandlers == null)
+		if (_responseHandlers == null && _successHandlers == null)
 			return;
 		
 		var response = new Response<T>(_core, reply);
 		
 		if (_outcomeHandlers != null)
 		{
-			if (response.hasError())
-				_outcomeHandlers.dispatch(FAIL(response.getError()));
+			if (response.success == false)
+				_outcomeHandlers.dispatch(FAIL(RESPONSE(response.error)));
+			else if (response.result.success == false)
+				_outcomeHandlers.dispatch(FAIL(RESULT(response.result.error)));
 			else
 				_outcomeHandlers.dispatch(SUCCESS(response.result.data));
 		}
 		
-		if (_dataHandlers != null)
-			_dataHandlers.dispatch(response);
+		if (_responseHandlers != null)
+			_responseHandlers.dispatch(response);
 		
 		if (response.success && response.result.success && _successHandlers != null)
 			_successHandlers.dispatch();
@@ -232,13 +253,11 @@ class Call<T:BaseData>
 		
 		_core.logError(message);
 		
-		var error = new Error(message);
-		
 		if (_outcomeHandlers == null)
-			_outcomeHandlers.dispatch(FAIL(error));
+			_outcomeHandlers.dispatch(FAIL(HTTP(message)));
 		
 		if (_httpErrorHandlers == null)
-			_httpErrorHandlers.dispatch(error);
+			_httpErrorHandlers.dispatch(new Error(message));
 	}
 	
 	function onStatus(status:Int):Void {
@@ -256,10 +275,38 @@ class Call<T:BaseData>
 		_properties = null;
 		_parameters = null;
 		
-		_dataHandlers = null;
+		_responseHandlers = null;
 		_successHandlers = null;
 		_httpErrorHandlers = null;
 		_statusHandlers = null;
 		_outcomeHandlers = null;
+	}
+}
+
+typedef CallOutcome<T> = TypedOutcome<T, CallError>;
+
+@:using(io.newgrounds.Call.CallErrorTools)
+enum CallError
+{
+	/** There was an error sending the request or receiving the result. */
+	HTTP(error:String);
+	
+	/** There was an error understanding the call. */
+	RESPONSE(error:Error);
+	
+	/** There was an error executing the call. */
+	RESULT(error:Error);
+}
+
+class CallErrorTools
+{
+	static public function toString(error:CallError)
+	{
+		return switch (error)
+		{
+			case HTTP(e): 'Http Error: $e';
+			case RESPONSE(e): 'Response Error: $e';
+			case RESULT(e): 'Result Error: $e';
+		}
 	}
 }

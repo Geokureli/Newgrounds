@@ -57,10 +57,14 @@ class NGLite {
 	public var encryptionHandler:String->String;
 	
 	/** 
-	 * Iniitializes the API, call before utilizing any other component
-	 * @param appId  	The unique ID of your app as found in the 'API Tools' tab of your Newgrounds.com project.
-	 * @param sessionId A unique session id used to identify the active user.
-	 * @param debug     Enables debug features and verbose responses from the server
+	 * Iniitializes the API, call before utilizing any other component.
+	 * 
+	 * @param appId      The unique ID of your app as found in the 'API Tools' tab of your
+	 *                   Newgrounds.com project.
+	 * @param sessionId  A unique session id used to identify the active user.
+	 * @param debug      Enables debug features and verbose responses from the server
+	 * @param callback   If a sessionId was given, this will be called with the outcome of that
+	 *                   login attempt.
 	**/
 	public function new
 	( appId = "test"
@@ -78,35 +82,40 @@ class NGLite {
 		if (this.sessionId != null) {
 			
 			calls.app.checkSession()
-				.addDataHandler(checkInitialSession.bind(callback))
-				.addErrorHandler(initialSessionFail.bind(callback))
+				.addOutcomeHandler(checkInitialSession.bind(callback))
 				.send();
 		}
 	}
 	
-	function checkInitialSession(callback:(LoginOutcome)->Void, response:Response<SessionData>):Void {
+	function checkInitialSession(callback:Null<(LoginOutcome)->Void>, outcome:CallOutcome<SessionData>):Void {
 		
-		if (!response.success || !response.result.success || response.result.data.session.expired) {
-			
-			initialSessionFail(callback, response.success ? response.result.error : response.error);
-		
-		} else {
-			
-			callback(SUCCESS);
+		switch(outcome)
+		{
+			case SUCCESS(_): callback.safe(SUCCESS);
+			case FAIL(error): initialSessionFail(callback, error);
 		}
 	}
 	
-	function initialSessionFail(callback:(LoginOutcome)->Void, error:Error):Void {
+	function initialSessionFail(callback:Null<(LoginOutcome)->Void>, error:CallError):Void {
 		
 		sessionId = null;
 		
-		if (callback != null)
-			callback(FAIL(ERROR(error.toString())));
+		callback.safe(FAIL(ERROR(error)));
 	}
 	
 	/**
-	 * Creates NG.core, the heart and soul of the API. This is not the only way to create an instance,
-	 * nor is NG a forced singleton, but it's the only way to set the static NG.core.
+	 * Creates NG.core, the heart and soul of the API.
+	 * 
+	 * This is not the only way to create an instance, nor is NG a forced singleton, but it's the
+	 * only way to set the static NG.core.
+	 * 
+	 * @param appId      The unique ID of your app as found in the 'API Tools' tab of your
+	 *                   Newgrounds.com project.
+	 * @param sessionId  A unique session id used to identify the active user.
+	 * @param callback   If a sessionId was given, this will be called with the outcome of that
+	 *                   login attempt.
+	 * 
+	 * @see createAndCheckSession
 	**/
 	static public function create
 	( appId            = "test"
@@ -120,18 +129,27 @@ class NGLite {
 	}
 	
 	/**
-	 * Creates NG.core, and tries to create a session. This is not the only way to create an instance,
-	 * nor is NG a forced singleton, but it's the only way to set the static NG.core.
+	 * Creates NG.core, looks in loader vars for a session (only works when playing on Newgrounds).
+	 * If a session is not found, the backup session is used.
+	 * 
+	 * This is not the only way to create an instance, nor is NG a forced singleton, but it's the
+	 * only way to set the static NG.core.
+	 * 
+	 * @param appId            The unique ID of your app as found in the 'API Tools' tab of your
+	 *                         Newgrounds.com project.
+	 * @param backupSessionId  A unique session id used to identify the active user.
+	 * @param callback         If a sessionId was given or found, this will be called with the
+	 *                         outcome of that login attempt.
 	**/
 	static public function createAndCheckSession
 	( appId = "test"
-	, backupSession:String = null
+	, backupSessionId:String = null
 	, ?callback:(LoginOutcome)->Void
 	):Void {
 		
 		var session = getSessionId();
 		if (session == null)
-			session = backupSession;
+			session = backupSessionId;
 		
 		create(appId, session, callback);
 	}
@@ -213,14 +231,11 @@ class NGLite {
 		
 		_pendingCalls.push(call);
 		
-		call.addDataHandler(function (_):Void { onCallComplete(call); });
-		call.addErrorHandler(function (_):Void { onCallComplete(call); });
-	}
-	
-	function onCallComplete(call:ICallable):Void {
-		
-		_pendingCalls.remove(call);
-		checkQueue();
+		call.addOutcomeHandler((_)->{ 
+			
+			_pendingCalls.remove(call);
+			checkQueue();
+		});
 	}
 	
 	function checkQueue():Void {
@@ -298,7 +313,7 @@ enum LoginFail
 	CANCELLED(type:LoginCancel);
 	
 	/** The login attempt failed, somewhere. */
-	ERROR(error:String);
+	ERROR(error:CallError);
 }
 
 enum LoginCancel

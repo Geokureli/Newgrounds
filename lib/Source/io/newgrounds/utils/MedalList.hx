@@ -1,5 +1,6 @@
 package io.newgrounds.utils;
 
+import io.newgrounds.Call;
 import io.newgrounds.objects.Error;
 import io.newgrounds.objects.Medal;
 import io.newgrounds.objects.events.Response;
@@ -44,49 +45,48 @@ abstract MedalList (RawMedalList) {
 @:access(io.newgrounds.objects.Medal)
 class RawMedalList extends ObjectList<Int, Medal> {
 	
-	public function loadList(?callback:(Outcome<Error>)->Void) {
+	public function loadList(?callback:(Outcome<CallError>)->Void) {
 		
 		if (checkState(callback) == false)
 			return;
 		
 		_core.calls.medal.getList(_externalAppId)
-			.addDataHandler((response)->onMedalsReceived(response))
-			.addErrorHandler((error)->fireCallbacks(FAIL(error)))
+			.addOutcomeHandler(onMedalsReceived)
 			.send();
 	}
 	
-	function onMedalsReceived(response:Response<MedalListData>) {
+	function onMedalsReceived(outcome:CallOutcome<MedalListData>) {
 		
-		if (response.hasError()) {
+		switch(outcome) {
 			
-			fireCallbacks(FAIL(response.getError()));
-			return;
-		}
-		
-		var idList:Array<Int> = new Array<Int>();
-		
-		if (_map == null) {
-			
-			_map = new Map();
-			
-			for (medalData in response.result.data.medals) {
+			case FAIL(error): fireCallbacks(FAIL(error));
+			case SUCCESS(data):
 				
-				var medal = new Medal(_core, medalData);
-				_map.set(medal.id, medal);
-				idList.push(medal.id);
-			}
-		} else {
-			
-			for (medalData in response.result.data.medals) {
+				var idList:Array<Int> = new Array<Int>();
 				
-				_map.get(medalData.id).parse(medalData);
-				idList.push(medalData.id);
-			}
+				if (_map == null) {
+					
+					_map = new Map();
+					
+					for (medalData in data.medals) {
+						
+						var medal = new Medal(_core, medalData);
+						_map.set(medal.id, medal);
+						idList.push(medal.id);
+					}
+				} else {
+					
+					for (medalData in data.medals) {
+						
+						_map.get(medalData.id).parse(medalData);
+						idList.push(medalData.id);
+					}
+				}
+				
+				_core.logVerbose('${data.medals.length} Medals received [${idList.join(", ")}]');
+				
+				fireCallbacks(SUCCESS);
 		}
-		
-		_core.logVerbose('${response.result.data.medals.length} Medals received [${idList.join(", ")}]');
-		
-		fireCallbacks(SUCCESS);
 	}
 }
 

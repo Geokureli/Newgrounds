@@ -39,8 +39,7 @@ abstract Session(RawSessionData) from RawSessionData {
 	}
 }
 
-@:enum
-abstract SessionStatus(String) {
+enum abstract SessionStatus(String) {
 	
 	var SESSION_EXPIRED = "session-expired";
 	var REQUEST_LOGIN   = "request-login";
