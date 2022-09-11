@@ -195,7 +195,7 @@ class AsyncHttp {
 		if (_timer != null)
 			return;
 		
-		_timer = new Timer(1000 / 60.0);
+		_timer = new Timer(Math.floor(1000 / 60.0));
 		_timer.run = update;
 	}
 	
