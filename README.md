@@ -55,8 +55,8 @@ If no session ID was found, you will need to start one.
 ```haxe
 if (NG.core.loggedIn == false) {
     NG.core.requestLogin(
-        function(result:ResultType):Void {
-            if (result.match(Success)
+        function(result:LoginOutcome):Void {
+            if (result.match(SUCCESS)
                 trace("logged on");
         }
     );
