@@ -234,6 +234,6 @@ class AsyncHttp {
 
 
 #if (target.threaded || neko || java || cpp)
-typedef LoaderData = { path:String, source:Thread, key:Int, args:String, logVerbose:(any:Any, ?pos:PosInfos)->Void };
+typedef LoaderData = { path:String, source:Thread, key:Int, args:String, logVerbose:(String, ?PosInfos)->Void };
 typedef ReplyData = { key:Int, ?data:String, ?error:String, ?status:Null<Int> };
 #end
