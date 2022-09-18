@@ -195,7 +195,7 @@ class AsyncHttp {
 		if (_timer != null)
 			return;
 		
-		_timer = new Timer(1000 / 60.0);
+		_timer = new Timer(Math.floor(1000 / 60.0));
 		_timer.run = update;
 	}
 	
@@ -234,6 +234,6 @@ class AsyncHttp {
 
 
 #if (target.threaded || neko || java || cpp)
-typedef LoaderData = { path:String, source:Thread, key:Int, args:String, logVerbose:(String)->Void };
+typedef LoaderData = { path:String, source:Thread, key:Int, args:String, logVerbose:(String, ?PosInfos)->Void };
 typedef ReplyData = { key:Int, ?data:String, ?error:String, ?status:Null<Int> };
 #end
