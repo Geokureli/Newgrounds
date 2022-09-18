@@ -109,15 +109,27 @@ class Call<T:ResultBase>
 		_statusHandlers.add(handler);
 		return this;
 	}
-
-	/** 
-	 * Sends the call to the server, do not modify this object after calling this
-	 * @param secure    If encryption is enabled, it will encrypt the call.
-	**/
-	public function send():Void {
+	
+	/** Sends the call to the server, do not modify this object after calling this **/
+	inline public function send() sendHelper();
+	
+	/**
+	 * Sends the call but replaces the `app_id` property with the external app id.
+	 * NOTE: This is **NOT** meant for call like `Medal.getList`, `ScoreBoard.getScores` or
+	 * `CloudSave.loadSlot`, for those use the provided `app_id` parameter. This is just a handy
+	 * helper to make calls to external apps that do not require a session id, like
+	 * `ScoreBoard.getBoards`.
+	 * 
+	 * @param   id  The id of the external app.
+	 */
+	inline public function sendExternalAppId(id:String) sendHelper(id);
+	
+	function sendHelper(?externalAppId:String):Void {
+		
+		final isExternal = externalAppId != null;
 		
 		var data:Dynamic = {};
-		data.app_id = _core.appId;
+		data.app_id = isExternal ? externalAppId : _core.appId;
 		data.call = {};
 		data.call.component  = component;
 		
@@ -127,14 +139,18 @@ class Call<T:ResultBase>
 		if (_properties == null || !_properties.exists("session_id")) {
 			// --- HAS NO SESSION ID
 			
-			if (_core.sessionId != null) {
+			if (_core.sessionId != null && isExternal == false) {
 				// --- AUTO ADD SESSION ID
 				
 				addProperty("session_id", _core.sessionId);
 				
 			} else if (_requireSession){
 				
-				_core.logError(new Error('cannot send "$component" call without a sessionId'));
+				if (isExternal)
+					_core.logError(new Error('cannot send "$component" call to an external app'));
+				else
+					_core.logError(new Error('cannot send "$component" call without a sessionId'));
+				
 				return;
 			}
 		}
@@ -156,6 +172,12 @@ class Call<T:ResultBase>
 		_core.logVerbose('Post  - ${Json.stringify(data)}');
 		
 		if (_isSecure) {
+			
+			if (isExternal) {
+				
+				_core.logError(new Error('cannot send "$component" call to an external app that requires encryption'));
+				return;
+			}
 			
 			var secureData = _core.encryptionHandler(Json.stringify(data.call));
 			data.call = {};
