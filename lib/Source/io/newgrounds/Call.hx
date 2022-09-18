@@ -111,13 +111,19 @@ class Call<T:ResultBase>
 		return this;
 	}
 
-	/** 
-	 * Sends the call to the server, do not modify this object after calling this
-	 * @param secure    If encryption is enabled, it will encrypt the call.
-	**/
+	/** Sends the call to the server, do not modify this object after calling this **/
 	inline public function send() sendHelper();
 	
-	inline public function sendExternal(appId:String) sendHelper(appId);
+	/**
+	 * Sends the call but replaces the `app_id` property with the external app id.
+	 * NOTE: This is NOT meant for call like `Medal.getList`, `ScoreBoard.getScores` or
+	 * `CloudSave.loadSlot`, for those use the provided `app_id` parameter. This is just a handy
+	 * helper to make calls to external apps that do not require a session id, like
+	 * `ScoreBoard.getBoards`.
+	 * 
+	 * @param   id  The id of the external app.
+	 */
+	inline public function sendExternalAppId(id:String) sendHelper(id);
 	
 	function sendHelper(?externalAppId:String):Void {
 		
