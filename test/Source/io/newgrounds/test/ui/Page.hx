@@ -14,7 +14,7 @@ import io.newgrounds.components.AppComponent;
 import io.newgrounds.components.Component;
 #if ng_lite
 	import io.newgrounds.objects.events.Response;
-	import io.newgrounds.objects.events.Result.ScoreBoardResult;
+	import io.newgrounds.objects.events.Result;
 #end
 
 import io.newgrounds.test.art.AppPageSwf;
@@ -229,7 +229,7 @@ class ScoreboardPage extends Page<ScoreBoardComponent> {
 	}
 	
 	#if ng_lite
-	function onBoardsReceived(response:Response<ScoreBoardResult>):Void {
+	function onBoardsReceived(response:Response<GetBoardsResult>):Void {
 		
 		if (response.success && response.result.success && response.result.data.scoreboards.length > 0) {
 			

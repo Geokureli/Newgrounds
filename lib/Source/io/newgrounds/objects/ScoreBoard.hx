@@ -1,9 +1,8 @@
 package io.newgrounds.objects;
 
-import io.newgrounds.components.ScoreBoardComponent.Period;
+import io.newgrounds.components.ScoreBoardComponent;
 import io.newgrounds.objects.events.Response;
 import io.newgrounds.objects.events.Result;
-import io.newgrounds.objects.events.Result.ScoreResult;
 import io.newgrounds.NGLite;
 
 @:noCompletion
@@ -46,7 +45,7 @@ class ScoreBoard extends Object<RawScoreBoardData> {
 			.send();
 	}
 	
-	function onScoresReceived(response:Response<ScoreResult>):Void {
+	function onScoresReceived(response:Response<GetScoresResult>):Void {
 		
 		if (!response.success || !response.result.success)
 			return;

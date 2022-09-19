@@ -59,7 +59,7 @@ class RadioGroup {
 		for (i in 0 ... target.numChildren) {
 			
 			var child = target.getChildAt(i);
-			if (Std.is(child, RadioButtonSwf)) {
+			if (child is RadioButtonSwf) {
 				
 				var choice = new RadioButton(cast child, onSelect.bind(child.name));
 				_choices.set(child.name, choice);

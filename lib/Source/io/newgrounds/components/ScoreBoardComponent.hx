@@ -1,18 +1,15 @@
 package io.newgrounds.components;
 
 import io.newgrounds.objects.User;
+import io.newgrounds.objects.Score;
+import io.newgrounds.objects.ScoreBoard;
 import io.newgrounds.objects.events.Response;
 import io.newgrounds.objects.events.Result;
-import io.newgrounds.objects.events.Result.ScoreBoardResult;
-import io.newgrounds.objects.events.Result.ScoreResult;
 import io.newgrounds.NGLite;
-import io.newgrounds.objects.ScoreBoard;
 
 import haxe.ds.IntMap;
 
 class ScoreBoardComponent extends Component {
-	
-	public var allById:IntMap<ScoreBoard>;
 	
 	public function new (core:NGLite){ super(core); }
 	
@@ -20,55 +17,74 @@ class ScoreBoardComponent extends Component {
 	//                                       GET SCORES
 	// -------------------------------------------------------------------------------------------
 	
-	public function getBoards():Call<ScoreBoardResult> {
+	/**
+	 * Fetches a list of available scoreboards.
+	 */
+	public function getBoards():Call<GetBoardsResult> {
 		
-		return new Call<ScoreBoardResult>(_core, "ScoreBoard.getBoards");
+		return new Call<GetBoardsResult>(_core, "ScoreBoard.getBoards");
 	}
-	
-	/*function onBoardsReceive(response:Response<ScoreBoardResult>):Void {
-		
-		if (!response.result.success)
-			return;
-		
-		allById = new IntMap<ScoreBoard>();
-		
-		for (boardData in response.result.scoreboards)
-			createBoard(boardData);
-		
-		_core.log('${response.result.scoreboards.length} ScoreBoards loaded');
-	}*/
 	
 	// -------------------------------------------------------------------------------------------
 	//                                       GET SCORES
 	// -------------------------------------------------------------------------------------------
 	
+	/**
+	 * Fetches a list of Score objects from a scoreboard. Use 'skip' and 'limit' for getting
+	 * different pages.
+	 * 
+	 * @param id             The numeric ID of the scoreboard.
+	 * @param limit          An integer indicating the number of scores to include in the list.
+	 *                       Default = 10.
+	 * @param skip           The time-frame to pull scores from (see notes for acceptable values).
+	 * @param period         An integer indicating the number of scores to skip before starting the
+	 *                       list. Default = 0.
+	 * @param social         If set to true, only social scores will be loaded (scores by the user
+	 *                       and their friends). This param will be ignored if there is no valid
+	 *                       session id and the 'user' param is absent.
+	 * @param tag            A tag to filter results by.
+	 * @param user           A user's ID or name. If 'social' is true, this user and their friends
+	 *                       will be included. Otherwise, only scores for this user will be loaded.
+	 *                       If this param is missing and there is a valid session id, that user
+	 *                       will be used by default.
+	 * @param externalAppId  Leave blank unless you which to fetch from an separate app.
+	 */
 	public function getScores
-	( id    :Int
-	, limit :Int     = 10
-	, skip  :Int     = 0
-	, period:Period  = Period.DAY
-	, social:Bool    = false
-	, tag   :String  = null
-	, user  :Dynamic = null
-	):Call<ScoreResult> {
+	( id           :Int
+	, limit        :Int     = 10
+	, skip         :Int     = 0
+	, period       :Period  = DAY
+	, social       :Bool    = false
+	, tag          :String  = null
+	, user         :Dynamic = null
+	, externalAppId:String  = null
+	):Call<GetScoresResult> {
 		
-		if (user != null && !Std.is(user, String) && !Std.is(user, Int))
+		if (user != null && !Std.isOfType(user, String) && !Std.isOfType(user, Int))
 			user = user.id;
 		
-		return new Call<ScoreResult>(_core, "ScoreBoard.getScores")
+		return new Call<GetScoresResult>(_core, "ScoreBoard.getScores")
 			.addComponentParameter("id"    , id    )
 			.addComponentParameter("limit" , limit , 10)
 			.addComponentParameter("skip"  , skip  , 0)
 			.addComponentParameter("period", period, Period.DAY)
 			.addComponentParameter("social", social, false)
 			.addComponentParameter("tag"   , tag   , null)
-			.addComponentParameter("user"  , user  , null);
+			.addComponentParameter("user"  , user  , null)
+			.addComponentParameter("app_id", externalAppId);
 	}
 	
 	// -------------------------------------------------------------------------------------------
 	//                                       POST SCORE
 	// -------------------------------------------------------------------------------------------
 	
+	/**
+	 * Posts a score to the specified scoreboard.
+	 * 
+	 * @param id     The numeric ID of the scoreboard.
+	 * @param value  The value of the score.
+	 * @param tag    An optional tag that can be used to filter scores via ScoreBoard.getScores
+	 */
 	public function postScore(id:Int, value:Int, tag:String = null):Call<PostScoreResult> {
 		
 		return new Call<PostScoreResult>(_core, "ScoreBoard.postScore", true, true)
@@ -76,30 +92,53 @@ class ScoreBoardComponent extends Component {
 			.addComponentParameter("value", value)
 			.addComponentParameter("tag"  , tag  , null);
 	}
-	
-	/*function onScorePosted(response:Response<ResultBase>):Void {
-		
-		if (!response.result.success)
-			return;
-		
-		allById = new IntMap<ScoreBoard>();
-		
-		//createBoard(data.data.scoreBoard).parseScores(data.data.scores);
-	}*/
-	
-	inline function createBoard(data:Dynamic):ScoreBoard {
-		
-		var board = new ScoreBoard(_core, data);
-		_core.logVerbose('created $board');
-		
-		allById.set(board.id, board);
-		
-		return board;
-	}
 }
 
-@:enum 
-abstract Period(String) to String from String{
+typedef GetBoardsResult = ResultBase & {
+	
+	/** An array of ScoreBoard objects. */
+	var scoreboards(default, null):Array<RawScoreBoardData>;
+}
+
+typedef RawGetScoresResult = ResultExternalApp & ResultBase & {
+	
+	/* An array of Score objects. */
+	var scores    (default, null):Array<Score>;
+	
+	/* The ScoreBoard being queried. */
+	var scoreboard(default, null):RawScoreBoardData;
+	
+	/* The query skip that was used. */
+	var limit(default, null):Int;
+	
+	/* The time-frame the scores belong to. See notes for acceptable values. */
+	var period(default, null):Period;
+	
+	/*
+	 * Will return true if scores were loaded in social context ('social' set to true and a
+	 * session or 'user' were provided).
+	**/
+	var social(default, null):Bool;
+	
+	/*
+	 * The User the score list is associated with (either as defined in the 'user' param, or
+	 * extracted from the current session when 'social' is set to true)
+	**/
+	var user(default, null):User;
+}
+@:forward
+abstract GetScoresResult(RawGetScoresResult) from RawGetScoresResult to ResultBase {
+	
+	/** The App ID of another, approved app to load medals from. */
+	public var externalAppId(get, never):String;
+	inline function get_externalAppId():String return this.app_id;
+	
+	/* Hidden, use externalAppId instead. */
+	var app_id(get, never):String;
+	inline function get_app_id():String return this.app_id;
+}
+
+enum abstract Period(String) to String from String {
 	
 	/** Indicates scores are from the current day. */
 	var DAY = "D";

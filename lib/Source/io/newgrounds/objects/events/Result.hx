@@ -1,8 +1,8 @@
 package io.newgrounds.objects.events;
 
-import io.newgrounds.objects.Medal.RawMedalData;
-import io.newgrounds.objects.ScoreBoard.RawScoreBoardData;
-import io.newgrounds.objects.SaveSlot.RawSaveSlot;
+import io.newgrounds.objects.Medal;
+import io.newgrounds.objects.ScoreBoard;
+import io.newgrounds.objects.SaveSlot;
 
 @:noCompletion
 typedef RawResult<T:ResultBase> = {
@@ -29,6 +29,11 @@ typedef ResultBase = {
 	var error  (default, null):Error;
 }
 
+typedef ResultExternalApp = {
+	
+	/** The App ID of another, approved app to load medals from. */
+	var app_id(default, null):String;
+}
 
 typedef SessionResult = ResultBase & {
 	
@@ -81,29 +86,6 @@ abstract LogEventResult(RawLogEventResult) from RawLogEventResult to ResultBase 
 	inline function get_eventName() return this.event_name;
 }
 
-@:noCompletion
-typedef RawGetDateTimeResult = ResultBase
-	& { datetime:String }
-@:forward
-abstract GetDateTimeResult(RawGetDateTimeResult) from RawGetDateTimeResult to ResultBase {
-	
-	public var datetime(get, never):String;
-	@:deprecated("datetime is deprecated, use dateTime (captial T)")
-	inline function get_datetime() return this.datetime;
-	public var dateTime(get, never):String;
-	inline function get_dateTime() return this.datetime;
-}
-
-typedef GetVersionResult = ResultBase & {
-	
-	var version(default, null):String;
-}
-
-typedef PingResult = ResultBase & {
-	
-	var pong(default, null):String;
-}
-
 typedef MedalListResult = ResultBase & {
 	
 	var medals(default, null):Array<RawMedalData>;
@@ -126,12 +108,6 @@ abstract MedalUnlockResult(RawMedalUnlockResult) from RawMedalUnlockResult to Re
 typedef ScoreBoardResult = ResultBase & {
 	
 	var scoreboards(default, null):Array<RawScoreBoardData>;
-}
-
-typedef ScoreResult = ResultBase & {
-	
-	var scores    (default, null):Array<Score>;
-	var scoreboard(default, null):RawScoreBoardData;
 }
 
 typedef PostScoreResult = ResultBase & {

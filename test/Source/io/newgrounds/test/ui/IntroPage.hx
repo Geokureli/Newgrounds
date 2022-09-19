@@ -3,7 +3,7 @@ package io.newgrounds.test.ui;
 import io.newgrounds.test.art.IntroScreenSwf;
 import io.newgrounds.components.Component;
 import io.newgrounds.crypto.Cipher;
-import io.newgrounds.crypto.EncryptionFormat;
+import io.newgrounds.crypto.EncodingFormat;
 import io.newgrounds.swf.common.Button;
 
 import openfl.display.Stage;
@@ -56,8 +56,8 @@ class IntroPage extends Page<Component> {
 		_encryptionKey = target.encryptionKey;
 		
 		_format = new RadioGroup(target.format);
-		_format.selected = EncryptionFormat.BASE_64;
-		_format.disableChoice(EncryptionFormat.HEX);
+		_format.selected = EncodingFormat.BASE_64;
+		_format.disableChoice(EncodingFormat.HEX);
 		
 		_cipher = new RadioGroup(target.cipher, onCipherChange);
 		_cipher.selected = Cipher.RC4;
@@ -100,7 +100,7 @@ class IntroPage extends Page<Component> {
 			NG.create(fieldString(_appId), fieldString(_sessionId), _debug.on);
 		#end
 		if (_cipher.selected != Cipher.NONE)
-			NG.core.initEncryption(fieldString(_encryptionKey), cast _cipher.selected, cast _format.selected);
+			NG.core.setupEncryption(fieldString(_encryptionKey), cast _cipher.selected, cast _format.selected);
 		
 		NG.core.verbose = true;
 		

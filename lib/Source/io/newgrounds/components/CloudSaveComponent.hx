@@ -30,22 +30,25 @@ class CloudSaveComponent extends Component {
 	/**
 	 * Returns a specific saveslot object.
 	 * 
-	 * @param id  The slot number
+	 * @param id             The slot number
+	 * @param externalAppId  Leave blank unless you which to fetch from an separate app.
 	**/
-	public function loadSlot(id:Int):Call<SaveSlotResult> {
+	public function loadSlot(id:Int, externalAppId:String = null):Call<SaveSlotResult> {
 		
 		return new Call<SaveSlotResult>(_core, "CloudSave.loadSlot", true)
-			.addComponentParameter("id", id);
+			.addComponentParameter("id", id)
+			.addComponentParameter("app_id", externalAppId);
 	}
 	
 	/**
 	 * Returns a list of saveslot objects.
 	 * 
-	 * @param id  The slot number
+	 * @param externalAppId  Leave blank unless you which to fetch from an separate app.
 	**/
-	public function loadSlots():Call<LoadSlotsResult> {
+	public function loadSlots(externalAppId:String = null):Call<LoadSlotsResult> {
 		
-		return new Call<LoadSlotsResult>(_core, "CloudSave.loadSlots", true);
+		return new Call<LoadSlotsResult>(_core, "CloudSave.loadSlots", true)
+			.addComponentParameter("app_id", externalAppId);
 	}
 	
 	/**

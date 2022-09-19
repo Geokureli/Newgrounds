@@ -22,3 +22,26 @@ class GatewayComponent extends Component {
 		return new Call<PingResult>(_core, "Gateway.ping");
 	}
 }
+
+@:noCompletion
+typedef RawGetDateTimeResult = ResultBase
+	& { datetime:String }
+@:forward
+abstract GetDateTimeResult(RawGetDateTimeResult) from RawGetDateTimeResult to ResultBase {
+	
+	public var datetime(get, never):String;
+	@:deprecated("datetime is deprecated, use dateTime (captial T)")
+	inline function get_datetime() return this.datetime;
+	public var dateTime(get, never):String;
+	inline function get_dateTime() return this.datetime;
+}
+
+typedef GetVersionResult = ResultBase & {
+	
+	var version(default, null):String;
+}
+
+typedef PingResult = ResultBase & {
+	
+	var pong(default, null):String;
+}

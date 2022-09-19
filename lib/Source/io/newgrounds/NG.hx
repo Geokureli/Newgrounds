@@ -4,10 +4,7 @@ package io.newgrounds;
 typedef NG = NGLite; //TODO: test and make lite UI
 #else
 import io.newgrounds.objects.Error;
-import io.newgrounds.objects.events.Result.SessionResult;
-import io.newgrounds.objects.events.Result.MedalListResult;
-import io.newgrounds.objects.events.Result.ScoreBoardResult;
-import io.newgrounds.objects.events.Result.LoadSlotsResult;
+import io.newgrounds.objects.events.Result;
 import io.newgrounds.objects.events.ResultType;
 import io.newgrounds.objects.events.Response;
 import io.newgrounds.objects.User;
