@@ -1,0 +1,5 @@
+<vbox verticalAlign="center" horizontalAlign="center" style="spacing:20px;">
+    <button width="150" text="Get DateTime" id="getDateTime"/>
+    <button width="150" text="Get Version" id="getVersion"/>
+    <button width="150" text="Ping" id="ping"/>
+</vbox>

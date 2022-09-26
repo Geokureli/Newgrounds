@@ -1,0 +1,27 @@
+<vbox verticalAlign="center" horizontalAlign="center" style="spacing:20px;">
+    <hbox>
+        <button width="150" text="Start Session" id="startSession"/>
+        <checkbox text="force" selected="true" verticalAlign="center"/>
+    </hbox>
+    <hbox>
+        <button width="150" text="Check Session" id="checkSession"/>
+        <label text="*Requires sessionId" verticalAlign="center"/>
+    </hbox>
+    <hbox>
+        <button width="150" text="End Session" id="endSession"/>
+        <label text="*Requires sessionId" verticalAlign="center"/>
+    </hbox>
+    <hbox>
+        <button width="150" text="Get Host Lic." id="getHostLicense"/>
+        <label text="*Requires host" verticalAlign="center"/>
+    </hbox>
+    <hbox>
+        <button width="150" text="Log View" id="logView"/>
+        <label text="*Requires host" verticalAlign="center"/>
+    </hbox>
+    <hbox>
+        <button width="150" text="Get Current Ver." id="getCurrentVersion"/>
+        <label text="version:" verticalAlign="center"/>
+        <textfield verticalAlign="center" text="1.0.0" id="version"/>
+    </hbox>
+</vbox>

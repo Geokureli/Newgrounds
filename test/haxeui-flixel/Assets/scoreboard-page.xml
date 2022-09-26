@@ -1,0 +1,29 @@
+<vbox verticalAlign="center" horizontalAlign="center" style="spacing:20px;">
+    <button width="150" text="Get Boards" id="getBoards"/>
+    <hbox>
+        <button width="150" text="Get Scores" id="getScores"/>
+        <label verticalAlign="center" text="limit:"/>
+        <number-stepper id="limit" width="60" pos="10"/>
+        <label verticalAlign="center" text="skip:"/>
+        <number-stepper id="skip" width="60"/>
+        <dropdown width="120">
+            <data>
+                <item text="Current Day"/>
+                <item text="Current Week"/>
+                <item text="Current Month"/>
+                <item text="Current Year"/>
+                <item text="All-Time"/>
+            </data>
+        </dropdown>
+        <label verticalAlign="center" text="social:"/>
+        <checkbox verticalAlign="center" id="social"/>
+        <label verticalAlign="center" text="user:"/>
+        <textfield verticalAlign="center" id="user" width="100"/>
+    </hbox>
+    <hbox>
+        <button width="150" text="Post Score" id="postScore"/>
+        <label verticalAlign="center" text="score:"/>
+        <textfield verticalAlign="center" text="0" id="score" width="50" restrictChars="0-9"/>
+        <label text="*Requires sessionId" verticalAlign="center"/>
+    </hbox>
+</vbox>
