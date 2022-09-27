@@ -4,5 +4,5 @@
     <button width="150" text="Newgrounds" id="loadNewgrounds"/>
     <button width="150" text="Official URL" id="loadOfficialUrl"/>
     <button width="150" text="Referral" id="loadReferral"/>
-    <checkbox text="redirect" horizontalAlign="center"/>
+    <checkbox text="redirect" horizontalAlign="center" id="redirect"/>
 </vbox>

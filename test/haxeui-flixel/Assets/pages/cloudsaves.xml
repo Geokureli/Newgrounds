@@ -3,18 +3,21 @@
         <button width="150" text="Load Slots" id="loadSlots"/>
         <hbox>
             <button width="150" text="Load Slot" id="loadSlot"/>
+            <spacer width="10"/>
             <label text="id:" verticalAlign="center"/>
             <number-stepper id="loadId" width="60"/>
             <label text="*Requires sessionId" verticalAlign="center"/>
         </hbox>
         <hbox>
             <button width="150" text="Clear Slot" id="clearSlot"/>
+            <spacer width="10"/>
             <label text="id:" verticalAlign="center"/>
             <number-stepper id="clearId" width="60"/>
             <label text="*Requires sessionId" verticalAlign="center"/>
         </hbox>
         <hbox>
             <button width="150" text="Set Data" id="setData"/>
+            <spacer width="10"/>
             <label text="id:" verticalAlign="center"/>
             <number-stepper id="setId" width="60" />
             <label text="*Requires sessionId" verticalAlign="center"/>

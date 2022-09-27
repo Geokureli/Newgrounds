@@ -1,0 +1,9 @@
+<vbox verticalAlign="center" horizontalAlign="center" style="spacing:20px;">
+    <hbox>
+        <button width="150" text="Log Event" id="logEvent"/>
+        <spacer width="10"/>
+        <label text="event:" verticalAlign="center"/>
+        <textfield verticalAlign="center" id="event"/>
+        <label text="*Requires host" verticalAlign="center"/>
+    </hbox>
+</vbox>

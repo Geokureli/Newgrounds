@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<vbox width="100%" height="100%" styleName="default-background" style="padding:4px;">
+	<hbox width="100%">
+		<label text="sessionId:" verticalAlign="center"/>
+		<textfield id="sessionId" width="100%"/>
+		<label text="host:" verticalAlign="center"/>
+		<textfield id="host" width="300"/>
+	</hbox>
+	<tabview id="tabs" width="100%" height="100%"> <!-- <styleName="full-width-buttons"> -->
+		<box text="Core" width="100%" height="100%" id="corePage"/>
+		<box text="App" width="100%" height="100%" id="appPage"/>
+		<box text="Event" width="100%" height="100%" id="eventPage"/>
+		<box text="Gateway" width="100%" height="100%" id="gatewayPage"/>
+		<box text="Loader" width="100%" height="100%" id="loaderPage"/>
+		<box text="Medal" width="100%" height="100%" id="medalPage"/>
+		<box text="Scoreboard" width="100%" height="100%" id="scoreboardPage"/>
+		<box text="Cloud Saves" width="100%" height="100%" id="cloudSavePage"/>
+	</tabview>
+	
+	<section-header text="Latest Outcome" id="outcomeHeader"/>
+	<textfield width="100%" text="" id="outcome"/>
+	
+	<hbox width="100%">
+		<section-header text="Console"/>
+		<checkbox text="Queue direct calls" verticalAlign="center"/>
+		<spacer width="10"/>
+		<button text="Clear" id="clearButton"/>
+	</hbox>
+	
+	<textarea width="100%" height="200" text="" id="console"/>
+</vbox>

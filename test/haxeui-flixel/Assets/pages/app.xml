@@ -1,7 +1,8 @@
 <vbox verticalAlign="center" horizontalAlign="center" style="spacing:20px;">
     <hbox>
         <button width="150" text="Start Session" id="startSession"/>
-        <checkbox text="force" selected="true" verticalAlign="center"/>
+        <spacer width="10"/>
+        <checkbox id="force" text="force:" selected="true" verticalAlign="center"/>
     </hbox>
     <hbox>
         <button width="150" text="Check Session" id="checkSession"/>
@@ -21,6 +22,7 @@
     </hbox>
     <hbox>
         <button width="150" text="Get Current Ver." id="getCurrentVersion"/>
+        <spacer width="10"/>
         <label text="version:" verticalAlign="center"/>
         <textfield verticalAlign="center" text="1.0.0" id="version"/>
     </hbox>

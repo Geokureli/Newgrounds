@@ -1,0 +1,46 @@
+<box width="100%" height="100%" style="padding:10;spacing:0;">
+	<vbox width="500" verticalAlign="center" horizontalAlign="center" style="padding:0;spacing:0;">
+		<vbox width="100%" style="border-size:1;padding:8;">
+			<label text="Setup Project Settings" verticalAlign="center" style="font-size:16;"/>
+		</vbox>
+		<vbox width="100%" style="border-size:1;padding:10;">
+			<grid width="100%">
+				<label text="App ID:" verticalAlign="center"/>
+				<textfield id="appId" width="100%" text="47215:Ip8uDj9v"/>
+				
+				<label text="Session ID:" verticalAlign="center"/>
+				<textfield id="sessionId" width="100%"/>
+				
+				<label text="Encryption Key:" verticalAlign="center"/>
+				<textfield id="encKey" width="100%" text="LrnXpr/ogBf+GmU97IzF7Q=="/>
+				
+				<label text="Encryption:" verticalAlign="center"/>
+				<hbox width="100%" style="spacing:60;">
+					<optionbox group="cipher" text="AES-128" id="aes128" selected="true"/>
+					<optionbox group="cipher" text="RC4"     id="rc4"/>
+					<optionbox group="cipher" text="None"    id="none"/>
+				</hbox> 
+				
+				<label text="Encoding:"/>
+				<hbox width="100%" style="spacing:64;">
+					<optionbox group="format" text="Base 64" id="base64" selected="true"/>''
+					<optionbox group="format" text="Hex"     id="hex"/>
+				</hbox> 
+			</grid>
+			<spacer height="10"/>
+			<box width="100%">
+				<hbox horizontalAlign="left" verticalAlign="center">
+					<label text="Enable debug logs:" verticalAlign="center"/>
+					<checkbox id="debug" selected="true"/>
+				</hbox>
+				
+				<button text="Start" horizontalAlign="center" id="start"/>
+				
+				<hbox horizontalAlign="right" verticalAlign="center">
+					<label text="Check Loader Vars:" verticalAlign="center"/>
+					<checkbox id="checkLoaderVars" selected="true"/>
+				</hbox>
+			</box>
+		</vbox>
+	</vbox>
+</box>

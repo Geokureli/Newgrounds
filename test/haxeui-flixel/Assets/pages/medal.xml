@@ -2,6 +2,7 @@
     <button width="150" text="Get List" id="getList"/>
     <hbox>
         <button width="150" text="Unlock" id="unlock"/>
+        <spacer width="10"/>
         <label text="id:" verticalAlign="center"/>
         <textfield verticalAlign="center" id="medalId" restrictChars="0-9"/>
         <label text="*Requires sessionId" verticalAlign="center"/>
