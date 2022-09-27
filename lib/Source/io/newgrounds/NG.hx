@@ -21,7 +21,7 @@ import io.newgrounds.utils.SaveSlotList;
 import io.newgrounds.utils.ScoreBoardList;
 #if (openfl < "4.0.0")
 import openfl.utils.JNI;
-#else
+#elseif (lime)
 import lime.system.JNI;
 #end
 import haxe.Timer;

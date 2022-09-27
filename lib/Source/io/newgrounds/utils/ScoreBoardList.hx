@@ -42,8 +42,8 @@ private class RawScoreBoardList extends ObjectList<Int, ScoreBoard> {
 			return;
 		
 		_core.calls.scoreBoard.getBoards()
-			.addOutcomeHandler((response)->onScoreBoardsReceived(response))
-			.sendExternal(_externalAppId);
+			.addOutcomeHandler((outcome)->onScoreBoardsReceived(outcome))
+			.sendExternalAppId(_externalAppId);
 	}
 	
 	

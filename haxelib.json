@@ -1,7 +1,7 @@
 { "name"        : "newgrounds"
 , "description" : "Newgrounds API for haxe"
 , "version"     : "2.0.0"
-, "releasenote" : "refactor helpers and ad add externalApps"
+, "releasenote" : "refactor to use outcomes"
 , "url"         : "https://newgrounds.io/"
 , "classPath"   : "lib/Source"
 , "license"     : "MIT"
