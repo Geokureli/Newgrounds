@@ -11,7 +11,7 @@
 	
 	<haxelib name="openfl" />
 	<haxelib name="swf" unless="simple" />
-	<classpath path="../lib/Source" />
+	<classpath path="../../lib/Source" />
 	<assets path="Assets" rename="assets" />
 	
 	<!-- <haxedef name="simulate_preloader" if="debug"/> -->
