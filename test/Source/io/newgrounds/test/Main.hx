@@ -1,14 +1,14 @@
 package io.newgrounds.test;
 
 #if !simple
+import io.newgrounds.crypto.Cipher;
+import io.newgrounds.crypto.EncodingFormat;
 import io.newgrounds.test.art.IntroScreenSwf;
 import io.newgrounds.test.ui.IntroPage;
 import io.newgrounds.test.ui.MainScreen;
 #end
 
-import openfl.display.Sprite;
-
-class Main extends Sprite {
+class Main extends openfl.display.Sprite {
 	
 	public function new() {
 		super();
@@ -22,12 +22,19 @@ class Main extends Sprite {
 		addChild(page);
 		
 		new IntroPage(page,
-			function onStart():Void {
+			function onStart
+			( appId        :String
+			, sessionId    :String
+			, debug        :Bool
+			, encryptionKey:String
+			, cipher       :Cipher
+			, format       :EncodingFormat
+			) {
 				
 				removeChild(page);
 				page = null;
 				
-				addChild(new MainScreen());
+				addChild(new MainScreen(appId, sessionId, debug, encryptionKey, cipher, format));
 			}
 		);
 		#end

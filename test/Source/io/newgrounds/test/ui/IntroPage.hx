@@ -1,18 +1,29 @@
 package io.newgrounds.test.ui;
 
-import io.newgrounds.test.art.IntroScreenSwf;
+import io.newgrounds.NG;
+import io.newgrounds.NGLite;
 import io.newgrounds.components.Component;
 import io.newgrounds.crypto.Cipher;
 import io.newgrounds.crypto.EncodingFormat;
 import io.newgrounds.swf.common.Button;
+import io.newgrounds.test.art.IntroScreenSwf;
 
 import openfl.display.Stage;
 import openfl.text.TextFieldType;
 import openfl.text.TextField;
 
+typedef StartCallback = 
+( appId        :String
+, sessionId    :String
+, debug        :Bool
+, encryptionKey:String
+, cipher       :Cipher
+, format       :EncodingFormat
+)->Void;
+
 class IntroPage extends Page<Component> {
 	
-	var _onStart:Void->Void;
+	var _onStart:StartCallback;
 	
 	var _appId:TextField;
 	var _sessionId:TextField;
@@ -24,7 +35,7 @@ class IntroPage extends Page<Component> {
 	var _cipher:RadioGroup;
 	var _format:RadioGroup;
 	
-	public function new (target:IntroScreenSwf, onStart:Void->Void):Void {
+	public function new (target:IntroScreenSwf, onStart:StartCallback):Void {
 		super(target);
 		
 		_stage = target.stage;
@@ -88,21 +99,14 @@ class IntroPage extends Page<Component> {
 	
 	function onStartClick():Void {
 		
-		#if ng_lite
-		NG.create(fieldString(_appId), fieldString(_sessionId), _debug.on);
-		NG.core.host = getHost(_stage);
-		#else
-		if (_autoConnect.on)
-			NG.createAndCheckSession(fieldString(_appId), _debug.on);
-		else
-			NG.create(fieldString(_appId), fieldString(_sessionId), _debug.on);
-		#end
-		if (_cipher.selected != Cipher.NONE)
-			NG.core.setupEncryption(fieldString(_encryptionKey), cast _cipher.selected, cast _format.selected);
-		
-		NG.core.verbose = true;
-		
-		_onStart();
+		_onStart
+			( fieldString(_appId)
+			, _autoConnect.on ? NGLite.getSessionId() : fieldString(_sessionId)
+			, _debug.on
+			, fieldString(_encryptionKey)
+			, cast _cipher.selected
+			, cast _format.selected
+			);
 	}
 	
 	#if ng_lite
@@ -111,29 +115,7 @@ class IntroPage extends Page<Component> {
 	 */
 	inline static public function getLoaderVar(stage:Stage, name:String):String {
 		
-		if (Reflect.hasField(stage.loaderInfo.parameters, name))
-			return Reflect.field(stage.loaderInfo.parameters, name);
-		
-		return null;
-	}
-	
-	
-	static var urlParser:EReg = ~/^(?:http[s]?:\/\/)?([^:\/\s]+)(:[0-9]+)?((?:\/\w+)*\/)([\w\-\.]+[^#?\s]+)([^#\s]*)?(#[\w\-]+)?$/i;//TODO:trim
-	/** Used to get the current web host of your game. */
-	static public function getHost(stage:Stage):String {
-		
-		var url = stage.loaderInfo.url;
-		
-		if (url == null || url == "")
-			return "<AppView>";
-		
-		if (url.indexOf("file") == 0)
-			return "<LocalHost>";
-		
-		if (urlParser.match(url))
-			return urlParser.matched(1);
-		
-		return "<Unknown>";
+		NGLite.
 	}
 	#end
 }
