@@ -3,8 +3,6 @@ package io.newgrounds.components;
 import io.newgrounds.objects.User;
 import io.newgrounds.objects.events.Response;
 import io.newgrounds.objects.events.Result;
-import io.newgrounds.objects.events.Result.GetBoardsResult;
-import io.newgrounds.objects.events.Result.GetScoresResult;
 import io.newgrounds.NGLite;
 
 import haxe.ds.IntMap;
@@ -20,9 +18,9 @@ class ScoreBoardComponent extends Component {
 	/**
 	 * Fetches a list of available scoreboards.
 	 */
-	public function getBoards():Call<GetBoardsResult> {
+	public function getBoards():Call<GetBoardsData> {
 		
-		return new Call<GetBoardsResult>(_core, "ScoreBoard.getBoards");
+		return new Call<GetBoardsData>(_core, "ScoreBoard.getBoards");
 	}
 	
 	// -------------------------------------------------------------------------------------------
@@ -58,12 +56,12 @@ class ScoreBoardComponent extends Component {
 	, tag          :String  = null
 	, user         :Dynamic = null
 	, externalAppId:String  = null
-	):Call<GetScoresResult> {
+	):Call<GetScoresData> {
 		
 		if (user != null && !Std.isOfType(user, String) && !Std.isOfType(user, Int))
 			user = user.id;
 		
-		return new Call<GetScoresResult>(_core, "ScoreBoard.getScores")
+		return new Call<GetScoresData>(_core, "ScoreBoard.getScores")
 			.addComponentParameter("id"    , id    )
 			.addComponentParameter("limit" , limit , 10)
 			.addComponentParameter("skip"  , skip  , 0)
@@ -85,9 +83,9 @@ class ScoreBoardComponent extends Component {
 	 * @param value  The value of the score.
 	 * @param tag    An optional tag that can be used to filter scores via ScoreBoard.getScores
 	 */
-	public function postScore(id:Int, value:Int, tag:String = null):Call<PostScoreResult> {
+	public function postScore(id:Int, value:Int, tag:String = null):Call<PostScoreData> {
 		
-		return new Call<PostScoreResult>(_core, "ScoreBoard.postScore", true, true)
+		return new Call<PostScoreData>(_core, "ScoreBoard.postScore", true, true)
 			.addComponentParameter("id"   , id)
 			.addComponentParameter("value", value)
 			.addComponentParameter("tag"  , tag  , null);

@@ -3,6 +3,7 @@ package io.newgrounds.test.ui;
 import openfl.display.MovieClip;
 import openfl.text.TextField;
 
+import io.newgrounds.Call;
 import io.newgrounds.components.CloudSaveComponent;
 import io.newgrounds.objects.Error;
 
@@ -73,25 +74,24 @@ class CloudSavePage extends Page<CloudSaveComponent> {
 	}
 	
 	#if ng_lite
-	function onSlotsReceived(response:Response<LoadSlotsResult>):Void {
+	function onSlotsReceived(response:CallOutcome<LoadSlotsResult>):Void {
 		
 	}
 	#else
-	function onSlotsReceived(outcome:Outcome<Error>):Void {
+	function onSlotsReceived(outcome:Outcome<CallError>):Void {
 		
 		switch(outcome) {
 			
-			case FAIL(msg):
+			case FAIL(error):
 				
-				setMessage("Error loading save slots: " + msg);
-				return;
+				setMessage("Error loading save slots: " + error);
 				
 			case SUCCESS:
+				
+				setMessage(null);
+				
+				_slotList.onSlotsRecieved();
 		}
-		
-		setMessage(null);
-		
-		_slotList.onSlotsRecieved();
 	}
 	#end
 	

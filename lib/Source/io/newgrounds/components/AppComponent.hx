@@ -1,44 +1,43 @@
 package io.newgrounds.components;
 
 import io.newgrounds.objects.events.Result;
-import io.newgrounds.objects.events.Result.SessionResult;
 import io.newgrounds.NGLite;
 
 class AppComponent extends Component {
 	
 	public function new (core:NGLite) { super(core); }
 	
-	public function startSession(force:Bool = false):Call<SessionResult> {
+	public function startSession(force:Bool = false):Call<SessionData> {
 		
-		return new Call<SessionResult>(_core, "App.startSession")
+		return new Call<SessionData>(_core, "App.startSession")
 			.addComponentParameter("force", force, false);
 	}
 	
-	public function checkSession():Call<SessionResult> {
+	public function checkSession():Call<SessionData> {
 		
-		return new Call<SessionResult>(_core, "App.checkSession", true);
+		return new Call<SessionData>(_core, "App.checkSession", true);
 	}
 	
-	public function endSession():Call<SessionResult> {
+	public function endSession():Call<SessionData> {
 		
-		return new Call<SessionResult>(_core, "App.endSession", true);
+		return new Call<SessionData>(_core, "App.endSession", true);
 	}
 	
-	public function getCurrentVersion(version:String):Call<GetCurrentVersionResult> {
+	public function getCurrentVersion(version:String):Call<GetCurrentVersionData> {
 	
-		return new Call<GetCurrentVersionResult>(_core, "App.getCurrentVersion")
+		return new Call<GetCurrentVersionData>(_core, "App.getCurrentVersion")
 			.addComponentParameter("version", version);
 	}
 	
-	public function getHostLicense():Call<GetHostResult> {
+	public function getHostLicense():Call<GetHostData> {
 		
-		return new Call<GetHostResult>(_core, "App.getHostLicense")
+		return new Call<GetHostData>(_core, "App.getHostLicense")
 			.addComponentParameter("host", _core.host);
 	}
 	
-	public function logView():Call<ResultBase> {
+	public function logView():Call<BaseData> {
 		
-		return new Call<ResultBase>(_core, "App.logView")
+		return new Call<BaseData>(_core, "App.logView")
 			.addComponentParameter("host", _core.host);
 	}
 }

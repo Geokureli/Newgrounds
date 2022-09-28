@@ -9,10 +9,13 @@ import openfl.text.TextField;
 import openfl.display.Sprite;
 import openfl.display.MovieClip;
 
+import io.newgrounds.NG;
+import io.newgrounds.NGLite;
+import io.newgrounds.crypto.Cipher;
+import io.newgrounds.crypto.EncodingFormat;
 import io.newgrounds.test.art.MainScreenSwf;
 import io.newgrounds.test.ui.Page;
 import io.newgrounds.test.ui.CloudSavePage;
-import io.newgrounds.NG;
 
 class MainScreen extends Sprite {
 	
@@ -36,9 +39,16 @@ class MainScreen extends Sprite {
 	var _clear:Button;
 	var _queue:CheckBox;
 	
-	public function new () {
+	public function new
+	( appId        :String
+	, sessionId    :Null<String>
+	, debug        :Bool
+	, encryptionKey:String
+	, cipher       :Cipher
+	, format       :EncodingFormat
+	) {
 		
-		super ();
+		super();
 		
 		_pageWrappers = 
 		[ CORE       => CorePage
@@ -51,6 +61,13 @@ class MainScreen extends Sprite {
 		, SCOREBOARD => ScoreboardPage
 		, CLOUD_SAVE => CloudSavePage
 		];
+		
+		
+		NG.create(appId, sessionId, debug);
+		if (cipher != Cipher.NONE)
+			NG.core.setupEncryption(encryptionKey, cipher, format);
+		
+		NG.core.verbose = true;
 		
 		// cache log messages that happen before initialization
 		var queuedOutput = new Array<{msg:String, pos:PosInfos}>();

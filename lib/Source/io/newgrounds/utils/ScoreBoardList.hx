@@ -1,5 +1,6 @@
 package io.newgrounds.utils;
 
+import io.newgrounds.Call;
 import io.newgrounds.objects.Error;
 import io.newgrounds.objects.ScoreBoard;
 import io.newgrounds.objects.events.Response;
@@ -35,43 +36,42 @@ abstract ScoreBoardList (RawScoreBoardList) {
 @:access(io.newgrounds.objects.ScoreBoard)
 private class RawScoreBoardList extends ObjectList<Int, ScoreBoard> {
 	
-	public function loadList(?callback:(Outcome<Error>)->Void) {
+	public function loadList(?callback:(Outcome<CallError>)->Void) {
 		
 		if (checkState(callback, false) == false)
 			return;
 		
 		_core.calls.scoreBoard.getBoards()
-			.addDataHandler((response)->onScoreBoardsReceived(response))
-			.addErrorHandler((error)->fireCallbacks(FAIL(error)))
+			.addOutcomeHandler((outcome)->onScoreBoardsReceived(outcome))
 			.sendExternalAppId(_externalAppId);
 	}
 	
 	
-	function onScoreBoardsReceived(response:Response<GetBoardsResult>) {
+	function onScoreBoardsReceived(outcome:CallOutcome<GetBoardsData>) {
 		
-		if (response.hasError()) {
+		switch (outcome) {
 			
-			fireCallbacks(FAIL(response.getError()));
-			return;
-		}
-		
-		var idList:Array<Int> = new Array<Int>();
-		
-		if (_map == null) {
-			
-			_map = new Map();
-			
-			for (boardData in response.result.data.scoreboards) {
+			case FAIL(error): fireCallbacks(FAIL(error));
+			case SUCCESS(data):
 				
-				var board = new ScoreBoard(_core, boardData);
-				_map.set(board.id, board);
-				idList.push(board.id);
-			}
+				var idList:Array<Int> = new Array<Int>();
+				
+				if (_map == null) {
+					
+					_map = new Map();
+					
+					for (boardData in data.scoreboards) {
+						
+						var board = new ScoreBoard(_core, boardData);
+						_map.set(board.id, board);
+						idList.push(board.id);
+					}
+				}
+				
+				_core.logVerbose('${data.scoreboards.length} ScoreBoards received [${idList.join(", ")}]');
+				
+				fireCallbacks(SUCCESS);
 		}
-		
-		_core.logVerbose('${response.result.data.scoreboards.length} ScoreBoards received [${idList.join(", ")}]');
-		
-		fireCallbacks(SUCCESS);
 	}
 }
 

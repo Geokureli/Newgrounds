@@ -14,38 +14,44 @@ class LoaderComponent extends Component {
 	
 	public function new (core:NGLite){ super(core); }
 	
-	public function loadAuthorUrl(redirect:Bool = false):Call<ResultBase> {
+	public function loadAuthorUrl(redirect:Bool = false):Call<UrlData> {
 		
-		return new Call<ResultBase>(_core, "Loader.loadAuthorUrl")
+		return new Call<UrlData>(_core, "Loader.loadAuthorUrl")
 			.addComponentParameter("host", _core.host)
 			.addComponentParameter("redirect", redirect, true);
 	}
 	
-	public function loadMoreGames(redirect:Bool = false):Call<ResultBase> {
+	public function loadMoreGames(redirect:Bool = false):Call<UrlData> {
 		
-		return new Call<ResultBase>(_core, "Loader.loadMoreGames")
+		return new Call<UrlData>(_core, "Loader.loadMoreGames")
 			.addComponentParameter("host", _core.host)
 			.addComponentParameter("redirect", redirect, true);
 	}
 	
-	public function loadNewgrounds(redirect:Bool = false):Call<ResultBase> {
+	public function loadNewgrounds(redirect:Bool = false):Call<UrlData> {
 		
-		return new Call<ResultBase>(_core, "Loader.loadNewgrounds")
+		return new Call<UrlData>(_core, "Loader.loadNewgrounds")
 			.addComponentParameter("host", _core.host)
 			.addComponentParameter("redirect", redirect, true);
 	}
 	
-	public function loadOfficialUrl(redirect:Bool = false):Call<ResultBase> {
+	public function loadOfficialUrl(redirect:Bool = false):Call<UrlData> {
 		
-		return new Call<ResultBase>(_core, "Loader.loadOfficialUrl")
+		return new Call<UrlData>(_core, "Loader.loadOfficialUrl")
 			.addComponentParameter("host", _core.host)
 			.addComponentParameter("redirect", redirect, true);
 	}
 	
-	public function loadReferral(redirect:Bool = false):Call<ResultBase> {
+	public function loadReferral(redirect:Bool = false):Call<UrlData> {
 		
-		return new Call<ResultBase>(_core, "Loader.loadReferral")
+		return new Call<UrlData>(_core, "Loader.loadReferral")
 			.addComponentParameter("host", _core.host)
 			.addComponentParameter("redirect", redirect, true);
 	}
+}
+
+typedef UrlData = BaseData & {
+	
+	// TODO: docs
+	var url:String;
 }

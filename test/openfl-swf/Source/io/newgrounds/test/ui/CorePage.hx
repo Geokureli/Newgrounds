@@ -223,7 +223,7 @@ class CorePage extends CorePageLite {
 			
 			new Button
 				( medal
-				, medalData.sendDebugUnlock
+				, medalData.sendDebugUnlock.bind()
 				, showMedalInfo.bind(medalData)
 				, hideMedalInfo
 				);
