@@ -124,7 +124,7 @@ class Call<T:BaseData>
 	**/
 	public function addOutcomeHandler(handler:(CallOutcome<T>)->Void):Call<T> {
 		
-		if (_httpErrorHandlers == null)
+		if (_outcomeHandlers == null)
 			_outcomeHandlers = new TypedDispatcher<CallOutcome<T>>();
 		
 		_outcomeHandlers.add(handler);
@@ -231,7 +231,7 @@ class Call<T:BaseData>
 		
 		_core.logVerbose('Reply - $reply');
 		
-		if (_responseHandlers == null && _successHandlers == null)
+		if (_responseHandlers == null && _successHandlers == null && _outcomeHandlers == null)
 			return;
 		
 		var response = new Response<T>(_core, reply);
