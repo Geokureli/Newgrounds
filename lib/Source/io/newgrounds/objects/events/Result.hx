@@ -1,22 +1,22 @@
 package io.newgrounds.objects.events;
 
-import io.newgrounds.components.ScoreBoardComponent.Period;
+import io.newgrounds.components.ScoreBoardComponent;
 import io.newgrounds.objects.Medal.RawMedalData;
-import io.newgrounds.objects.ScoreBoard.RawScoreBoardData;
+import io.newgrounds.objects.ScoreBoard;
 import io.newgrounds.objects.SaveSlot.RawSaveSlot;
 import io.newgrounds.objects.User;
 
 using DateTools;
 
 @:noCompletion
-typedef RawResult<T:ResultBase> = {
+typedef RawResult<T:BaseData> = {
 	
 	var component(default, null):String;
 	var echo     (default, null):String;
 	var data     (default, null):T;
 }
 
-abstract Result<T:ResultBase>(RawResult<T>) from RawResult<T> {
+abstract Result<T:BaseData>(RawResult<T>) from RawResult<T> {
 	
 	public var component(get, never):String; inline function get_component() return this.component;
 	public var echo     (get, never):String; inline function get_echo     () return this.echo;
@@ -26,29 +26,29 @@ abstract Result<T:ResultBase>(RawResult<T>) from RawResult<T> {
 	public var error    (get, never):Error ; inline function get_error    () return data.error;
 }
 
-typedef ResultBase = {
+typedef BaseData = {
 	
 	var success(default, null):Bool;
 	var debug  (default, null):Bool;
 	var error  (default, null):Error;
 }
 
-typedef SessionResult = ResultBase & {
+typedef SessionData = BaseData & {
 	
 	var session(default, null):Session;
 }
 
-typedef ResultExternalApp = {
+typedef ExternalAppData = {
 	
 	/** The App ID of another, approved app to load medals from. */
 	var app_id(default, null):String;
 }
 
 @:noCompletion
-typedef RawGetHostResult = ResultBase
+typedef RawGetHostData = BaseData
 	& { host_approved:Bool }
 @:forward
-abstract GetHostResult(RawGetHostResult) from RawGetHostResult to ResultBase {
+abstract GetHostData(RawGetHostData) from RawGetHostData to BaseData {
 	
 	/** Wether the host is in the approved list. */
 	public var hostApproved(get, never):Bool;
@@ -61,10 +61,10 @@ abstract GetHostResult(RawGetHostResult) from RawGetHostResult to ResultBase {
 }
 
 @:noCompletion
-typedef RawGetCurrentVersionResult = ResultBase
+typedef RawGetCurrentVersionData = BaseData
 	& { current_version:String, client_deprecated:Bool }
 @:forward
-abstract GetCurrentVersionResult(RawGetCurrentVersionResult) from RawGetCurrentVersionResult to ResultBase {
+abstract GetCurrentVersionData(RawGetCurrentVersionData) from RawGetCurrentVersionData to BaseData {
 	
 	/** The version number of the app as defined in your "Version Control" settings. */
 	public var currentVersion(get, never):String;
@@ -86,10 +86,10 @@ abstract GetCurrentVersionResult(RawGetCurrentVersionResult) from RawGetCurrentV
 }
 
 @:noCompletion
-typedef RawLogEventResult = ResultBase
+typedef RawLogEventData = BaseData
 	& { event_name:String }
 @:forward
-abstract LogEventResult(RawLogEventResult) from RawLogEventResult to ResultBase {
+abstract LogEventData(RawLogEventData) from RawLogEventData to BaseData {
 	
 	/** Hidden, use eventName instead . */
 	public var event_name(get, never):String;
@@ -102,10 +102,10 @@ abstract LogEventResult(RawLogEventResult) from RawLogEventResult to ResultBase 
 }
 
 @:noCompletion
-typedef RawGetDateTimeResult = ResultBase
+typedef RawGetDateTimeData = BaseData
 	& { datetime:String, timestamp:Int }
 @:forward
-abstract GetDateTimeResult(RawGetDateTimeResult) from RawGetDateTimeResult to ResultBase {
+abstract GetDateTimeData(RawGetDateTimeData) from RawGetDateTimeData to BaseData {
 	
 	/** The current UNIX timestamp on the server. */
 	public var timestamp(get, never):Int;
@@ -137,22 +137,22 @@ abstract GetDateTimeResult(RawGetDateTimeResult) from RawGetDateTimeResult to Re
 	}
 }
 
-typedef GetVersionResult = ResultBase & {
+typedef GetVersionData = BaseData & {
 	
 	/** The version number (in X.Y.Z format). */
 	var version(default, null):String;
 }
 
-typedef PingResult = ResultBase & {
+typedef PingData = BaseData & {
 	
 	/** Will always have a value of 'pong'. */
 	var pong(default, null):String;
 }
 
-typedef RawMedalListResult = ResultExternalApp & ResultBase
+typedef RawMedalListData = ExternalAppData & BaseData
 	& { medals:Array<RawMedalData> }
 @:forward
-abstract MedalListResult(RawMedalListResult) from RawMedalListResult to ResultBase {
+abstract MedalListData(RawMedalListData) from RawMedalListData to BaseData {
 	
 	/** The App ID of another, approved app to load medals from. */
 	public var externalAppId(get, never):String;
@@ -163,10 +163,10 @@ abstract MedalListResult(RawMedalListResult) from RawMedalListResult to ResultBa
 	inline function get_app_id():String return this.app_id;
 }
 
-typedef RawMedalScoreResult = ResultBase
+typedef RawMedalScoreData = BaseData
 	& { medal_score:Int }
 @:forward
-abstract MedalScoreResult(RawMedalScoreResult) from RawMedalScoreResult to ResultBase {
+abstract MedalScoreData(RawMedalScoreData) from RawMedalScoreData to BaseData {
 	
 	/** The user's medal score. */
 	public var medalScore(get, never):Int;
@@ -178,10 +178,10 @@ abstract MedalScoreResult(RawMedalScoreResult) from RawMedalScoreResult to Resul
 }
 
 @:noCompletion
-typedef RawMedalUnlockResult = ResultBase
+typedef RawMedalUnlockData = BaseData
 	& { medal_score:String, medal:RawMedalData }
 @:forward
-abstract MedalUnlockResult(RawMedalUnlockResult) from RawMedalUnlockResult to ResultBase {
+abstract MedalUnlockData(RawMedalUnlockData) from RawMedalUnlockData to BaseData {
 	
 	/** The user's new medal score. */
 	public var medalScore(get, never):String;
@@ -193,13 +193,13 @@ abstract MedalUnlockResult(RawMedalUnlockResult) from RawMedalUnlockResult to Re
 	inline function get_medal_score() return this.medal_score;
 }
 
-typedef GetBoardsResult = ResultBase & {
+typedef GetBoardsData = BaseData & {
 	
 	/** An array of ScoreBoard objects. */
 	var scoreboards(default, null):Array<RawScoreBoardData>;
 }
 
-typedef RawGetScoresResult = ResultExternalApp & ResultBase & {
+typedef RawGetScoresData = ExternalAppData & BaseData & {
 	
 	/* An array of Score objects. */
 	var scores    (default, null):Array<Score>;
@@ -226,7 +226,7 @@ typedef RawGetScoresResult = ResultExternalApp & ResultBase & {
 	var user(default, null):User;
 }
 @:forward
-abstract GetScoresResult(RawGetScoresResult) from RawGetScoresResult to ResultBase {
+abstract GetScoresData(RawGetScoresData) from RawGetScoresData to BaseData {
 	
 	/** The App ID of another, approved app to load medals from. */
 	public var externalAppId(get, never):String;
@@ -237,7 +237,7 @@ abstract GetScoresResult(RawGetScoresResult) from RawGetScoresResult to ResultBa
 	inline function get_app_id():String return this.app_id;
 }
 
-typedef PostScoreResult = ResultBase & {
+typedef PostScoreData = BaseData & {
 	
 	/** The ScoreBoard that was posted to. */
 	var scoreboard(default, null):RawScoreBoardData;
@@ -245,13 +245,13 @@ typedef PostScoreResult = ResultBase & {
 	var score     (default, null):Score;
 }
 
-typedef SaveSlotResult = ResultBase & {
+typedef SaveSlotData = BaseData & {
 	
 	/** The save slot that was changed. */
 	var slot(default, null):RawSaveSlot;
 }
 
-typedef LoadSlotsResult = ResultExternalApp & ResultBase & {
+typedef LoadSlotsData = ExternalAppData & BaseData & {
 	
 	/** An array of SaveSlot objects. */
 	var slots(default, null):Array<RawSaveSlot>;

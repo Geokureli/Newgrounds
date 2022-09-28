@@ -55,8 +55,8 @@ If no session ID was found, you will need to start one.
 ```haxe
 if (NG.core.loggedIn == false) {
     NG.core.requestLogin(
-        function(result:LoginOutcome):Void {
-            if (result.match(SUCCESS)
+        function(outcome:LoginOutcome):Void {
+            if (outcome.match(SUCCESS))
                 trace("logged on");
         }
     );
@@ -148,7 +148,7 @@ readonly `contents` field that is null until you call `load` on that SaveSlot in
 if there is no save in that slot, check this using `isEmpty()`). You can also call `save(mySaveContents)` or `clear()` on
 SaveSlots.
 
-## Calling Components and Handling Results
+## Calling Components and Handling Outcomes
 You can talk to the NG.io server directly, but NG.core won't automatically handle 
 the response for you (unlike NG.core.requestMedals()). All of the component calls are 
 in `NG.core.call.[componentName].[callName]("call args")`
@@ -164,41 +164,36 @@ You can add various listeners to a call to track successful or unsuccessful resp
 
 ```haxe
 var call = NG.core.calls.medal.unlock(medalId);
-call.addDataHandler(onMedalUnlockDataReceived);
+call.addOutcomeHandler(onMedalUnlockDataReceived);
 call.send();
 ```
 
 The various calls types result in different response data structures. For instance medal.unlock 
-responds with a `Response<io.newgrounds.objects.events.MedalUnlockResult>` object. The response type determines the data 
-contained in `myResponse.result.data`. 
+responds with a `CallOutcome<io.newgrounds.objects.events.Data>` object. The outcome type determines the data 
+contained in the `SUCCESS(data)`. 
 
 #### Example Usage:
 
 ```haxe
 var call = NG.core.calls.medal.unlock(medalId);
-call.addDataHandler(
-    function(response:Response<MedalUnlockResult>):Void {
+call.addOutcomeHandler(
+    function(outcome:CallOutcome<MedalUnlockData>):Void {
         
-        if (response.success && response.result.success) {
+        switch(outcome) {
             
-            var data:MedalUnlockResult = response.result.data;
-            trace('Medal unlocked, [name=${data.medal.name}] [total NG medal points=${data.medal_points}]');
+            case SUCCESS(data): trace('Medal unlocked, [name=${data.medal.name}]');
+            case FAIL(error): trace('Error unlocking medal: ' + error.toString());
         }
     }
 );
 call.send();
 ```
 
-### Error Handling
-
-If response.success is false, response.result is null, and response.error will have the error info.
-If response.result.success is false, response.result.data is null, and response.result.error will have the error info.
-
 You can use `myCall.addSuccessHandler(function():Void { trace("success"); });` 
 to only listen for successful responses from the server
 
 You can also use myCall.addErrorHandler to listen for errors thrown by NG server, or errors
- resulting from general Http remoting
+resulting from general Http remoting
 
 ```haxe
 myCall.addErrorHandler(
@@ -234,7 +229,7 @@ NG.core.calls.medal.unlock(id).queue();
  - ~~Hex encoding~~
  - ~~Enable AES-128 and Hex in the GUI test project~~
  - ~~Pretty up the GUI test project in general~~
- - ~~Replace successCallbacks and failCallbacks with resultCallbacks (2.0.0)~~
+ - ~~Replace successCallbacks and failCallbacks with outcomeCallbacks (2.0.0)~~
  - Explain OutcomeTools in readme
  - kill all humans
  - flash API assets

@@ -13,9 +13,9 @@ class MedalComponent extends Component {
 	 * 
 	 * @param id  The numeric ID of the medal to unlock.
 	**/
-	public function unlock(id:Int):Call<MedalUnlockResult> {
+	public function unlock(id:Int):Call<MedalUnlockData> {
 		
-		return new Call<MedalUnlockResult>(_core, "Medal.unlock", true, true)
+		return new Call<MedalUnlockData>(_core, "Medal.unlock", true, true)
 			.addComponentParameter("id", id);
 	}
 	
@@ -24,17 +24,17 @@ class MedalComponent extends Component {
 	 * 
 	 * @param externalAppId  Leave blank unless you which to fetch from an separate app.
 	**/
-	public function getList(externalAppId:String = null):Call<MedalListResult> {
+	public function getList(externalAppId:String = null):Call<MedalListData> {
 		
-		return new Call<MedalListResult>(_core, "Medal.getList")
+		return new Call<MedalListData>(_core, "Medal.getList")
 			.addComponentParameter("app_id", externalAppId);
 	}
 	
 	/**
 	 * Fetches the user's current medal score.
 	**/
-	public function getMedalScore():Call<MedalScoreResult> {
+	public function getMedalScore():Call<MedalScoreData> {
 		
-		return new Call<MedalScoreResult>(_core, "Medal.getMedalScore");
+		return new Call<MedalScoreData>(_core, "Medal.getMedalScore");
 	}
 }

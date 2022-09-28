@@ -11,7 +11,7 @@ typedef DebugResponse = {
 }
 
 @:noCompletion
-typedef RawResponse<T:ResultBase> =
+typedef RawResponse<T:BaseData> =
 {
 	success:Bool,
 	?error :Error,
@@ -20,7 +20,7 @@ typedef RawResponse<T:ResultBase> =
 	app_id :String
 }
 
-abstract Response<T:ResultBase>(RawResponse<T>) {
+abstract Response<T:BaseData>(RawResponse<T>) {
 	
 	public var success(get, never):Bool               ; inline function get_success () return this.success;
 	public var error  (get, never):Null<Error>        ; inline function get_error   () return this.error;

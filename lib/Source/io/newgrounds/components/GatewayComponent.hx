@@ -7,18 +7,18 @@ class GatewayComponent extends Component {
 	
 	public function new (core:NGLite){ super(core); }
 	
-	public function getDatetime():Call<GetDateTimeResult> {
+	public function getDatetime():Call<GetDateTimeData> {
 		
-		return new Call<GetDateTimeResult>(_core, "Gateway.getDatetime");
+		return new Call<GetDateTimeData>(_core, "Gateway.getDatetime");
 	}
 	
-	public function getVersion():Call<GetVersionResult> {
+	public function getVersion():Call<GetVersionData> {
 		
-		return new Call<GetVersionResult>(_core, "Gateway.getVersion");
+		return new Call<GetVersionData>(_core, "Gateway.getVersion");
 	}
 	
-	public function ping():Call<PingResult> {
+	public function ping():Call<PingData> {
 		
-		return new Call<PingResult>(_core, "Gateway.ping");
+		return new Call<PingData>(_core, "Gateway.ping");
 	}
 }

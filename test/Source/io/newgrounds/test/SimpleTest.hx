@@ -1,5 +1,6 @@
 package io.newgrounds.test;
 
+import io.newgrounds.Call;
 import io.newgrounds.NG;
 import io.newgrounds.objects.Error;
 import io.newgrounds.objects.SaveSlot;
@@ -56,7 +57,7 @@ class SimpleTest {
 	}
 	
 	// --- MEDALS
-	function onNGMedalFetch(outcome:Outcome<Error>) {
+	function onNGMedalFetch(outcome:Outcome<CallError>) {
 		
 		switch (outcome) {
 			case FAIL(error): throw 'Error loading medals: $error';
@@ -77,7 +78,7 @@ class SimpleTest {
 	}
 	
 	// --- SCOREBOARDS
-	function onNGBoardsFetch(outcome:Outcome<Error>) {
+	function onNGBoardsFetch(outcome:Outcome<CallError>) {
 		
 		outcome.assert('Error loading score boards:');
 		
@@ -107,7 +108,7 @@ class SimpleTest {
 			trace('score loaded user:${score.user.name}, score:${score.formattedValue}');
 	}
 	
-	function onNGSlotsFetch(outcome:Outcome<String>) {
+	function onNGSlotsFetch(outcome:Outcome<CallError>) {
 		
 		outcome.assert('Error getting saveSlots:');
 		

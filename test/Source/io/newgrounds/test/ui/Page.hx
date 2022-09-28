@@ -52,7 +52,7 @@ class Page<T:Component> {
 	
 	function fieldString(field:TextField):String {
 		
-		var text:String = Input.trimEndWhitespace(field.text);
+		var text = Input.trimEndWhitespace(field.text);
 		
 		if (text == "")
 			return null;

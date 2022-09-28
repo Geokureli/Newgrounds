@@ -1,7 +1,7 @@
 package io.newgrounds.components;
 
-import io.newgrounds.objects.events.Result.SaveSlotResult;
-import io.newgrounds.objects.events.Result.LoadSlotsResult;
+import io.newgrounds.objects.events.Result;
+import io.newgrounds.objects.events.Result;
 import io.newgrounds.NGLite;
 
 /** Handles loading and saving of game states. */
@@ -21,9 +21,9 @@ class CloudSaveComponent extends Component {
 	 * 
 	 * @param id  The slot number
 	**/
-	public function clearSlot(id:Int):Call<SaveSlotResult> {
+	public function clearSlot(id:Int):Call<SaveSlotData> {
 		
-		return new Call<SaveSlotResult>(_core, "CloudSave.clearSlot", true)
+		return new Call<SaveSlotData>(_core, "CloudSave.clearSlot", true)
 			.addComponentParameter("id", id);
 	}
 	
@@ -33,9 +33,9 @@ class CloudSaveComponent extends Component {
 	 * @param id             The slot number
 	 * @param externalAppId  Leave blank unless you which to fetch from an separate app.
 	**/
-	public function loadSlot(id:Int, externalAppId:String = null):Call<SaveSlotResult> {
+	public function loadSlot(id:Int, externalAppId:String = null):Call<SaveSlotData> {
 		
-		return new Call<SaveSlotResult>(_core, "CloudSave.loadSlot", true)
+		return new Call<SaveSlotData>(_core, "CloudSave.loadSlot", true)
 			.addComponentParameter("id", id)
 			.addComponentParameter("app_id", externalAppId);
 	}
@@ -46,9 +46,9 @@ class CloudSaveComponent extends Component {
 	 * @param id             The slot number
 	 * @param externalAppId  Leave blank unless you which to fetch from an separate app.
 	**/
-	public function loadSlots(externalAppId:String = null):Call<LoadSlotsResult> {
+	public function loadSlots(externalAppId:String = null):Call<LoadSlotsData> {
 		
-		return new Call<LoadSlotsResult>(_core, "CloudSave.loadSlots", true)
+		return new Call<LoadSlotsData>(_core, "CloudSave.loadSlots", true)
 			.addComponentParameter("app_id", externalAppId);
 	}
 	
@@ -58,9 +58,9 @@ class CloudSaveComponent extends Component {
 	 * @param data  The data you want to save
 	 * @param id    The slot number
 	**/
-	public function setData(data:String, id:Int):Call<SaveSlotResult> {
+	public function setData(data:String, id:Int):Call<SaveSlotData> {
 		
-		return new Call<SaveSlotResult>(_core, "CloudSave.setData", true)
+		return new Call<SaveSlotData>(_core, "CloudSave.setData", true)
 			.addComponentParameter("data", data, allowNull)
 			.addComponentParameter("id", id);
 	}

@@ -1,9 +1,11 @@
 package io.newgrounds.objects;
 
-import io.newgrounds.objects.events.Response;
-import io.newgrounds.objects.events.Result.MedalUnlockResult;
-import io.newgrounds.utils.Dispatcher;
+import io.newgrounds.Call;
 import io.newgrounds.NGLite;
+import io.newgrounds.objects.events.Outcome;
+import io.newgrounds.objects.events.Response;
+import io.newgrounds.objects.events.Result;
+import io.newgrounds.utils.Dispatcher;
 
 typedef RawMedalData =
 {
@@ -57,7 +59,7 @@ class Medal extends Object<RawMedalData> {
 			onUnlock.dispatch();
 	}
 	
-	public function sendUnlock():Void {
+	public function sendUnlock(?callback:(Outcome<CallError>)->Void):Void {
 		
 		if (_core.sessionId == null) {
 			// --- Unlock regardless, show medal popup to encourage NG signup
@@ -67,37 +69,43 @@ class Medal extends Object<RawMedalData> {
 		}
 		
 		_core.calls.medal.unlock(id)
-			.addDataHandler(onUnlockResponse)
+			.addOutcomeHandler(onUnlockResponse.bind(_, callback))
 			.send();
 	}
 	
-	function onUnlockResponse(response:Response<MedalUnlockResult>):Void {
+	function onUnlockResponse(outcome:CallOutcome<MedalUnlockData>, callback:Null<(Outcome<CallError>)->Void>):Void {
 		
-		if (response.success && response.result.success) {
-			
-			parse(response.result.data.medal);
-			
-			// --- Unlock response doesn't include unlock=true, so parse won't change it.
-			if (!unlocked) {
+		switch (outcome)
+		{
+			case FAIL(error): callback.safe(FAIL(error));
+			case SUCCESS(data):
+			{
+				parse(data.medal);
 				
-				_data.unlocked = true;
-				onUnlock.dispatch();
+				// --- Unlock response doesn't include unlock=true, so parse won't change it.
+				if (!unlocked) {
+					
+					_data.unlocked = true;
+					callback.safe(outcome.toUntyped());
+					onUnlock.dispatch();
+				}
 			}
 		}
 	}
 	
 	/** Locks the medal on the client and sends an unlock request, Server responds the same either way. */ 
-	public function sendDebugUnlock():Void {
+	public function sendDebugUnlock(?callback:Null<(Outcome<CallError>)->Void>):Void {
 		
 		if (NG.core.sessionId == null) {
 			
+			callback.safe(SUCCESS);
 			onUnlock.dispatch();
 			
 		} else {
 			
 			_data.unlocked = false;
 			
-			sendUnlock();
+			sendUnlock(callback);
 		}
 	}
 	

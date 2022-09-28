@@ -14,6 +14,18 @@ enum TypedOutcome<T, E>
 class TypedOutcomeTools
 {
 	/**
+	 * Calls the callback if it's not null
+	 */
+	inline static public function safe<T, E>
+	( callback:Null<(TypedOutcome<T, E>)->Void>
+	, outcome:TypedOutcome<T, E>
+	) {
+		
+		if (callback != null)
+			callback(outcome);
+	}
+	
+	/**
 	 * Calls the corresponding handler, with the outcome's value, depending on the supplied outcome.
 	 * 
 	 * @param outcome The outcome.
@@ -25,8 +37,8 @@ class TypedOutcomeTools
 	, ?success:(T)->Void
 	, ?fail   :(E)->Void
 	) {
-		switch outcome
-		{
+		switch outcome {
+			
 			case SUCCESS(value) if (success != null): success(value);
 			case FAIL   (error) if (fail    != null): fail   (error);
 			default:
@@ -45,8 +57,8 @@ class TypedOutcomeTools
 	, ?success:(TypedOutcome<T, E>)->Void
 	, ?fail   :(TypedOutcome<T, E>)->Void
 	) {
-		switch outcome
-		{
+		switch outcome {
+			
 			case SUCCESS(value) if (success != null): success(outcome);
 			case FAIL   (error) if (fail    != null): fail(outcome);
 			default:
@@ -63,8 +75,8 @@ class TypedOutcomeTools
 	( outcome:TypedOutcome<T, E>
 	, success:(T)->Void
 	) {
-		switch outcome
-		{
+		switch outcome {
+			
 			case FAIL(_): // nothing
 			case SUCCESS(value): success(value);
 		}
@@ -81,8 +93,8 @@ class TypedOutcomeTools
 	( outcome:TypedOutcome<T, E>
 	, success:(T)->Void
 	) {
-		switch outcome
-		{
+		switch outcome {
+			
 			case SUCCESS(value): success(value);
 			case FAIL   (error): throw error;
 		}
@@ -93,12 +105,36 @@ class TypedOutcomeTools
 	 * 
 	 * @param outcome The outcome.
 	**/
-	inline static public function assert<T, E>(outcome:TypedOutcome<T, E>)
-	{
-		switch outcome
-		{
+	inline static public function assert<T, E>(outcome:TypedOutcome<T, E>) {
+		
+		switch outcome {
+			
 			case FAIL(error): throw error;
 			case SUCCESS(_): //nothing
+		}
+	}
+	
+	/**
+	 * Converts the outcome from a `TypedOutcome<T, E>` to an `Outcome<E>` by ignoring the success
+	 * value
+	 * 
+	 * @param outcome The outcome.
+	**/
+	inline static public function toUntyped<T, E>(outcome:TypedOutcome<T, E>):Outcome<E> {
+		
+		return switch outcome {
+			
+			case SUCCESS(_): SUCCESS;
+			case FAIL(error): FAIL(error);
+		}
+	}
+	
+	inline static public function errorToString<T, E>(outcome:TypedOutcome<T, E>):TypedOutcome<T, String> {
+		
+		return switch(outcome) {
+			
+			case SUCCESS(value): SUCCESS(value);
+			case FAIL(error): FAIL(Std.string(error));
 		}
 	}
 }
@@ -116,6 +152,15 @@ enum Outcome<E>
 class OutcomeTools
 {
 	/**
+	 * Calls the callback if it's not null
+	 */
+	inline static public function safe<E>(callback:Null<(Outcome<E>)->Void>, outcome:Outcome<E>) {
+		
+		if (callback != null)
+			callback(outcome);
+	}
+	
+	/**
 	 * Calls the list of function via daisy-chaining callbacks starting with the first. If any
 	 * function fails, the callback is called with that Error, if all succeed, the callback is
 	 * called with SUCCESS.
@@ -129,12 +174,12 @@ class OutcomeTools
 	) {
 		final initialCallback = callback;
 		var i = list.length;
-		while (i-- > 1)
-		{
+		while (i-- > 1) {
+			
 			final prevCallback = callback;
 			final successHandler = list[i];
-			callback = (o)->switch(o)
-			{
+			callback = (o)->switch(o) {
+				
 				case SUCCESS: successHandler(prevCallback);
 				case FAIL(_): initialCallback(o);
 			}
@@ -154,8 +199,8 @@ class OutcomeTools
 	, ?success:()->Void
 	, ?fail   :(E)->Void
 	) {
-		switch outcome
-		{
+		switch outcome {
+			
 			case SUCCESS     if (success != null): success();
 			case FAIL(error) if (fail    != null): fail(error);
 			default:
@@ -174,8 +219,8 @@ class OutcomeTools
 	, ?success:(Outcome<E>)->Void
 	, ?fail   :(Outcome<E>)->Void
 	) {
-		switch outcome
-		{
+		switch outcome {
+			
 			case SUCCESS     if (success != null): success(outcome);
 			case FAIL(error) if (fail    != null): fail   (outcome);
 			default:
@@ -192,8 +237,8 @@ class OutcomeTools
 	( outcome:Outcome<E>
 	, success:()->Void
 	) {
-		switch outcome
-		{
+		switch outcome {
+			
 			case FAIL(_): // nothing
 			case SUCCESS: success();
 		}
@@ -210,8 +255,8 @@ class OutcomeTools
 	( outcome:Outcome<E>
 	, success:()->Void
 	) {
-		switch outcome
-		{
+		switch outcome {
+			
 			case SUCCESS: success();
 			case FAIL(error): throw error;
 		}
@@ -222,17 +267,26 @@ class OutcomeTools
 	 * 
 	 * @param outcome The outcome.
 	**/
-	inline static public function assert<E>(outcome:Outcome<E>, ?msgPrefix:String)
-	{
+	inline static public function assert<E>(outcome:Outcome<E>, ?msgPrefix:String) {
+		
 		if (msgPrefix == null)
 			msgPrefix = "";
 		else
 			msgPrefix += " ";
 		
-		switch outcome
-		{
+		switch outcome {
+			
 			case FAIL(error): throw msgPrefix + Std.string(error);
 			case SUCCESS: //nothing
+		}
+	}
+	
+	inline static public function errorToString<E>(outcome:Outcome<E>):Outcome<String> {
+		
+		return switch(outcome) {
+			
+			case SUCCESS: SUCCESS;
+			case FAIL(error): FAIL(Std.string(error));
 		}
 	}
 }
