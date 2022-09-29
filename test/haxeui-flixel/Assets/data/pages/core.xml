@@ -1,0 +1,43 @@
+<vbox width="100%">
+	<hbox width="100%">
+		<vbox width="115">
+			<section-header text="Session"/>
+			<button text="Login" width="100%" id="login"/>
+			<hbox>
+				<image
+					id="userIcon"
+					resource="http://apifiles.ngfiles.com/medals/47000/47215/53995_easy.webp"
+					width="60" height="60"
+					scaleMode="fitheight"
+					style="border:1px"
+				/>
+				<vbox>
+					<button id="url" text="url" width="50"/>
+					<image
+						id="supporter"
+						resource="Assets/images/supporter.png"
+						width="32" height="32"
+						scaleMode="fitheight"
+					/>
+				</vbox>
+			</hbox>
+			<label
+				id="username"
+				width="120"
+				autoWidth="true"
+				text="LOOOONNG UserName"
+				style="border:1px"
+				horizontalAlign="center"
+				visible="false"
+			/>
+		</vbox>
+		
+		<vbox width="100%">
+			<section-header text="Medals"/>
+			<scrollview width="100%" height="110" style="borderSize:0;padding:0;">
+				<grid columns="10" id="medalList">
+				</grid>
+			</scrollview> 
+		</vbox>
+	</hbox>
+</vbox>

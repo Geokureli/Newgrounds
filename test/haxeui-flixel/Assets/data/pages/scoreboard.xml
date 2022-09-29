@@ -3,13 +3,20 @@
     <hbox>
         <button width="150" text="Get Scores" id="getScores"/>
         <spacer width="10"/>
+        
+        <label verticalAlign="center" text="id:"/>
+        <textfield id="getScoresId" width="40"/>
+        <spacer width="10"/>
+        
         <label verticalAlign="center" text="limit:"/>
-        <number-stepper id="limit" width="60" pos="10"/>
+        <number-stepper id="limit" width="50" pos="10"/>
         <spacer width="10"/>
+        
         <label verticalAlign="center" text="skip:"/>
-        <number-stepper id="skip" width="60"/>
+        <number-stepper id="skip" width="50"/>
         <spacer width="10"/>
-        <dropdown width="120" id="period">
+        
+        <dropdown width="105" id="period">
             <data>
                 <item text="Current Day"/>
                 <item text="Current Week"/>
@@ -19,15 +26,22 @@
             </data>
         </dropdown>
         <spacer width="10"/>
+        
         <label verticalAlign="center" text="social:"/>
         <checkbox verticalAlign="center" id="social"/>
         <spacer width="10"/>
+        
         <label verticalAlign="center" text="user:"/>
-        <textfield verticalAlign="center" id="user" width="100"/>
+        <textfield id="user" width="100"/>
     </hbox>
     <hbox>
         <button width="150" text="Post Score" id="postScore"/>
         <spacer width="10"/>
+        
+        <label verticalAlign="center" text="id:"/>
+        <textfield id="postScoreId" width="40"/>
+        <spacer width="10"/>
+        
         <label verticalAlign="center" text="score:"/>
         <textfield verticalAlign="center" text="0" id="score" width="50" restrictChars="0-9"/>
         <label text="*Requires sessionId" verticalAlign="center"/>

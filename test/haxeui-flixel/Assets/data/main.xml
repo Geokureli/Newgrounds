@@ -13,7 +13,7 @@
 		<box text="Gateway" width="100%" height="100%" id="gatewayPage"/>
 		<box text="Loader" width="100%" height="100%" id="loaderPage"/>
 		<box text="Medal" width="100%" height="100%" id="medalPage"/>
-		<box text="Scoreboard" width="100%" height="100%" id="scoreboardPage"/>
+		<box text="Scoreboard" width="100%" height="100%" id="scoreBoardPage"/>
 		<box text="Cloud Saves" width="100%" height="100%" id="cloudSavePage"/>
 	</tabview>
 	

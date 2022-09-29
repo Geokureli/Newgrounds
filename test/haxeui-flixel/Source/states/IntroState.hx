@@ -17,7 +17,7 @@ class IntroState extends flixel.FlxState
     override function create() add(new IntroView());
 }
 
-@:build(haxe.ui.ComponentBuilder.build("assets/intro.xml"))
+@:build(haxe.ui.ComponentBuilder.build("Assets/data/intro.xml"))
 class IntroView extends Box
 {
     override function onReady()
@@ -38,9 +38,13 @@ class IntroView extends Box
             format = base64.selected ? BASE_64 : HEX;
         }
         
+        var session = sessionId.text;
+        if (StringTools.trim(session) == "")
+            session = null;
+        
         FlxG.switchState(new MainState
             ( appId.text
-            , sessionId.text
+            , session
             , debug.selected
             , encKey.text
             , cipher

@@ -388,7 +388,7 @@ class NG extends NGLite {
 		callback.safe(outcome);
 	}
 	
-	public function logOut(onComplete:(Outcome<CallError>)->Void = null) {
+	public function logOut(onComplete:?(Outcome<CallError>)->Void = null) {
 		
 		var call = calls.app.endSession()
 			.addSuccessHandler(onLogOutSuccessful);

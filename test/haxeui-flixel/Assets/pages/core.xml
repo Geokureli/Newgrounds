@@ -1,7 +1,0 @@
-<vbox width="100%">
-    <section-header text="Medals"/>
-    <scrollview width="100%" height="110" style="borderSize:0;padding:0;">
-        <grid columns="14">
-        </grid>
-    </scrollview> 
-</vbox>

@@ -1,0 +1,3 @@
+<dialog width="400" title="Open Passport Url">
+    <label text="You will be directed to the Newgrounds Passport page." verticalAlign="center" horizontalAlign="center"/>
+</dialog>

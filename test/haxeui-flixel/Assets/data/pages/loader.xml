@@ -1,0 +1,19 @@
+<vbox verticalAlign="center" horizontalAlign="center" style="spacing:20px;">
+    <button width="150" text="Author URL" id="loadAuthorUrl"/>
+    <button width="150" text="More games" id="loadMoreGames"/>
+    <button width="150" text="Newgrounds" id="loadNewgrounds"/>
+    <button width="150" text="Official URL" id="loadOfficialUrl"/>
+    <hbox>
+        <button width="150" text="Referral" id="loadReferral"/>
+        <spacer width="10"/>
+        
+        <label text="referral name:" verticalAlign="center"/>
+        <textfield id="referralName" text="test referral"/>
+        <spacer width="10"/>
+        
+        <label text="log stat:" verticalAlign="center"/>
+        <checkbox id="logStat" selected="true"/>
+        
+    </hbox>
+    <checkbox text="redirect" id="redirect"/>
+</vbox>

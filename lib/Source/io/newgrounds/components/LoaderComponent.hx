@@ -14,38 +14,40 @@ class LoaderComponent extends Component {
 	
 	public function new (core:NGLite){ super(core); }
 	
-	public function loadAuthorUrl(redirect:Bool = false):Call<UrlData> {
+	public function loadAuthorUrl(redirect = false):Call<UrlData> {
 		
 		return new Call<UrlData>(_core, "Loader.loadAuthorUrl")
 			.addComponentParameter("host", _core.host)
 			.addComponentParameter("redirect", redirect, true);
 	}
 	
-	public function loadMoreGames(redirect:Bool = false):Call<UrlData> {
+	public function loadMoreGames(redirect = false):Call<UrlData> {
 		
 		return new Call<UrlData>(_core, "Loader.loadMoreGames")
 			.addComponentParameter("host", _core.host)
 			.addComponentParameter("redirect", redirect, true);
 	}
 	
-	public function loadNewgrounds(redirect:Bool = false):Call<UrlData> {
+	public function loadNewgrounds(redirect = false):Call<UrlData> {
 		
 		return new Call<UrlData>(_core, "Loader.loadNewgrounds")
 			.addComponentParameter("host", _core.host)
 			.addComponentParameter("redirect", redirect, true);
 	}
 	
-	public function loadOfficialUrl(redirect:Bool = false):Call<UrlData> {
+	public function loadOfficialUrl(redirect = false):Call<UrlData> {
 		
 		return new Call<UrlData>(_core, "Loader.loadOfficialUrl")
 			.addComponentParameter("host", _core.host)
 			.addComponentParameter("redirect", redirect, true);
 	}
 	
-	public function loadReferral(redirect:Bool = false):Call<UrlData> {
+	public function loadReferral(referralName:String, logStat = true, redirect = false):Call<UrlData> {
 		
 		return new Call<UrlData>(_core, "Loader.loadReferral")
 			.addComponentParameter("host", _core.host)
+			.addComponentParameter("referral_name", referralName)
+			.addComponentParameter("log_stat", logStat, true)
 			.addComponentParameter("redirect", redirect, true);
 	}
 }

@@ -13,7 +13,7 @@ import io.newgrounds.objects.events.Result;
 import io.newgrounds.objects.events.Outcome;
 import io.newgrounds.utils.Dispatcher;
 
-#if !(js || flash || cpp || neko || hl)
+#if !(js || flash || cpp || neko || hl || display)
 	#error "Target not supported, use: Flash, JS, cpp or maybe neko or hashlink";
 #end
 
