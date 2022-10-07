@@ -1,12 +1,6 @@
-<vbox style="padding: 5px;">
-    <style>
-        .button {
-            font-size: 20px;
-        }
-    </style>
-    <hbox>
-        <button text="Click Me!" id="button1" style="color: red;" />
-        <button text="Click Me!" id="button2" style="color: green;" />
-        <button text="Click Me!" onclick="this.text='Thanks!'" style="color: blue;" />
-    </hbox>    
-</vbox>
+<scrollview width="400" height="100">
+    <grid columns="10">
+        <image width="50" height="50" resource="haxeui-core/styles/default/haxeui.png"/>
+        <image width="50" height="50" resource="haxeui-core/styles/default/haxeui.png"/>
+    </grid>
+</scrollview> 

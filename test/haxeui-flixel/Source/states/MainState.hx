@@ -4,6 +4,8 @@ import haxe.PosInfos;
 
 import pages.*;
 
+import flixel.FlxG;
+
 import haxe.ui.containers.VBox;
 import haxe.ui.components.Label;
 import haxe.ui.components.TextField;

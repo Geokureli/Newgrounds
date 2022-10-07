@@ -46,6 +46,16 @@ private class RawScoreBoardList extends ObjectList<Int, ScoreBoard> {
 			.sendExternalAppId(_externalAppId);
 	}
 	
+	public function findByName(name:String)
+	{
+		for (board in _map)
+		{
+			if (board.name == name)
+				return board;
+		}
+		
+		return null;
+	}
 	
 	function onScoreBoardsReceived(outcome:CallOutcome<GetBoardsData>) {
 		

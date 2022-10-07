@@ -4,9 +4,13 @@ import io.newgrounds.NG;
 import io.newgrounds.Call;
 import io.newgrounds.objects.events.Outcome;
 
+import components.ScoreBoard;
 import dialogs.Passport;
 import states.MainState;
 
+import flixel.FlxG;
+
+import haxe.ui.containers.Box;
 import haxe.ui.containers.VBox;
 import haxe.ui.events.MouseEvent;
 
@@ -14,10 +18,20 @@ import flixel.math.FlxPoint;
 import openfl.display.BitmapData;
 
 using haxe.ui.animation.AnimationTools;
+using StringTools;
 
 @:build(haxe.ui.ComponentBuilder.build("Assets/data/pages/core.xml"))
 class CorePage extends Page
 {
+	var scoreBoard:ScoreBoard;
+	
+	public function new ()
+	{
+		super();
+		
+		scoreBoardContainer.addComponent(scoreBoard = new ScoreBoard());
+	}
+	
 	override function onReady()
 	{
 		super.onReady();
@@ -27,7 +41,12 @@ class CorePage extends Page
 			if (NG.core.attemptingLogin)
 				login.text = "Cancel";
 			else
-				onLogout();
+			{
+				username.hidden = true;
+				userIcon.hidden = true;
+				supporter.hidden = true;
+				url.hidden = true;
+			}
 		}
 		
 		NG.core.onLogin.add(onLogin);
@@ -36,6 +55,9 @@ class CorePage extends Page
 	
 	public function onLogin()
 	{
+		FlxG.save.data.sessionId = NG.core.sessionId;
+		FlxG.save.flush();
+		
 		_main.sessionId.text = NG.core.sessionId;
 		login.text = "Logout";
 		final user = NG.core.user;
@@ -56,18 +78,19 @@ class CorePage extends Page
 		BitmapData.loadFromFile(user.icons.large)
 			.onComplete((bmd)->
 			{
-				var imageBg = userIcon.members[0];
-				var image = userIcon.members[1];
-				image.loadGraphic(bmd);
-				image.setGraphicSize(Std.int(imageBg.width), Std.int(imageBg.height));
-				image.updateHitbox();
+				final key = 'user-icon:${user.name}';
+				FlxG.bitmap.add(bmd, false, key);
+				userIcon.resource = key;
 			})
-			.onError((e)->trace('Error: $e'));//TODO:show error photo
+			.onError((e)->userIcon.resource = "Assets/images/pfp.png");
 		
 		if (NG.core.medals.state == Empty)
 		{
-			NG.core.medals.loadList(onMedalsRecieve);
+			NG.core.medals.loadList(onMedalsReceive);
 		}
+		
+		// if (NG.core.scoreBoards.state == Empty)
+		// 	scoreBoard.loadBoards();
 	}
 	
 	public function onLogout()
@@ -93,16 +116,18 @@ class CorePage extends Page
 			NG.core.requestLogin(null, (url)->{ new Passport().showDialog(); });
 	}
 	
-	function onMedalsRecieve(outcome:Outcome<CallError>)
+	function onMedalsReceive(outcome:Outcome<CallError>)
 	{
 		switch outcome
 		{
 			case FAIL(_):
 			case SUCCESS:
+			{
 				for (medal in NG.core.medals)
 				{
-					
+					medalList.addComponent(new MedalItem(medal.icon, medal.unlocked));
 				}
+			}
 		}
 	}
 	
@@ -130,5 +155,22 @@ class CorePage extends Page
 		#else
 			logError("Could not open passport url, unhandled target");
 		#end
+	}
+}
+
+@:build(haxe.ui.ComponentBuilder.build("Assets/data/components/medal.xml"))
+class MedalItem extends Box
+{
+	public function new (url:String, unlocked:Bool)
+	{
+		super();
+		
+		if (url.endsWith("medal_secret.png"))
+			url = "Assets/images/medal_secret.png";
+		else if (url.indexOf("//") == 0)
+			url = "https:" + url;
+		
+		medalIcon.resource = url;
+		lock.hidden = unlocked;
 	}
 }

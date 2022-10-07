@@ -1,0 +1,11 @@
+<box width="50" height="50">
+	<image id="medalIcon"
+		resource="Assets/images/medal_secret.png"
+		width="50" height="50"
+	/>
+	<image id="lock"
+		resource="Assets/images/lock.png"
+		verticalAlign="bottom"
+		horizontalAlign="right"
+	/>
+</box>

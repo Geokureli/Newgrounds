@@ -1,0 +1,51 @@
+<vbox width="100%" style="padding:0;spacing:0;">
+	<section-header text="High Scores"/>
+	<spacer height="5"/>
+	<hbox width="100%">
+		<dropdown id="boardName" text="Select Board" width="100%">
+			<data>
+			</data>
+		</dropdown>
+		
+		<dropdown id="periodDropDown" width="115">
+			<data>
+				<item text="All-Time"/>
+				<item text="Current Day"/>
+				<item text="Current Year"/>
+				<item text="Current Week"/>
+				<item text="Current Month"/>
+			</data>
+		</dropdown>
+	</hbox>
+	
+	<tableview id="scoreList" width="100%" style="padding:0;">
+		<header width="100%" height="0">
+			<column id="rank"  text="Rank"/>
+			<column id="user"  text="User" width="100%"/>
+			<column id="score" text="Score" width="100"/>
+		</header>
+		<data>
+			<item rank="1"  user="GeoKureli" score="0"/>
+			<item rank="2"  user="GeoKureli" score="0"/>
+			<item rank="3"  user="GeoKureli" score="0"/>
+			<item rank="4"  user="GeoKureli" score="0"/>
+			<item rank="5"  user="GeoKureli" score="0"/>
+			<item rank="6"  user="GeoKureli" score="0"/>
+			<item rank="7"  user="GeoKureli" score="0"/>
+			<item rank="8"  user="GeoKureli" score="0"/>
+			<item rank="9"  user="GeoKureli" score="0"/>
+			<item rank="10" user="GeoKureli" score="0"/>
+		</data>
+	</tableview>
+	<spacer height="5"/>
+	<hbox width="100%">
+		<textfield id="tag" placeholder="tag" width="100%"/>
+		<spacer width="10"/>
+		<label text="social:" verticalAlign="center"/>
+		<checkbox id="social" verticalAlign="center"/>
+		<spacer width="10"/>
+		<label id="pageLabel" text="page 1" verticalAlign="center"/>
+		<button id="prev" width="20" icon="haxeui-core/styles/shared/left-arrow-blue.png" verticalAlign="center"/>
+		<button id="next" width="20" icon="haxeui-core/styles/shared/right-arrow-blue.png" verticalAlign="center"/>
+	</hbox>
+</vbox>

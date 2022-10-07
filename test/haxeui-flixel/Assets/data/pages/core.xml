@@ -1,43 +1,63 @@
 <vbox width="100%">
 	<hbox width="100%">
-		<vbox width="115">
+		<vbox width="150">
 			<section-header text="Session"/>
 			<button text="Login" width="100%" id="login"/>
 			<hbox>
-				<image
-					id="userIcon"
-					resource="http://apifiles.ngfiles.com/medals/47000/47215/53995_easy.webp"
+				<image id="userIcon"
+					resource="Assets/images/pfp.png"
 					width="60" height="60"
 					scaleMode="fitheight"
 					style="border:1px"
 				/>
 				<vbox>
 					<button id="url" text="url" width="50"/>
-					<image
-						id="supporter"
+					<image id="supporter"
 						resource="Assets/images/supporter.png"
 						width="32" height="32"
 						scaleMode="fitheight"
 					/>
 				</vbox>
 			</hbox>
-			<label
-				id="username"
+			<label id="username" text="UserName"
 				width="120"
-				autoWidth="true"
-				text="LOOOONNG UserName"
 				style="border:1px"
-				horizontalAlign="center"
-				visible="false"
 			/>
 		</vbox>
 		
-		<vbox width="100%">
+		<vbox width="100%" height="100%">
 			<section-header text="Medals"/>
 			<scrollview width="100%" height="110" style="borderSize:0;padding:0;">
 				<grid columns="10" id="medalList">
 				</grid>
 			</scrollview> 
 		</vbox>
+	</hbox>
+	<spacer height="10"/>
+	<hbox width="100%">
+		<vbox width="50%" style="padding:0;">
+			<section-header text="Save Slots"/>
+			<tableview id="saveSlots" width="100%">
+				<header width="100%">
+					<column id="slotId" text="ID" width="30"/>
+					<column id="time" text="Last Saved" width="100%"/>
+					<column id="size" text="Size" width="80"/>
+				</header>
+				<data>
+					<item slotId="1"  time="2022-09-27 23:14:47" size="18 bytes"/>
+					<item slotId="2"  time="Empty" size="-"/>
+					<item slotId="3"  time="Empty" size="-"/>
+					<item slotId="4"  time="Empty" size="-"/>
+					<item slotId="5"  time="Empty" size="-"/>
+					<item slotId="6"  time="Empty" size="-"/>
+					<item slotId="7"  time="Empty" size="-"/>
+					<item slotId="8"  time="Empty" size="-"/>
+					<item slotId="9"  time="Empty" size="-"/>
+					<item slotId="10" time="Empty" size="-"/>
+				</data>
+			</tableview>
+			<label text="Click on a slot to see it's data" horizontalAlign="center"/>
+		</vbox>
+		<box id="scoreBoardContainer" width="50%" style="padding:0;spacing:0;"/>
 	</hbox>
 </vbox>
