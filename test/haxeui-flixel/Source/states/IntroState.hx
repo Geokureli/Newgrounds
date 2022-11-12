@@ -1,6 +1,5 @@
 package states;
 
-import js.html.ClipboardEvent;
 import states.MainState;
 import haxe.ui.containers.Box;
 import haxe.ui.components.Label;

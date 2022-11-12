@@ -20,12 +20,12 @@
 	<section-header text="Latest Outcome" id="outcomeHeader"/>
 	<textfield width="100%" text="" id="outcome"/>
 	
-	<hbox width="100%">
+	<hbox width="100%" id="consoleHeader" hidden="true">
 		<section-header text="Console"/>
 		<checkbox text="Queue direct calls" verticalAlign="center"/>
 		<spacer width="10"/>
 		<button text="Clear" id="clearButton"/>
 	</hbox>
 	
-	<textarea width="100%" height="160" text="" id="console"/>
+	<textarea width="100%" height="160" text="" id="console" hidden="true"/>
 </vbox>

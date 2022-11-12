@@ -208,6 +208,9 @@ typedef RawGetScoresData = ExternalAppData & BaseData & {
 	var scoreboard(default, null):RawScoreBoardData;
 	
 	/* The query skip that was used. */
+	var skip(default, null):Int;
+	
+	/* The query limit that was used. */
 	var limit(default, null):Int;
 	
 	/* The time-frame the scores belong to. See notes for acceptable values. */

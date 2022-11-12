@@ -4,6 +4,7 @@ import io.newgrounds.NG;
 import io.newgrounds.Call;
 import io.newgrounds.objects.events.Outcome;
 
+import components.CloudSaves;
 import components.ScoreBoard;
 import dialogs.Passport;
 import states.MainState;
@@ -23,12 +24,14 @@ using StringTools;
 @:build(haxe.ui.ComponentBuilder.build("Assets/data/pages/core.xml"))
 class CorePage extends Page
 {
+	var cloudSaves:CloudSaves;
 	var scoreBoard:ScoreBoard;
 	
 	public function new ()
 	{
 		super();
 		
+		cloudSaveContainer.addComponent(cloudSaves = new CloudSaves());
 		scoreBoardContainer.addComponent(scoreBoard = new ScoreBoard());
 	}
 	
@@ -85,12 +88,13 @@ class CorePage extends Page
 			.onError((e)->userIcon.resource = "Assets/images/pfp.png");
 		
 		if (NG.core.medals.state == Empty)
-		{
 			NG.core.medals.loadList(onMedalsReceive);
-		}
 		
-		// if (NG.core.scoreBoards.state == Empty)
-		// 	scoreBoard.loadBoards();
+		if (NG.core.scoreBoards.state == Empty)
+			scoreBoard.loadBoards();
+		
+		if (NG.core.saveSlots.state == Empty)
+			cloudSaves.loadSlots();
 	}
 	
 	public function onLogout()
@@ -150,10 +154,10 @@ class CorePage extends Page
 				case 'Windows': Sys.command('start ${url}');
 				case 'Linux': Sys.command('xdg-open ${url}');
 				case 'Mac': Sys.command('open ${url}');
-				case name: logError("Unhandled systemName: " + name);
+				case name: NG.core.logError("Unhandled systemName: " + name);
 			}
 		#else
-			logError("Could not open passport url, unhandled target");
+			NG.core.logError("Could not open passport url, unhandled target");
 		#end
 	}
 }

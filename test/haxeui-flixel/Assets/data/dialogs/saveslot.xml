@@ -1,0 +1,9 @@
+<dialog width="400" title="Save slot contents">
+	<label id="body" horizontalAlign="center"/>
+	<hbox horizontalAlign="center">
+		<button id="loadButton" text="Load"  width="60"/>
+		<button id="saveButton" text="Save"  width="60"/>
+		<button id="clearButton" text="Clear" width="60"/>
+	</hbox>
+	<textarea id="contents" width="100%" height="300" disabled="true"/>
+</dialog>

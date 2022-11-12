@@ -32,10 +32,13 @@ class ScoreBoard extends haxe.ui.containers.VBox
 		return value;
 	}
 	
-	public function new ()
+	public function new () { super(); }
+	
+	override function onReady()
 	{
-		super();
+		super.onReady();
 		
+		clearScores();
 	}
 	
 	@:bind(prev, MouseEvent.CLICK)
@@ -78,6 +81,8 @@ class ScoreBoard extends haxe.ui.containers.VBox
 	
 	function loadScores()
 	{
+		clearScores();
+		
 		final board = NG.core.scoreBoards.findByName(boardName.selectedItem);
 		final social = this.social.selected;
 		board.requestScores
@@ -95,6 +100,12 @@ class ScoreBoard extends haxe.ui.containers.VBox
 			);
 	}
 	
+	function clearScores()
+	{
+		for (i in 0...size)
+			scoreList.dataSource.update(i, { rank : " ", user : " ", score: " " });
+	}
+	
 	function onScoresReceive(scores:Array<Score>)
 	{
 		if (scores.length > size)
@@ -103,7 +114,7 @@ class ScoreBoard extends haxe.ui.containers.VBox
 		for (i=>score in scores)
 		{
 			scoreList.dataSource.update(i,
-				{ rank : Std.string(page * size + i)
+				{ rank : Std.string((page - 1) * size + i + 1)
 				, user : score.user.name
 				, score: score.formattedValue
 				}

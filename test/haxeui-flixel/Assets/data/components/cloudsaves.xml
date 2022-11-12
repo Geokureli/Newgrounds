@@ -1,0 +1,23 @@
+<vbox width="100%" style="padding:0;">
+	<section-header text="Save Slots"/>
+	<tableview id="saveSlots" width="100%">
+		<header width="100%">
+			<column id="slotId" text="ID" width="30"/>
+			<column id="time" text="Last Saved" width="100%"/>
+			<column id="size" text="Size" width="80"/>
+		</header>
+		<data>
+			<item slotId="1"  time="2022-09-27 23:14:47" size="18 bytes"/>
+			<item slotId="2"  time="Empty" size="-"/>
+			<item slotId="3"  time="Empty" size="-"/>
+			<item slotId="4"  time="Empty" size="-"/>
+			<item slotId="5"  time="Empty" size="-"/>
+			<item slotId="6"  time="Empty" size="-"/>
+			<item slotId="7"  time="Empty" size="-"/>
+			<item slotId="8"  time="Empty" size="-"/>
+			<item slotId="9"  time="Empty" size="-"/>
+			<item slotId="10" time="Empty" size="-"/>
+		</data>
+	</tableview>
+	<label text="Click on a slot to see it's data" horizontalAlign="center"/>
+</vbox>

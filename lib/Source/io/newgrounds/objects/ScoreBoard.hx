@@ -7,6 +7,8 @@ import io.newgrounds.objects.events.Response;
 import io.newgrounds.objects.events.Result;
 import io.newgrounds.NGLite;
 
+using Lambda;
+
 @:noCompletion
 typedef RawScoreBoardData = {
 	
@@ -56,8 +58,19 @@ class ScoreBoard extends Object<RawScoreBoardData> {
 			case SUCCESS(data):
 				
 				scores = data.scores;
-				_core.logVerbose('received ${scores.length} scores');
-				
+				if (_core.verbose)
+				{
+					final rank = data.skip;
+					function displayScore(i:Int, score:Score):String
+					{
+						return '${rank + i} ${score.user.name} - ${score.formattedValue}';
+					}
+					final plural = scores.length == 1 ? "scores" : "scores";
+					_core.logVerbose
+						('received ${scores.length} $plural:\n'
+						+ scores.mapi(displayScore).join("\n")
+						);
+				}
 				
 				callback.safe(SUCCESS);
 				

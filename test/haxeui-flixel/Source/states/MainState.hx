@@ -121,7 +121,8 @@ class MainView extends VBox
     {
         haxe.Log.trace(msg, pos);
         
-        console.text += '$msg\n';
+        if (console.hidden == false)
+            console.text += '$msg\n';
     }
     
     public function logOutcome<T>(callOutcome:CallOutcome<T>)
@@ -142,6 +143,6 @@ class MainView extends VBox
     public function setOutcome(headerText:String, outcomeText:String)
     {
         outcomeHeader.text = 'Latest Outcome: $headerText';
-        outcome.text = outcomeText;
+        outcome.text = outcomeText;// crashes on large additions
     }
 }
