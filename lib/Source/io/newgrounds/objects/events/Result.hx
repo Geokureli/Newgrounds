@@ -133,7 +133,7 @@ abstract GetDateTimeData(RawGetDateTimeData) from RawGetDateTimeData to BaseData
 		serverTimeZone += (serverTimeZone < 0 ? -1 : 1) * Std.parseInt(splitIso[1]);
 		final localTimeZone = date.getTimezoneOffset();
 		
-		return date.delta(localTimeZone + serverTimeZone * 60 * 1000);
+		return date.delta((localTimeZone + serverTimeZone) * 60 * 1000);
 	}
 }
 
