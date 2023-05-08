@@ -3,7 +3,7 @@ package io.newgrounds.crypto;
 import haxe.io.Bytes;
 import haxe.crypto.Base64;
 
-@:enum
+#if haxe4 enum #else @:enum #end
 abstract EncodingFormat(String) to String {
 	var BASE_64 = "base64";
 	var HEX     = "hex";

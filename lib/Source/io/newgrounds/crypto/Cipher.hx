@@ -2,7 +2,7 @@ package io.newgrounds.crypto;
 
 import haxe.io.Bytes;
 
-@:enum
+#if haxe4 enum #else @:enum #end
 abstract Cipher(String) to String{
 	var NONE    = "none";
 	var AES_128 = "aes128";

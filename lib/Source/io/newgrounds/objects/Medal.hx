@@ -129,7 +129,8 @@ class Medal extends Object<RawMedalData> {
 	}
 }
 
-@:enum abstract Difficulty(Int) from Int to Int {
+#if haxe4 enum #else @:enum #end
+abstract Difficulty(Int) from Int to Int {
 	
 	var EASY        = 1;
 	var MODERATE    = 2;
