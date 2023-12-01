@@ -259,10 +259,10 @@ class Call<T:BaseData>
 		
 		_core.logError(message);
 		
-		if (_outcomeHandlers == null)
+		if (_outcomeHandlers != null)
 			_outcomeHandlers.dispatch(FAIL(HTTP(message)));
 		
-		if (_httpErrorHandlers == null)
+		if (_httpErrorHandlers != null)
 			_httpErrorHandlers.dispatch(new Error(message));
 	}
 	

@@ -65,7 +65,8 @@ class ScoreBoard extends Object<RawScoreBoardData> {
 		}
 	}
 	
-	public function postScore(value:Int, tag:String = null, ?callback:(Outcome<CallError>)->Void):Void {
+	public function postScore(value:Int, ?tag:String, ?callback:(Outcome<CallError>)->Void):Void {
+		
 		final call = _core.calls.scoreBoard.postScore(id, value, tag);
 		
 		if (callback != null) {
