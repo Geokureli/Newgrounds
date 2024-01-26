@@ -2,7 +2,7 @@
 , "description" : "Newgrounds API for haxe"
 , "version"     : "2.0.2"
 , "releasenote" : "fix warnings on haxe 4.3.1"
-, "url"         : "https://newgrounds.io/"
+, "url"         : "https://github.com/Geokureli/Newgrounds"
 , "classPath"   : "lib/Source"
 , "license"     : "MIT"
 , "tags"        : ["newgrounds", "ng.io", "web", "strawberryclock"]
