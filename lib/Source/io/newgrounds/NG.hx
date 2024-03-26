@@ -147,8 +147,19 @@ class NG extends NGLite {
 		
 		super(appId, null, debug);
 		
-		// if (sessionId != null)
-		// 	session.connectTo()
+		if (sessionId != null) {
+			
+			session.connectTo(sessionId, (outcome)->{
+				
+				callback(switch (outcome) {
+					
+					case SUCCESS(_)           : SUCCESS;
+					case FAIL(EXPIRED)        : FAIL(CANCELLED(PASSPORT));
+					case FAIL(CALL(error))    : FAIL(ERROR(error));
+					case FAIL(CANCELLED(type)): FAIL(CANCELLED(type));
+				});
+			});
+		}
 	}
 	
 	/**
