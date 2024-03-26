@@ -56,7 +56,7 @@ class CloudSavePage extends Page<CloudSaveComponent> {
 			case Empty if (NG.core.loggedIn == false):
 				
 				setMessage("Login to get save slots");
-				NG.core.onLogin.addOnce(function () {
+				NG.core.session.onLogIn.addOnce(function () {
 					
 					if (NG.core.saveSlots.state != Loaded)
 						setMessage("Loading...");

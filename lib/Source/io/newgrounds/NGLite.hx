@@ -154,7 +154,7 @@ class NGLite {
 		create(appId, session, callback);
 	}
 	
-	inline static public function getUrl():String {
+	inline static public function getUrl():Null<String> {
 		
 		#if js
 			return js.Browser.document.location.href;
@@ -167,7 +167,7 @@ class NGLite {
 		#end
 	}
 	
-	static public function getSessionId():String {
+	static public function getSessionId():Null<String> {
 		
 		#if js
 			

@@ -58,8 +58,8 @@ class CorePage extends CorePageLite {
 		_openPassport.enabled = false;
 		_profileButton.onClick = onProfileClick;
 		
-		NG.core.onLogin.add(onLogin);
-		NG.core.onLogOut.add(onLogOut);
+		NG.core.session.onLogIn.add(onLogin);
+		NG.core.session.onLogOut.add(onLogOut);
 		
 		if (NG.core.attemptingLogin) {
 			
