@@ -19,6 +19,7 @@ import io.newgrounds.utils.ExternalAppList;
 import io.newgrounds.utils.MedalList;
 import io.newgrounds.utils.SaveSlotList;
 import io.newgrounds.utils.ScoreBoardList;
+import io.newgrounds.utils.SessionUtil;
 #if (openfl < "4.0.0")
 import openfl.utils.JNI;
 #elseif (lime)
@@ -40,53 +41,88 @@ class NG extends NGLite {
 	// --- DATA
 	
 	/** The logged in user */
+	@:deprecated("user is deprecated, use session.current.user")
 	public var user(get, never):User;
 	function get_user():User {
 		
-		if (_session == null)
+		final session = _session;
+		if (session == null)
 			return null;
 		
-		return _session.user;
+		return session.user;
 	}
+	// Todo:deprecate
 	public var passportUrl(get, never):String;
 	function get_passportUrl():String {
 		
-		if (_session == null || _session.status != SessionStatus.REQUEST_LOGIN)
-			return null;
-		
-		return _session.passportUrl;
+		return session.getPassportUrl();
 	}
+	
+	/** Helper for starting, ending and continuing sessions */
+	public var session(default, null):SessionUtil;
+	
+	/** Helper for unlocking, and checking the unlock status of medals */
 	public var medals(default, null):MedalList;
+	
+	/** Helper for posting, and retrieving scoreboards and scores */
 	public var scoreBoards(default, null):ScoreBoardList;
+	
+	/** Helper for reading and writing to save slots */
 	public var saveSlots(default, null):SaveSlotList;
+	
+	/** A list of external apps about which you may access limited information */
 	public var externalApps(default, null):ExternalAppList;
 	
 	// --- EVENTS
 	
-	public var onLogin(default, null):Dispatcher;
-	public var onLogOut(default, null):Dispatcher;
+	@:deprecated("Use NG.session.onLogIn")
+	public var onLogin(get, never):Dispatcher;
+	inline function get_onLogin() return session.onLogIn;
 	
-	@:deprecated("Use medals.onLoad")
+	@:deprecated("Use NG.session.onLogOut")
+	public var onLogOut(get, never):Dispatcher;
+	inline function get_onLogOut() return session.onLogOut;
+	
+	@:deprecated("Use NG.medals.onLoad")
 	public var onMedalsLoaded(get, never):Dispatcher;
-	inline function get_onMedalsLoaded()  return medals.onLoad;
+	inline function get_onMedalsLoaded() return medals.onLoad;
 	
-	@:deprecated("Use scoreBoards.onLoad")
+	@:deprecated("Use NG.scoreBoards.onLoad")
 	public var onScoreBoardsLoaded(get, never):Dispatcher;
-	inline function get_onScoreBoardsLoaded()  return scoreBoards.onLoad;
+	inline function get_onScoreBoardsLoaded() return scoreBoards.onLoad;
 	
-	@:deprecated("Use saveSlots.onLoad")
+	@:deprecated("Use NG.saveSlots.onLoad")
 	public var onSaveSlotsLoaded(get, never):Dispatcher;
-	inline function get_onSaveSlotsLoaded()  return saveSlots.onLoad;
+	inline function get_onSaveSlotsLoaded() return saveSlots.onLoad;
 	
 	// --- MISC
 	
-	public var loggedIn(default, null) = false;
-	public var attemptingLogin(default, null) = false;
+	@:deprecated("loggedIn is deprecated, use session.status")
+	public var loggedIn(get, never):Bool;
+	function get_loggedIn() {
+		
+		return session.status.match(LOGGED_IN(_));
+	}
 	
-	var _loginCancelled = false;
-	var _passportCallback:Void->Void;
+	@:deprecated("attemptingLogin is deprecated, use session.status")
+	public var attemptingLogin(get, never):Bool;
+	function get_attemptingLogin() {
+		
+		return switch (session.status) {
+			
+			case AWAITING_PASSPORT(_): true;
+			case STARTING_NEW        : true;
+			case CHECKING_STATUS(_)  : true;
+			case LOGGED_OUT          : false;
+			case LOGGED_IN(_)        : false;
+		}
+	}
 	
-	var _session:Session;
+	var _session(get, never):Session;
+	function get__session() {
+		
+		return session.current;
+	}
 	
 	/** 
 	 * Iniitializes the API, call before utilizing any other component
@@ -102,17 +138,28 @@ class NG extends NGLite {
 	) {
 		
 		host = getHost();
-		onLogin = new Dispatcher();
-		onLogOut = new Dispatcher();
 		
+		session = new SessionUtil(this);
 		medals = new MedalList(this);
 		saveSlots = new SaveSlotList(this);
 		scoreBoards = new ScoreBoardList(this);
 		externalApps = new ExternalAppList(this);
 		
-		attemptingLogin = sessionId != null;
+		super(appId, null, debug);
 		
-		super(appId, sessionId, debug, callback);
+		if (sessionId != null) {
+			
+			session.connectTo(sessionId, (outcome)->{
+				
+				callback(switch (outcome) {
+					
+					case SUCCESS(_)           : SUCCESS;
+					case FAIL(EXPIRED)        : FAIL(CANCELLED(PASSPORT));
+					case FAIL(CALL(error))    : FAIL(ERROR(error));
+					case FAIL(CANCELLED(type)): FAIL(CANCELLED(type));
+				});
+			});
+		}
 	}
 	
 	/**
@@ -145,27 +192,16 @@ class NG extends NGLite {
 	, ?callback:(LoginOutcome)->Void
 	):Void {
 		
-		var session = NGLite.getSessionId();
-		if (session == null)
-			session = backupSession;
+		var sessionId = NGLite.getSessionId();
+		if (sessionId == null)
+			sessionId = backupSession;
 		
-		create(appId, session, debug, callback);
-		
-		if (core.sessionId != null)
-			core.attemptingLogin = true;
+		create(appId, sessionId, debug, callback);
 	}
 	
 	// -------------------------------------------------------------------------------------------
 	//                                         APP
 	// -------------------------------------------------------------------------------------------
-	
-	override function checkInitialSession
-	( callback:Null<(LoginOutcome)->Void>
-	, outcome:CallOutcome<SessionData>
-	):Void {
-		
-		onSessionReceive(outcome, callback, null);
-	}
 	
 	/**
 	 * Begins the login process
@@ -177,64 +213,13 @@ class NG extends NGLite {
 	 *                          must open links on click events or else it will be blocked by the
 	 *                          popup blocker.
 	 */
-	public function requestLogin
+	@:deprecated("requestLogin is deprecated, use session.startNew, instead")
+	inline public function requestLogin
 	( callback:(LoginOutcome)->Void = null
 	, passportHandler:String->Void = null
 	):Void {
 		
-		if (attemptingLogin) {
-			
-			throw "cannot request another login until the previous attempt is complete";
-		}
-		
-		if (loggedIn) {
-			
-			logError("cannot log in, already logged in");
-			callback.safe(SUCCESS);
-			return;
-		}
-		
-		attemptingLogin = true;
-		_loginCancelled = false;
-		_passportCallback = null;
-		
-		calls.app.startSession(true)
-			.addOutcomeHandler(onSessionReceive.bind(_, callback, passportHandler))
-			.send();
-	}
-	
-	function onSessionReceive
-	( outcome:CallOutcome<SessionData>
-	, callback:Null<(LoginOutcome)->Void>
-	, passportHandler:String->Void
-	):Void {
-		
-		switch(outcome)
-		{
-			case SUCCESS(data): _session = data.session;
-			case FAIL(error):
-				
-				sessionId = null;
-				endLogin();
-				
-				callback.safe(FAIL(ERROR(error)));
-				return;
-		}
-		
-		sessionId = _session.id;
-		
-		logVerbose('session started - status: ${_session.status}');
-		
-		if (_session.status == REQUEST_LOGIN) {
-			
-			_passportCallback = checkSessionStatus.bind(callback);
-			if (passportHandler != null)
-				passportHandler(passportUrl);
-			else
-				openPassportUrl();
-			
-		} else
-			checkSessionStatus(callback);
+		session.startNew(callback, passportHandler);
 	}
 	
 	/**
@@ -243,17 +228,10 @@ class NG extends NGLite {
 	 */
 	public function openPassportUrl():Void {
 		
-		if (passportUrl != null) {
-			
-			logVerbose('loading passport: ${passportUrl}');
-			openPassportHelper(passportUrl);
-			dispatchPassportCallback();
-			
-		} else
-			logError("Cannot open passport");
+		session.openPassportUrl();
 	}
 	
-	function openPassportHelper(url:String):Void {
+	function openUrl(url:String):Void {
 		var window = "_blank";
 		
 		#if flash
@@ -275,7 +253,7 @@ class NG extends NGLite {
 				case name: logError("Unhandled systemName: " + name);
 			}
 		#else
-			logError("Could not open passport url, unhandled target");
+			logError('Could not open url: $url, unhandled target');
 		#end
 	}
 	
@@ -284,127 +262,19 @@ class NG extends NGLite {
 	 */
 	public function onPassportUrlOpen():Void {
 		
-		dispatchPassportCallback();
+		// no longer needed
 	}
 	
-	function dispatchPassportCallback():Void {
-		
-		if (_passportCallback != null) {
-			
-			logVerbose("dispatching passport callback");
-			var callback = _passportCallback;
-			_passportCallback = null;
-			callback();
-		}
-	}
-	
-	function checkSession(outcome:CallOutcome<SessionData>, callback:Null<(LoginOutcome)->Void>) {
-		
-		switch (outcome) {
-			
-			case FAIL(_):
-				log("login cancelled via passport");
-				
-				endLoginAndCall(callback, FAIL(CANCELLED(PASSPORT)));
-				
-			case SUCCESS(data):
-				
-				logVerbose("Session received");
-				
-				_session = data.session;
-				checkSessionStatus(callback);
-		}
-	}
-	
-	function checkSessionStatus(callback:Null<(LoginOutcome)->Void>) {
-		
-		if (_loginCancelled)
-		{
-			log("login cancelled via cancelLoginRequest");
-			
-			endLoginAndCall(callback, FAIL(CANCELLED(MANUAL)));
-			return;
-		}
-		
-		switch(_session.status) {
-			
-			case USER_LOADED:
-				
-				loggedIn = true;
-				endLoginAndCall(callback, SUCCESS);
-				onLogin.dispatch();
-				
-			case REQUEST_LOGIN:
-				
-				var call = calls.app.checkSession()
-					.addOutcomeHandler(checkSession.bind(_, callback));
-				
-				// Wait 3 seconds and try again
-				timer(3.0,
-					function():Void {
-						
-						logVerbose("3s elapsed, checking session again");
-						
-						// Check if cancelLoginRequest was called
-						if (!_loginCancelled)
-							call.send();
-						else {
-							
-							log("login cancelled via cancelLoginRequest");
-							endLoginAndCall(callback, FAIL(CANCELLED(MANUAL)));
-						}
-					}
-				);
-				
-			case SESSION_EXPIRED:
-				
-				log("login cancelled via passport");
-				
-				// The user cancelled the passport
-				endLoginAndCall(callback, FAIL(CANCELLED(PASSPORT)));
-		}
-	}
-	
+	@:deprecated('cancelLoginRequest')
 	public function cancelLoginRequest():Void {
 		
-		if (attemptingLogin)
-		{
-			_loginCancelled = true;
-			// Pretend we opened the passport to process the client cancel.
-			dispatchPassportCallback();
-		}
+		if (session.status.match(AWAITING_PASSPORT(_) | STARTING_NEW))
+			session.cancel();
 	}
 	
-	function endLogin():Void {
+	public function logOut(?onComplete:(Outcome<CallError>)->Void) {
 		
-		attemptingLogin = false;
-		_loginCancelled = false;
-	}
-	
-	function endLoginAndCall(callback:Null<(LoginOutcome)->Void>, outcome:LoginOutcome) {
-		
-		endLogin();
-		
-		callback.safe(outcome);
-	}
-	
-	public function logOut(onComplete:(Outcome<CallError>)->Void = null) {
-		
-		var call = calls.app.endSession()
-			.addSuccessHandler(onLogOutSuccessful);
-		
-		if (onComplete != null)
-			call.addOutcomeHandler((o)->onComplete(o.toUntyped()));
-		
-		call.addSuccessHandler(onLogOut.dispatch)
-			.send();
-	}
-	
-	function onLogOutSuccessful():Void {
-		
-		_session = null;
-		sessionId = null;
-		loggedIn = false;
+		session.endCurrent(onComplete);
 	}
 	
 	/**

@@ -55,7 +55,7 @@ class MedalPopup extends BaseAsset {
 			onMedalsLoaded();
 		else {
 			
-			NG.core.onLogin.addOnce(function () {
+			NG.core.session.onLogIn.addOnce(function () {
 				
 				NG.core.medals.onLoad.addOnce(onMedalsLoaded);
 				NG.core.medals.loadList();

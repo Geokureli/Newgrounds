@@ -99,7 +99,7 @@ class Input {
 		while(i < parent.numChildren) {
 			
 			child = parent.getChildAt(i);
-			if (Std.is(child, TextField)) {
+			if (Std.isOfType(child, TextField)) {
 				
 				field = cast (child, TextField);
 				if (field.background) {

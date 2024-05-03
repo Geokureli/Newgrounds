@@ -13,9 +13,17 @@ class AppComponent extends Component {
 			.addComponentParameter("force", force, false);
 	}
 	
-	public function checkSession():Call<SessionData> {
+	/**
+	 * Checks the status of the supplied session id
+	 * @param   id  If null, the current session is used
+	 */
+	public function checkSession(?id:String):Call<SessionData> {
 		
-		return new Call<SessionData>(_core, "App.checkSession", true);
+		return if (id == null)
+			new Call<SessionData>(_core, "App.checkSession", true);
+		else
+			new Call<SessionData>(_core, "App.checkSession", false)
+				.addProperty("session_id", id);
 	}
 	
 	public function endSession():Call<SessionData> {

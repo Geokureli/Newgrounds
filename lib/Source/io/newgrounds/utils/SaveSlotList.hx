@@ -54,7 +54,7 @@ private class RawSaveSlotList extends ObjectList<Int, SaveSlot> {
 	 */
 	public function loadList(?callback:(Outcome<CallError>)->Void) {
 		
-		if (_core.loggedIn == false)
+		if (_core.session.status.match(LOGGED_IN(_)) == false)
 			throw "Must be logged in to request cloud saves";
 		
 		if (checkState(callback) == false)
