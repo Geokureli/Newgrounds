@@ -2,7 +2,6 @@ package io.newgrounds.swf.common;
 
 
 import haxe.ds.StringMap;
-
 import openfl.display.MovieClip;
 import openfl.display.Sprite;
 import openfl.text.TextField;
@@ -77,7 +76,7 @@ class DropDown {
 		
 		if (_unusedChoices.length == 0) {
 			
-			NG.core.logError('cannot create another dropBox item max=${_choiceContainer.numChildren}');
+			NG.core.logger.logError('cannot create another dropBox item max=${_choiceContainer.numChildren}');
 			return;
 		}
 		

@@ -1,10 +1,9 @@
 package io.newgrounds.utils;
 
-import io.newgrounds.NGLite;
-
 import haxe.Http;
 import haxe.PosInfos;
 import haxe.Timer;
+import io.newgrounds.NGLite;
 
 #if (target.threaded)
 import sys.thread.Thread;
@@ -33,7 +32,7 @@ class AsyncNGCall {
 	, onStatus:Int->Void
 	) {
 		
-		core.logVerbose('sending: $data');
+		core.logger.logVerbose('sending: $data');
 		
 		#if (target.threaded || neko || java || cpp)
 		AsyncHttp.sendAsync(PATH, data, onData, onError, onStatus, core.logVerbose);

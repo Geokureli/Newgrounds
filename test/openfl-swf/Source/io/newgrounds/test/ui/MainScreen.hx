@@ -1,21 +1,19 @@
 package io.newgrounds.test.ui;
 
-import io.newgrounds.swf.common.Button;
-import haxe.ds.StringMap;
 import haxe.PosInfos;
-
-import openfl.events.Event;
-import openfl.text.TextField;
-import openfl.display.Sprite;
-import openfl.display.MovieClip;
-
+import haxe.ds.StringMap;
 import io.newgrounds.NG;
 import io.newgrounds.NGLite;
 import io.newgrounds.crypto.Cipher;
 import io.newgrounds.crypto.EncodingFormat;
+import io.newgrounds.swf.common.Button;
 import io.newgrounds.test.art.MainScreenSwf;
-import io.newgrounds.test.ui.Page;
 import io.newgrounds.test.ui.CloudSavePage;
+import io.newgrounds.test.ui.Page;
+import openfl.display.MovieClip;
+import openfl.display.Sprite;
+import openfl.events.Event;
+import openfl.text.TextField;
 
 class MainScreen extends Sprite {
 	
@@ -67,11 +65,11 @@ class MainScreen extends Sprite {
 		if (cipher != Cipher.NONE)
 			NG.core.setupEncryption(encryptionKey, cipher, format);
 		
-		NG.core.verbose = true;
+		NG.core.logger.verbose = true;
 		
 		// cache log messages that happen before initialization
 		var queuedOutput = new Array<{msg:String, pos:PosInfos}>();
-		NG.core.log = function (msg, ?pos) queuedOutput.push({msg:msg, pos:pos});
+		NG.core.logger.log = function (msg, ?pos) queuedOutput.push({msg:msg, pos:pos});
 		
 		_layout = new MainScreenSwf();
 		addChild(_layout);
@@ -80,7 +78,7 @@ class MainScreen extends Sprite {
 		#end
 		_output = _layout.output;
 		_output.text = "";
-		NG.core.log = logOutput;
+		NG.core.logger.log = logOutput;
 		// log the early messages
 		while (queuedOutput.length > 0) {
 			
@@ -125,9 +123,9 @@ class MainScreen extends Sprite {
 		_currentPage = name;
 	}
 	
-	function logOutput(msg:String, ?pos:PosInfos):Void {
+	function logOutput(msg:Any, ?pos:PosInfos):Void {
 		
-		_output.appendText(msg + "\n");
+		_output.appendText('$msg\n');
 		_output.setSelection(_output.text.length, _output.text.length);
 	}
 }

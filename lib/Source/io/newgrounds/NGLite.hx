@@ -12,6 +12,7 @@ import io.newgrounds.objects.events.Outcome;
 import io.newgrounds.objects.events.Response;
 import io.newgrounds.objects.events.Result;
 import io.newgrounds.utils.Dispatcher;
+import io.newgrounds.utils.Logger;
 
 #if !(js || flash || cpp || neko || hl)
 	#error "Target not supported, use: Flash, JS, cpp or maybe neko or hashlink";
@@ -31,8 +32,6 @@ class NGLite {
 	static public var core(default, null):NGLite;
 	static public var onCoreReady(default, null):Dispatcher = new Dispatcher();
 	
-	/** Enables verbose logging */
-	public var verbose:Bool;
 	public var debug:Bool;
 	/** The unique ID of your app as found in the 'API Tools' tab of your Newgrounds.com project. */
 	public var appId(default, null):String;
@@ -56,6 +55,8 @@ class NGLite {
 	**/
 	public var encryptionHandler:String->String;
 	
+	public final logger:Logger;
+	
 	/** 
 	 * Iniitializes the API, call before utilizing any other component.
 	 * 
@@ -76,6 +77,7 @@ class NGLite {
 		this.appId = appId;
 		this.sessionId = sessionId;
 		this.debug = debug;
+		logger = new Logger((any, ?pos)->haxe.Log.trace('[Newgrounds API] :: ${any}', pos));
 		
 		calls = new ComponentList(this);
 		
@@ -219,7 +221,7 @@ class NGLite {
 	@:generic
 	function queueCall<T:BaseResultData>(call:Call<T>):Void {
 		
-		logVerbose('queued - ${call.component}');
+		logger.logVerbose('queued - ${call.component}');
 		
 		_queuedCalls.push(call);
 		checkQueue();
@@ -242,37 +244,6 @@ class NGLite {
 		
 		if (_pendingCalls.length == 0 && _queuedCalls.length > 0)
 			_queuedCalls.shift().send();
-	}
-	
-	// -------------------------------------------------------------------------------------------
-	//                                   LOGGING / ERRORS
-	// -------------------------------------------------------------------------------------------
-	
-	/** Called internally, set this to your preferred logging method */
-	dynamic public function log(any:Dynamic, ?pos:PosInfos):Void {//TODO: limit access via @:allow
-		
-		haxe.Log.trace('[Newgrounds API] :: ${any}', pos);
-	}
-	
-	/** used internally, logs if verbose is true */
-	inline public function logVerbose(any:Dynamic, ?pos:PosInfos):Void {//TODO: limit access via @:allow
-		
-		if (verbose)
-			log(any, pos);
-	}
-	
-	/** Used internally. Logs by default, set this to your preferred error handling method */
-	dynamic public function logError(any:Dynamic, ?pos:PosInfos):Void {//TODO: limit access via @:allow
-		
-		log('Error: $any', pos);
-	}
-	
-	/** used internally, calls log error if the condition is false. EX: if (assert(data != null, "null data")) */
-	inline public function assert(condition:Bool, msg:Dynamic, ?pos:PosInfos):Bool {//TODO: limit access via @:allow
-		if (!condition)
-			logError(msg, pos);
-		
-		return condition;
 	}
 	
 	// -------------------------------------------------------------------------------------------

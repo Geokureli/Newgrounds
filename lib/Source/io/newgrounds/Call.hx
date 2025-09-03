@@ -3,9 +3,9 @@ package io.newgrounds;
 import haxe.Json;
 import haxe.ds.StringMap;
 import io.newgrounds.objects.Error;
+import io.newgrounds.objects.events.BaseResultData;
 import io.newgrounds.objects.events.Outcome;
 import io.newgrounds.objects.events.Response;
-import io.newgrounds.objects.events.BaseResultData;
 import io.newgrounds.utils.AsyncHttp;
 import io.newgrounds.utils.Dispatcher;
 
@@ -176,9 +176,9 @@ class Call<T:BaseResultData>
 			} else if (_requireSession){
 				
 				if (isExternal)
-					_core.logError(new Error('cannot send "$component" call to an external app'));
+					_core.logger.logError(new Error('cannot send "$component" call to an external app'));
 				else
-					_core.logError(new Error('cannot send "$component" call without a sessionId'));
+					_core.logger.logError(new Error('cannot send "$component" call without a sessionId'));
 				
 				return;
 			}
@@ -198,13 +198,13 @@ class Call<T:BaseResultData>
 				Reflect.setField(data.call.parameters, field, _parameters.get(field));
 		}
 		
-		_core.logVerbose('Post  - ${Json.stringify(data)}');
+		_core.logger.logVerbose('Post  - ${Json.stringify(data)}');
 		
 		if (_isSecure) {
 			
 			if (isExternal) {
 				
-				_core.logError(new Error('cannot send "$component" call to an external app that requires encryption'));
+				_core.logger.logError(new Error('cannot send "$component" call to an external app that requires encryption'));
 				return;
 			}
 			
@@ -212,7 +212,7 @@ class Call<T:BaseResultData>
 			data.call = {};
 			data.call.secure = secureData;
 			
-			_core.logVerbose('    secure - $secureData');
+			_core.logger.logVerbose('    secure - $secureData');
 		}
 		
 		_core.markCallPending(this);
@@ -228,7 +228,7 @@ class Call<T:BaseResultData>
 	
 	function onData(reply:String):Void {
 		
-		_core.logVerbose('Reply - $reply');
+		_core.logger.logVerbose('Reply - $reply');
 		
 		if (_responseHandlers == null && _successHandlers == null && _outcomeHandlers == null)
 			return;
@@ -256,7 +256,7 @@ class Call<T:BaseResultData>
 	
 	function onHttpError(message:String):Void {
 		
-		_core.logError(message);
+		_core.logger.logError(message);
 		
 		if (_outcomeHandlers != null)
 			_outcomeHandlers.dispatch(FAIL(HTTP(message)));

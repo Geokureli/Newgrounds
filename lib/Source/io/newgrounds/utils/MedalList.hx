@@ -84,7 +84,7 @@ class RawMedalList extends ObjectList<Int, Medal> {
 					}
 				}
 				
-				_core.logVerbose('${data.medals.length} Medals received [${idList.join(", ")}]');
+				_core.logger.logVerbose('${data.medals.length} Medals received [${idList.join(", ")}]');
 				
 				fireCallbacks(SUCCESS);
 		}

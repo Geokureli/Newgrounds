@@ -190,7 +190,7 @@ class NG extends NGLite {
 		
 		if (loggedIn) {
 			
-			logError("cannot log in, already logged in");
+			logger.logError("cannot log in, already logged in");
 			callback.safe(SUCCESS);
 			return;
 		}
@@ -224,7 +224,7 @@ class NG extends NGLite {
 		
 		sessionId = _session.id;
 		
-		logVerbose('session started - status: ${_session.status}');
+		logger.logVerbose('session started - status: ${_session.status}');
 		
 		if (_session.status == REQUEST_LOGIN) {
 			
@@ -246,12 +246,12 @@ class NG extends NGLite {
 		
 		if (passportUrl != null) {
 			
-			logVerbose('loading passport: ${passportUrl}');
+			logger.logVerbose('loading passport: ${passportUrl}');
 			openPassportHelper(passportUrl);
 			dispatchPassportCallback();
 			
 		} else
-			logError("Cannot open passport");
+			logger.logError("Cannot open passport");
 	}
 	
 	function openPassportHelper(url:String):Void {
@@ -273,10 +273,10 @@ class NG extends NGLite {
 				case 'Windows': Sys.command('start ${url}');
 				case 'Linux': Sys.command('xdg-open ${url}');
 				case 'Mac': Sys.command('open ${url}');
-				case name: logError("Unhandled systemName: " + name);
+				case name: logger.logError("Unhandled systemName: " + name);
 			}
 		#else
-			logError("Could not open passport url, unhandled target");
+			logger.logError("Could not open passport url, unhandled target");
 		#end
 	}
 	
@@ -292,7 +292,7 @@ class NG extends NGLite {
 		
 		if (_passportCallback != null) {
 			
-			logVerbose("dispatching passport callback");
+			logger.logVerbose("dispatching passport callback");
 			var callback = _passportCallback;
 			_passportCallback = null;
 			callback();
@@ -304,13 +304,13 @@ class NG extends NGLite {
 		switch (outcome) {
 			
 			case FAIL(_):
-				log("login cancelled via passport");
+				logger.log("login cancelled via passport");
 				
 				endLoginAndCall(callback, FAIL(CANCELLED(PASSPORT)));
 				
 			case SUCCESS(data):
 				
-				logVerbose("Session received");
+				logger.logVerbose("Session received");
 				
 				_session = data.session;
 				checkSessionStatus(callback);
@@ -321,7 +321,7 @@ class NG extends NGLite {
 		
 		if (_loginCancelled)
 		{
-			log("login cancelled via cancelLoginRequest");
+			logger.log("login cancelled via cancelLoginRequest");
 			
 			endLoginAndCall(callback, FAIL(CANCELLED(MANUAL)));
 			return;
@@ -344,14 +344,14 @@ class NG extends NGLite {
 				timer(3.0,
 					function():Void {
 						
-						logVerbose("3s elapsed, checking session again");
+						logger.logVerbose("3s elapsed, checking session again");
 						
 						// Check if cancelLoginRequest was called
 						if (!_loginCancelled)
 							call.send();
 						else {
 							
-							log("login cancelled via cancelLoginRequest");
+							logger.log("login cancelled via cancelLoginRequest");
 							endLoginAndCall(callback, FAIL(CANCELLED(MANUAL)));
 						}
 					}
@@ -359,7 +359,7 @@ class NG extends NGLite {
 				
 			case SESSION_EXPIRED:
 				
-				log("login cancelled via passport");
+				logger.log("login cancelled via passport");
 				
 				// The user cancelled the passport
 				endLoginAndCall(callback, FAIL(CANCELLED(PASSPORT)));

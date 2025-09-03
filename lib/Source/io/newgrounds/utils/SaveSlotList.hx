@@ -95,7 +95,7 @@ private class RawSaveSlotList extends ObjectList<Int, SaveSlot> {
 					idList.push(id);
 				}
 				
-				_core.logVerbose('${idList.length} SaveSlots received [${idList.join(", ")}]');
+				_core.logger.logVerbose('${idList.length} SaveSlots received [${idList.join(", ")}]');
 				
 				fireCallbacks(SUCCESS);
 		}

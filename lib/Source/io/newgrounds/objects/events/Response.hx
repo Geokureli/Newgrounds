@@ -37,9 +37,9 @@ abstract Response<T:BaseResultData>(RawResponse<T>) {
 		}
 		
 		if (!success)
-			core.logError('Call unseccessful: $error');
+			core.logger.logError('Call unseccessful: $error');
 		else if(!result.success)
-			core.logError('${result.component} fail: ${result.error}');
+			core.logger.logError('${result.component} fail: ${result.error}');
 	}
 	
 	inline public function hasError() {

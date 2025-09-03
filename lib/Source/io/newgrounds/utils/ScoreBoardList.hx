@@ -69,7 +69,7 @@ private class RawScoreBoardList extends ObjectList<Int, ScoreBoard> {
 					}
 				}
 				
-				_core.logVerbose('${data.scoreboards.length} ScoreBoards received [${idList.join(", ")}]');
+				_core.logger.logVerbose('${data.scoreboards.length} ScoreBoards received [${idList.join(", ")}]');
 				
 				fireCallbacks(SUCCESS);
 		}

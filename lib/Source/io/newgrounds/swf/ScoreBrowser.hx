@@ -171,7 +171,7 @@ class ScoreBrowser extends BaseAsset {
 		
 		for (board in NG.core.scoreBoards) {
 			
-			NG.core.log('No boardId specified defaulting to ${board.name}');
+			NG.core.logger.log('No boardId specified defaulting to ${board.name}');
 			boardId = board.id;
 			return;
 		}

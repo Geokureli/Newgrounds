@@ -50,7 +50,7 @@ class ScoreBoard extends Object<RawScoreBoardData> {
 			case SUCCESS(data):
 				
 				scores = data.scores;
-				_core.logVerbose('received ${scores.length} scores');
+				_core.logger.logVerbose('received ${scores.length} scores');
 				
 				
 				callback.safe(SUCCESS);
