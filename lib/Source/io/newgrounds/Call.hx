@@ -1,14 +1,13 @@
 package io.newgrounds;
 
-import io.newgrounds.utils.Dispatcher;
-import io.newgrounds.utils.AsyncHttp;
-import io.newgrounds.objects.Error;
-import io.newgrounds.objects.events.Result;
-import io.newgrounds.objects.events.Response;
-import io.newgrounds.objects.events.Outcome;
-
-import haxe.ds.StringMap;
 import haxe.Json;
+import haxe.ds.StringMap;
+import io.newgrounds.objects.Error;
+import io.newgrounds.objects.events.Outcome;
+import io.newgrounds.objects.events.Response;
+import io.newgrounds.objects.events.BaseResultData;
+import io.newgrounds.utils.AsyncHttp;
+import io.newgrounds.utils.Dispatcher;
 
 /** A generic way to handle calls agnostic to their type */
 interface ICallable {
@@ -20,7 +19,7 @@ interface ICallable {
 	public function destroy():Void;
 }
 
-class Call<T:BaseData>
+class Call<T:BaseResultData>
 	implements ICallable {
 	
 	public var component(default, null):String;

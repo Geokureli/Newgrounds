@@ -3,17 +3,19 @@ package io.newgrounds;
 #if ng_lite
 typedef NG = NGLite; //TODO: test and make lite UI
 #else
+import haxe.Timer;
 import io.newgrounds.Call;
 import io.newgrounds.NGLite;
 import io.newgrounds.objects.Error;
-import io.newgrounds.objects.events.Result;
-import io.newgrounds.objects.events.Outcome;
-import io.newgrounds.objects.events.Response;
-import io.newgrounds.objects.User;
 import io.newgrounds.objects.Medal;
 import io.newgrounds.objects.SaveSlot;
 import io.newgrounds.objects.ScoreBoard;
 import io.newgrounds.objects.Session;
+import io.newgrounds.objects.User;
+import io.newgrounds.objects.events.BaseResultData;
+import io.newgrounds.objects.events.Outcome;
+import io.newgrounds.objects.events.Response;
+import io.newgrounds.objects.events.Result;
 import io.newgrounds.utils.Dispatcher;
 import io.newgrounds.utils.ExternalAppList;
 import io.newgrounds.utils.MedalList;
@@ -24,7 +26,6 @@ import openfl.utils.JNI;
 #elseif (lime)
 import lime.system.JNI;
 #end
-import haxe.Timer;
 
 /**
  * The Newgrounds API for Haxe.
@@ -161,7 +162,7 @@ class NG extends NGLite {
 	
 	override function checkInitialSession
 	( callback:Null<(LoginOutcome)->Void>
-	, outcome:CallOutcome<SessionData>
+	, outcome:CallOutcome<SessionResultData>
 	):Void {
 		
 		onSessionReceive(outcome, callback, null);
@@ -204,7 +205,7 @@ class NG extends NGLite {
 	}
 	
 	function onSessionReceive
-	( outcome:CallOutcome<SessionData>
+	( outcome:CallOutcome<SessionResultData>
 	, callback:Null<(LoginOutcome)->Void>
 	, passportHandler:String->Void
 	):Void {
@@ -298,7 +299,7 @@ class NG extends NGLite {
 		}
 	}
 	
-	function checkSession(outcome:CallOutcome<SessionData>, callback:Null<(LoginOutcome)->Void>) {
+	function checkSession(outcome:CallOutcome<SessionResultData>, callback:Null<(LoginOutcome)->Void>) {
 		
 		switch (outcome) {
 			

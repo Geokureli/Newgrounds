@@ -1,18 +1,12 @@
 package io.newgrounds.objects;
 
 import io.newgrounds.Call;
-import io.newgrounds.components.ScoreBoardComponent;
+import io.newgrounds.NGLite;
+import io.newgrounds.components.score.*;
+import io.newgrounds.objects.RawScoreBoardData;
 import io.newgrounds.objects.events.Outcome;
 import io.newgrounds.objects.events.Response;
 import io.newgrounds.objects.events.Result;
-import io.newgrounds.NGLite;
-
-@:noCompletion
-typedef RawScoreBoardData = {
-	
-	id  :Int,
-	name:String
-}
 
 class ScoreBoard extends Object<RawScoreBoardData> {
 	

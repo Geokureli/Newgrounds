@@ -1,10 +1,11 @@
 package io.newgrounds.utils;
 
 import io.newgrounds.Call;
+import io.newgrounds.components.score.*;
 import io.newgrounds.objects.Error;
 import io.newgrounds.objects.ScoreBoard;
-import io.newgrounds.objects.events.Response;
 import io.newgrounds.objects.events.Outcome;
+import io.newgrounds.objects.events.Response;
 import io.newgrounds.objects.events.Result;
 import io.newgrounds.utils.Dispatcher;
 

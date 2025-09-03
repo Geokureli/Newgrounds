@@ -1,22 +1,31 @@
 package io.newgrounds.components;
+
+import io.newgrounds.components.app.AppComponent;
+import io.newgrounds.components.cloud.CloudSaveComponent;
+import io.newgrounds.components.event.EventComponent;
+import io.newgrounds.components.gateway.GatewayComponent;
+import io.newgrounds.components.loader.LoaderComponent;
+import io.newgrounds.components.medal.MedalComponent;
+import io.newgrounds.components.score.ScoreBoardComponent;
+
 class ComponentList {
 	
 	var _core:NGLite;
 	
 	/** Used to get and validate information associated with your app, including user sessions. */
-	public var app       : AppComponent;
+	public final app       : AppComponent;
 	/** Handles loading and saving of game states. */
-	public var cloudSave : CloudSaveComponent;
+	public final cloudSave : CloudSaveComponent;
 	/** Handles logging of custom events. */
-	public var event     : EventComponent;
+	public final event     : EventComponent;
 	/** Provides information about the gateway server. */
-	public var gateway   : GatewayComponent;
+	public final gateway   : GatewayComponent;
 	/** This class handles loading various URLs and tracking referral stats. */
-	public var loader    : LoaderComponent;
+	public final loader    : LoaderComponent;
 	/** Handles loading and unlocking of medals. */
-	public var medal     : MedalComponent;
+	public final medal     : MedalComponent;
 	/** Handles loading and posting of high scores and scoreboards. */
-	public var scoreBoard: ScoreBoardComponent;
+	public final scoreBoard: ScoreBoardComponent;
 	
 	public function new(core:NGLite) {
 		

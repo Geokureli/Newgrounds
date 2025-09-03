@@ -2,6 +2,7 @@ package io.newgrounds.objects;
 
 import io.newgrounds.Call;
 import io.newgrounds.NGLite;
+import io.newgrounds.components.medal.*;
 import io.newgrounds.objects.events.Outcome;
 import io.newgrounds.objects.events.Response;
 import io.newgrounds.objects.events.Result;

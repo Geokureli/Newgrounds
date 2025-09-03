@@ -4,16 +4,16 @@ import openfl.display.MovieClip;
 import openfl.text.TextField;
 
 import io.newgrounds.Call.ICallable;
-import io.newgrounds.components.AppComponent;
+import io.newgrounds.components.app.AppComponent;
 import io.newgrounds.components.Component;
-import io.newgrounds.components.EventComponent;
-import io.newgrounds.components.GatewayComponent;
-import io.newgrounds.components.LoaderComponent;
-import io.newgrounds.components.MedalComponent;
-import io.newgrounds.components.ScoreBoardComponent;
+import io.newgrounds.components.event.EventComponent;
+import io.newgrounds.components.gateway.GatewayComponent;
+import io.newgrounds.components.loader.LoaderComponent;
+import io.newgrounds.components.medal.MedalComponent;
+import io.newgrounds.components.score.ScoreBoardComponent;
 #if ng_lite
 	import io.newgrounds.objects.events.Response;
-	import io.newgrounds.objects.events.Result.GetBoardsResult;
+	import io.newgrounds.components.score.GetBoardsData;
 #end
 
 import io.newgrounds.test.art.AppPageSwf;

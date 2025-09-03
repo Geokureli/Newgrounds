@@ -1,11 +1,8 @@
-package io.newgrounds.components;
-
-import io.newgrounds.objects.events.Result;
-import io.newgrounds.NGLite;
+package io.newgrounds.components.event;
 
 class EventComponent extends Component {
 	
-	public function new (core:NGLite){ super(core); }
+	public function new (core){ super(core); }
 	
 	public function logEvent(eventName:String):Call<LogEventData> {
 		

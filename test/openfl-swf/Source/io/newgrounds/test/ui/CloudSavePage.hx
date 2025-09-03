@@ -4,7 +4,7 @@ import openfl.display.MovieClip;
 import openfl.text.TextField;
 
 import io.newgrounds.Call;
-import io.newgrounds.components.CloudSaveComponent;
+import io.newgrounds.components.cloud.CloudSaveComponent;
 import io.newgrounds.objects.Error;
 
 #if ng_lite
@@ -119,7 +119,7 @@ class CloudSavePage extends Page<CloudSaveComponent> {
 			
 		} else {
 			
-			_slotData.text = 'ID: ${slot.id} Last Saved: ${slot.getDate())} Size: ${slot.size} bytes';
+			_slotData.text = 'ID: ${slot.id} Last Saved: ${slot.getDate()} Size: ${slot.size} bytes';
 			
 			if (slot.contents == null)
 				setContents(false, "Press LOAD to fetch the save contents.");

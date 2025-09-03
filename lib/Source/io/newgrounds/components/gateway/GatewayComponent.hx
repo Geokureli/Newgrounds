@@ -1,11 +1,8 @@
-package io.newgrounds.components;
-
-import io.newgrounds.objects.events.Result;
-import io.newgrounds.NGLite;
+package io.newgrounds.components.gateway;
 
 class GatewayComponent extends Component {
 	
-	public function new (core:NGLite){ super(core); }
+	public function new (core){ super(core); }
 	
 	public function getDatetime():Call<GetDateTimeData> {
 		

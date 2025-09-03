@@ -1,7 +1,4 @@
-package io.newgrounds.components;
-
-import io.newgrounds.objects.events.Result;
-import io.newgrounds.NGLite;
+package io.newgrounds.components.loader;
 
 /**
  * This class handles loading various URLs and tracking referral stats.
@@ -12,46 +9,40 @@ import io.newgrounds.NGLite;
  */
 class LoaderComponent extends Component {
 	
-	public function new (core:NGLite){ super(core); }
+	public function new (core){ super(core); }
 	
-	public function loadAuthorUrl(redirect:Bool = false):Call<UrlData> {
+	public function loadAuthorUrl(redirect = false) {
 		
 		return new Call<UrlData>(_core, "Loader.loadAuthorUrl")
 			.addComponentParameter("host", _core.host)
 			.addComponentParameter("redirect", redirect, true);
 	}
 	
-	public function loadMoreGames(redirect:Bool = false):Call<UrlData> {
+	public function loadMoreGames(redirect = false) {
 		
 		return new Call<UrlData>(_core, "Loader.loadMoreGames")
 			.addComponentParameter("host", _core.host)
 			.addComponentParameter("redirect", redirect, true);
 	}
 	
-	public function loadNewgrounds(redirect:Bool = false):Call<UrlData> {
+	public function loadNewgrounds(redirect = false) {
 		
 		return new Call<UrlData>(_core, "Loader.loadNewgrounds")
 			.addComponentParameter("host", _core.host)
 			.addComponentParameter("redirect", redirect, true);
 	}
 	
-	public function loadOfficialUrl(redirect:Bool = false):Call<UrlData> {
+	public function loadOfficialUrl(redirect = false) {
 		
 		return new Call<UrlData>(_core, "Loader.loadOfficialUrl")
 			.addComponentParameter("host", _core.host)
 			.addComponentParameter("redirect", redirect, true);
 	}
 	
-	public function loadReferral(redirect:Bool = false):Call<UrlData> {
+	public function loadReferral(redirect = false) {
 		
 		return new Call<UrlData>(_core, "Loader.loadReferral")
 			.addComponentParameter("host", _core.host)
 			.addComponentParameter("redirect", redirect, true);
 	}
-}
-
-typedef UrlData = BaseData & {
-	
-	// TODO: docs
-	var url:String;
 }

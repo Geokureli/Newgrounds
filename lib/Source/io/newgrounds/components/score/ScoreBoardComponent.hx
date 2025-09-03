@@ -1,11 +1,15 @@
-package io.newgrounds.components;
+package io.newgrounds.components.score;
 
-import io.newgrounds.objects.User;
-import io.newgrounds.objects.events.Response;
-import io.newgrounds.objects.events.Result;
+// import haxe.ds.IntMap;
 import io.newgrounds.NGLite;
+// import io.newgrounds.components.score.ScoreBoardCalls;
+import io.newgrounds.objects.Period;
+import io.newgrounds.objects.Score;
+import io.newgrounds.objects.ScoreBoard;
+import io.newgrounds.objects.User;
 
-import haxe.ds.IntMap;
+// import io.newgrounds.objects.events.Response;
+// import io.newgrounds.objects.events.Result;
 
 class ScoreBoardComponent extends Component {
 	
@@ -90,18 +94,4 @@ class ScoreBoardComponent extends Component {
 			.addComponentParameter("value", value)
 			.addComponentParameter("tag"  , tag  , null);
 	}
-}
-
-enum abstract Period(String) to String from String {
-	
-	/** Indicates scores are from the current day. */
-	var DAY = "D";
-	/** Indicates scores are from the current week. */
-	var WEEK = "W";
-	/** Indicates scores are from the current month. */
-	var MONTH = "M";
-	/** Indicates scores are from the current year. */
-	var YEAR = "Y";
-	/** Indicates scores are from all-time. */
-	var ALL = "A";
 }

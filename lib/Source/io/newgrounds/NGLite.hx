@@ -1,16 +1,16 @@
 package io.newgrounds;
 
-import haxe.io.Bytes;
 import haxe.PosInfos;
-
+import haxe.io.Bytes;
 import io.newgrounds.Call;
 import io.newgrounds.components.ComponentList;
-import io.newgrounds.crypto.EncodingFormat;
 import io.newgrounds.crypto.Cipher;
+import io.newgrounds.crypto.EncodingFormat;
 import io.newgrounds.objects.Error;
+import io.newgrounds.objects.events.BaseResultData;
+import io.newgrounds.objects.events.Outcome;
 import io.newgrounds.objects.events.Response;
 import io.newgrounds.objects.events.Result;
-import io.newgrounds.objects.events.Outcome;
 import io.newgrounds.utils.Dispatcher;
 
 #if !(js || flash || cpp || neko || hl)
@@ -87,7 +87,7 @@ class NGLite {
 		}
 	}
 	
-	function checkInitialSession(callback:Null<(LoginOutcome)->Void>, outcome:CallOutcome<SessionData>):Void {
+	function checkInitialSession(callback:Null<(LoginOutcome)->Void>, outcome:CallOutcome<SessionResultData>):Void {
 		
 		switch(outcome)
 		{
@@ -217,7 +217,7 @@ class NGLite {
 	
 	@:allow(io.newgrounds.Call)
 	@:generic
-	function queueCall<T:BaseData>(call:Call<T>):Void {
+	function queueCall<T:BaseResultData>(call:Call<T>):Void {
 		
 		logVerbose('queued - ${call.component}');
 		
@@ -227,7 +227,7 @@ class NGLite {
 	
 	@:allow(io.newgrounds.Call)
 	@:generic
-	function markCallPending<T:BaseData>(call:Call<T>):Void {
+	function markCallPending<T:BaseResultData>(call:Call<T>):Void {
 		
 		_pendingCalls.push(call);
 		

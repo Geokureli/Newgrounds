@@ -1,6 +1,8 @@
 package io.newgrounds.swf;
 
 import io.newgrounds.Call;
+import io.newgrounds.components.score.*;
+import io.newgrounds.objects.Period;
 import io.newgrounds.objects.Score;
 import io.newgrounds.objects.events.Outcome;
 import io.newgrounds.objects.events.Response;
@@ -8,8 +10,6 @@ import io.newgrounds.objects.events.Result;
 import io.newgrounds.swf.common.BaseAsset;
 import io.newgrounds.swf.common.Button;
 import io.newgrounds.swf.common.DropDown;
-import io.newgrounds.components.ScoreBoardComponent;
-
 import openfl.display.MovieClip;
 import openfl.events.Event;
 import openfl.text.TextField;

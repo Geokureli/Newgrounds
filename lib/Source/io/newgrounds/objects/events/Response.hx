@@ -2,7 +2,7 @@ package io.newgrounds.objects.events;
 
 import haxe.Json;
 import io.newgrounds.objects.Error;
-import io.newgrounds.objects.events.Result;
+import io.newgrounds.objects.events.BaseResultData;
 
 typedef DebugResponse = {
 	
@@ -11,7 +11,7 @@ typedef DebugResponse = {
 }
 
 @:noCompletion
-typedef RawResponse<T:BaseData> =
+typedef RawResponse<T:BaseResultData> =
 {
 	success:Bool,
 	?error :Error,
@@ -20,7 +20,7 @@ typedef RawResponse<T:BaseData> =
 	app_id :String
 }
 
-abstract Response<T:BaseData>(RawResponse<T>) {
+abstract Response<T:BaseResultData>(RawResponse<T>) {
 	
 	public var success(get, never):Bool               ; inline function get_success () return this.success;
 	public var error  (get, never):Null<Error>        ; inline function get_error   () return this.error;

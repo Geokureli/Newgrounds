@@ -1,10 +1,11 @@
 package io.newgrounds.objects;
 
 import io.newgrounds.Call;
-import io.newgrounds.utils.AsyncHttp;
-import io.newgrounds.objects.events.Result;
+import io.newgrounds.components.cloud.SaveSlotData;
 import io.newgrounds.objects.events.Outcome;
 import io.newgrounds.objects.events.Response;
+import io.newgrounds.objects.events.Result;
+import io.newgrounds.utils.AsyncHttp;
 
 /**
  * Contains information about a CloudSave slot.

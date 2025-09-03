@@ -1,8 +1,4 @@
-package io.newgrounds.components;
-
-import io.newgrounds.objects.events.Result;
-import io.newgrounds.objects.events.Result;
-import io.newgrounds.NGLite;
+package io.newgrounds.components.cloud;
 
 /** Handles loading and saving of game states. */
 class CloudSaveComponent extends Component {
@@ -14,7 +10,7 @@ class CloudSaveComponent extends Component {
 	**/
 	static var allowNull:Dynamic = {};
 	
-	public function new (core:NGLite){ super(core); }
+	public function new (core){ super(core); }
 	
 	/**
 	 * Deletes all data from a save slot.
