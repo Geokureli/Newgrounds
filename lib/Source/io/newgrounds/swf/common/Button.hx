@@ -1,10 +1,10 @@
 package io.newgrounds.swf.common;
 
+import openfl.display.DisplayObject;
+import openfl.display.MovieClip;
 import openfl.display.Stage;
 import openfl.events.Event;
 import openfl.events.MouseEvent;
-import openfl.display.DisplayObject;
-import openfl.display.MovieClip;
 import openfl.text.TextField;
 
 class Button {

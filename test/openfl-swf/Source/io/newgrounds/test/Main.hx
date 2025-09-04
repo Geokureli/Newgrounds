@@ -1,8 +1,6 @@
 package io.newgrounds.test;
 
 #if !simple
-import io.newgrounds.crypto.Cipher;
-import io.newgrounds.crypto.EncodingFormat;
 import io.newgrounds.test.art.IntroScreenSwf;
 import io.newgrounds.test.ui.IntroPage;
 import io.newgrounds.test.ui.MainScreen;

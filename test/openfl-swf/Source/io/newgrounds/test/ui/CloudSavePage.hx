@@ -2,21 +2,21 @@ package io.newgrounds.test.ui;
 
 import openfl.display.MovieClip;
 import openfl.text.TextField;
-
-import io.newgrounds.Call;
-import io.newgrounds.components.cloud.CloudSaveComponent;
-import io.newgrounds.objects.Error;
+import io.newgrounds.NG;
+import io.newgrounds.components.CloudSaveComponent;
+import io.newgrounds.net.Call;
+import io.newgrounds.net.outcomes.CallOutcome;
+import io.newgrounds.swf.common.Button;
+import io.newgrounds.test.art.CloudSavesPageSwf;
 
 #if ng_lite
-	import io.newgrounds.objects.events.Response;
+	import io.newgrounds.net.data.Response;
 	import io.newgrounds.objects.events.Result.LoadSlotsResult;
 #else
-	import io.newgrounds.objects.events.Outcome;
+	import io.newgrounds.net.outcomes.Outcome;
 	import io.newgrounds.objects.SaveSlot;
 #end
 
-import io.newgrounds.swf.common.Button;
-import io.newgrounds.test.art.CloudSavesPageSwf;
 
 class CloudSavePage extends Page<CloudSaveComponent> {
 	

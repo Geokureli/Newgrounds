@@ -1,26 +1,23 @@
 package io.newgrounds.test.ui;
 
-import haxe.ds.IntMap;
-
 import flash.Lib;
-
+import haxe.ds.IntMap;
+import io.newgrounds.NG;
 import io.newgrounds.NGLite;
 import io.newgrounds.components.Component;
-import io.newgrounds.objects.Error;
+import io.newgrounds.net.data.Error;
+import io.newgrounds.net.outcomes.Outcome;
 import io.newgrounds.objects.Medal;
-import io.newgrounds.objects.ScoreBoard;
 import io.newgrounds.objects.SaveSlot;
-import io.newgrounds.objects.events.Outcome;
+import io.newgrounds.objects.ScoreBoard;
 import io.newgrounds.swf.common.Button;
-
+import io.newgrounds.test.art.CorePageSwf;
+import io.newgrounds.test.art.MedalListSwf;
+import io.newgrounds.test.art.MedalSwf;
+import io.newgrounds.test.art.ProfileSwf;
 import io.newgrounds.test.art.ScoreBoardListSwf;
 import io.newgrounds.test.art.ScoreBoardSwf;
-import io.newgrounds.test.art.ProfileSwf;
-import io.newgrounds.test.art.MedalListSwf;
-import io.newgrounds.test.art.CorePageSwf;
-import io.newgrounds.test.art.MedalSwf;
 import io.newgrounds.test.swf.ScoreBrowserSlim;
-
 import openfl.display.Bitmap;
 import openfl.display.Loader;
 import openfl.display.MovieClip;
@@ -223,7 +220,7 @@ class CorePage extends CorePageLite {
 			
 			new Button
 				( medal
-				, medalData.sendDebugUnlock.bind()
+				, medalData.sendUnlock.bind()
 				, showMedalInfo.bind(medalData)
 				, hideMedalInfo
 				);

@@ -1,12 +1,12 @@
 package io.newgrounds.test.swf;
 
-import io.newgrounds.test.ui.Input;
-import io.newgrounds.test.ui.CheckBox;
+import io.newgrounds.NG;
+import io.newgrounds.swf.ScoreBrowser;
 import io.newgrounds.swf.common.DropDown;
+import io.newgrounds.test.ui.CheckBox;
+import io.newgrounds.test.ui.Input;
 import openfl.display.MovieClip;
 import openfl.text.TextField;
-
-import io.newgrounds.swf.ScoreBrowser;
 
 class ScoreBrowserSlim extends ScoreBrowser {
 	

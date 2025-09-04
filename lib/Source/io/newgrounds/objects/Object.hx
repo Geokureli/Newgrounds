@@ -1,12 +1,10 @@
 package io.newgrounds.objects;
 
-// import io.newgrounds.NGLite;
 import io.newgrounds.utils.Dispatcher;
 
-// @:deprecated
 class CoreObject<T> extends Object<T>
 {
-	var _core:NGLite;
+	var _core:CallableCore;
 	
 	public function new(core, data:T = null) {
 		
@@ -20,6 +18,7 @@ class CoreObject<T> extends Object<T>
 		_core = null;
 	}
 }
+
 class Object<T> {
 	
 	var _data:T;

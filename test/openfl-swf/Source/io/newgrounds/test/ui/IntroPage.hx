@@ -6,7 +6,7 @@ import io.newgrounds.components.Component;
 import io.newgrounds.crypto.Cipher;
 import io.newgrounds.crypto.EncodingFormat;
 import io.newgrounds.crypto.Encryption;
-import io.newgrounds.objects.AppData;
+import io.newgrounds.net.data.AppData;
 import io.newgrounds.swf.common.Button;
 import io.newgrounds.test.art.IntroScreenSwf;
 import openfl.display.Stage;

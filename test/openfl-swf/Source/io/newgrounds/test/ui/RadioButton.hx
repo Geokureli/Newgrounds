@@ -1,7 +1,6 @@
 package io.newgrounds.test.ui;
 
 import io.newgrounds.swf.common.Button;
-
 import openfl.display.MovieClip;
 
 class RadioButton extends Button {

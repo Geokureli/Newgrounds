@@ -177,7 +177,7 @@ contained in the `SUCCESS(data)`.
 ```haxe
 var call = NG.core.calls.medal.unlock(medalId);
 call.addOutcomeHandler(
-    function(outcome:CallOutcome<MedalUnlockData>):Void {
+    function(outcome:CallOutcome<MedalUnlockResultData>):Void {
         
         switch(outcome) {
             
@@ -197,7 +197,7 @@ resulting from general Http remoting
 
 ```haxe
 myCall.addErrorHandler(
-    function(e:io.newgrounds.objects.Error):Void {
+    function(e:ng.new.data.Error):Void {
         
         trace('Error: $e');
     }

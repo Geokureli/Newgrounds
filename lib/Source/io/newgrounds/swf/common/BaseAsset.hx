@@ -1,7 +1,8 @@
 package io.newgrounds.swf.common;
 
-import openfl.events.Event;
+import io.newgrounds.NG;
 import openfl.display.MovieClip;
+import openfl.events.Event;
 
 class BaseAsset extends MovieClip {
 	

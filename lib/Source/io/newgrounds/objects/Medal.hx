@@ -1,21 +1,29 @@
 package io.newgrounds.objects;
 
-import io.newgrounds.Call;
-import io.newgrounds.NGLite;
-import io.newgrounds.components.medal.*;
+import io.newgrounds.net.Call;
+import io.newgrounds.net.data.MedalData;
+import io.newgrounds.net.data.Response;
+import io.newgrounds.net.outcomes.CallOutcome;
+import io.newgrounds.net.outcomes.Outcome;
+import io.newgrounds.net.results.Result;
+import io.newgrounds.net.results.medal.*;
 import io.newgrounds.objects.Object;
-import io.newgrounds.objects.RawMedalData;
-import io.newgrounds.objects.events.Outcome;
-import io.newgrounds.objects.events.Response;
-import io.newgrounds.objects.events.Result;
 import io.newgrounds.utils.Dispatcher;
 
-class Medal extends CoreObject<RawMedalData> {
+using io.newgrounds.net.outcomes.Outcome.OutcomeTools;
+using io.newgrounds.net.outcomes.Outcome.TypedOutcomeTools;
+
+class Medal extends Object<MedalData> {
 	
+	@:depracated("Medal.EASY is deprecated, use Difficulty.EASY, instead")
 	inline static public var EASY        = Difficulty.EASY;
+	@:depracated("Medal.MODERATE is deprecated, use Difficulty.MODERATE, instead")
 	inline static public var MODERATE    = Difficulty.MODERATE;
+	@:depracated("Medal.CHALLENGING is deprecated, use Difficulty.CHALLENGING, instead")
 	inline static public var CHALLENGING = Difficulty.CHALLENGING;
+	@:depracated("Medal.DIFFICULT is deprecated, use Difficulty.DIFFICULT, instead")
 	inline static public var DIFFICULT   = Difficulty.DIFFICULT;
+	@:depracated("Medal.BRUTAL is deprecated, use Difficulty.BRUTAL, instead")
 	inline static public var BRUTAL      = Difficulty.BRUTAL;
 	
 	// --- FROM SERVER
@@ -30,17 +38,18 @@ class Medal extends CoreObject<RawMedalData> {
 	// --- HELPERS
 	public var difficultyName(get, never):String;
 	
-	public var onUnlock = new Dispatcher();
+	public final onUnlock = new Dispatcher();
 	
-	public function new(core, data:RawMedalData = null):Void {
+	final onUnlockCalled = new TypedDispatcher<(CallOutcome<MedalUnlockResultData>)->Void>();
+	
+	public function new(data:MedalData = null):Void {
 		
-		super(core, data);
+		super(data);
 	}
 
-	@:allow(io.newgrounds.NG)
-	override function parse(data:RawMedalData):Void {
+	override function parse(data:MedalData):Void {
 		
-		var wasLocked = _data == null || !unlocked;
+		final wasLocked = _data == null || !unlocked;
 		
 		super.parse(data);
 		
@@ -48,21 +57,18 @@ class Medal extends CoreObject<RawMedalData> {
 			onUnlock.dispatch();
 	}
 	
-	public function sendUnlock(?callback:(Outcome<CallError>)->Void):Void {
+	public function sendUnlock(?callback:(Outcome<CallError>)->Void, force = false) {
 		
-		if (_core.appData.sessionId == null) {
-			// --- Unlock regardless, show medal popup to encourage NG signup
-			_data.unlocked = true;
-			onUnlock.dispatch();
-			//TODO: save unlock in local save
+		if (unlocked && !force) {
+			
+			callback.safe(SUCCESS);
+			return;
 		}
 		
-		_core.calls.medal.unlock(id)
-			.addOutcomeHandler(onUnlockResponse.bind(_, callback))
-			.send();
+		onUnlockCalled.dispatch(onUnlockResponse.bind(_, callback));
 	}
 	
-	function onUnlockResponse(outcome:CallOutcome<MedalUnlockData>, callback:Null<(Outcome<CallError>)->Void>):Void {
+	function onUnlockResponse(outcome:CallOutcome<MedalUnlockResultData>, callback:Null<(Outcome<CallError>)->Void>) {
 		
 		switch (outcome)
 		{
@@ -71,32 +77,26 @@ class Medal extends CoreObject<RawMedalData> {
 			{
 				parse(data.medal);
 				
-				// --- Unlock response doesn't include unlock=true, so parse won't change it.
-				if (!unlocked) {
-					
-					_data.unlocked = true;
-					callback.safe(outcome.toUntyped());
-					onUnlock.dispatch();
-				}
+				callback.safe(outcome.toUntyped());
 			}
 		}
 	}
 	
-	/** Locks the medal on the client and sends an unlock request, Server responds the same either way. */ 
-	public function sendDebugUnlock(?callback:Null<(Outcome<CallError>)->Void>):Void {
+	// /** Locks the medal on the client and sends an unlock request, Server responds the same either way. */ 
+	// public function sendDebugUnlock(?callback:Null<(Outcome<CallError>)->Void>):Void {
 		
-		if (NG.core.sessionId == null) {
+	// 	if (NG.core.sessionId == null) {
 			
-			callback.safe(SUCCESS);
-			onUnlock.dispatch();
+	// 		callback.safe(SUCCESS);
+	// 		onUnlock.dispatch();
 			
-		} else {
+	// 	} else {
 			
-			_data.unlocked = false;
+	// 		_data.unlocked = false;
 			
-			sendUnlock(callback);
-		}
-	}
+	// 		sendUnlock(callback);
+	// 	}
+	// }
 	
 	inline public function get_difficultyName():String {
 		

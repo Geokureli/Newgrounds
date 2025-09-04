@@ -1,12 +1,14 @@
 package io.newgrounds.swf;
 
-import io.newgrounds.Call;
-import io.newgrounds.components.score.*;
-import io.newgrounds.objects.Period;
-import io.newgrounds.objects.Score;
-import io.newgrounds.objects.events.Outcome;
-import io.newgrounds.objects.events.Response;
-import io.newgrounds.objects.events.Result;
+import io.newgrounds.NG;
+import io.newgrounds.net.Call;
+import io.newgrounds.net.data.Period;
+import io.newgrounds.net.data.Response;
+import io.newgrounds.net.data.Score;
+import io.newgrounds.net.outcomes.CallOutcome;
+import io.newgrounds.net.outcomes.Outcome;
+import io.newgrounds.net.results.Result;
+import io.newgrounds.net.results.score.GetScoresResultData;
 import io.newgrounds.swf.common.BaseAsset;
 import io.newgrounds.swf.common.Button;
 import io.newgrounds.swf.common.DropDown;
@@ -204,7 +206,7 @@ class ScoreBrowser extends BaseAsset {
 		}
 	}
 	
-	function onScoresReceive(skip:Int, outcome:CallOutcome<GetScoresData>):Void {
+	function onScoresReceive(skip:Int, outcome:CallOutcome<GetScoresResultData>):Void {
 		
 		loadingIcon.visible = false;
 		

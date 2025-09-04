@@ -2,6 +2,7 @@ package io.newgrounds.swf.common;
 
 
 import haxe.ds.StringMap;
+import io.newgrounds.NG;
 import openfl.display.MovieClip;
 import openfl.display.Sprite;
 import openfl.text.TextField;

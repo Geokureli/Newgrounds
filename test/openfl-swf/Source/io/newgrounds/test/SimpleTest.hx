@@ -1,10 +1,11 @@
 package io.newgrounds.test;
 
-import io.newgrounds.Call;
 import io.newgrounds.NG;
-import io.newgrounds.objects.Error;
+import io.newgrounds.net.Call;
+import io.newgrounds.net.data.Error;
+import io.newgrounds.net.outcomes.Outcome;
+import io.newgrounds.net.results.cloud.SaveSlotResultData;
 import io.newgrounds.objects.SaveSlot;
-import io.newgrounds.objects.events.Outcome;
 
 class SimpleTest {
 	
@@ -130,7 +131,7 @@ class SimpleTest {
 			takeOneDown(slot, callback);
 	}
 	
-	function waitForClick(slot:SaveSlot) {
+	function waitForClick(slot:SaveSlotResultData) {
 		
 		#if openfl
 		openfl.Lib.current.stage.addEventListener(openfl.events.MouseEvent.CLICK, onClick);
@@ -146,12 +147,12 @@ class SimpleTest {
 	}
 	#end
 	
-	function buySomeMore(slot:SaveSlot, callback:(SaveSlot)->Void) {
+	function buySomeMore(slot:SaveSlot, callback:(SaveSlotResultData)->Void) {
 		
 		saveSlot(slot, "99 bottles of beer", callback);
 	}
 	
-	function takeOneDown(slot:SaveSlot, callback:(SaveSlot)->Void) {
+	function takeOneDown(slot:SaveSlot, callback:(SaveSlotResultData)->Void) {
 		
 		var bottles = Std.parseInt(slot.contents.split(" ")[0]);
 		switch(slot.contents) {
@@ -168,7 +169,7 @@ class SimpleTest {
 		}
 	}
 	
-	function saveSlot(slot:SaveSlot, value:String, callback:(SaveSlot)->Void) {
+	function saveSlot(slot:SaveSlot, value:String, callback:(SaveSlotResultData)->Void) {
 		
 		trace('Saving slot[${slot.id}]: "${slot.contents}"->"$value"');
 		slot.save(value, (r)->{
@@ -181,7 +182,7 @@ class SimpleTest {
 		});
 	}
 	
-	function clearSlot(slot:SaveSlot, callback:(SaveSlot)->Void) {
+	function clearSlot(slot:SaveSlot, callback:(SaveSlotResultData)->Void) {
 		
 		trace('Clearing slot[${slot.id}]: "${slot.contents}"');
 		slot.clear((r)->{

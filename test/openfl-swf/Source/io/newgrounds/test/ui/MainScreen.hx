@@ -3,7 +3,7 @@ package io.newgrounds.test.ui;
 import haxe.PosInfos;
 import haxe.ds.StringMap;
 import io.newgrounds.NG;
-import io.newgrounds.objects.AppData;
+import io.newgrounds.net.data.AppData;
 import io.newgrounds.swf.common.Button;
 import io.newgrounds.test.art.MainScreenSwf;
 import io.newgrounds.test.ui.CloudSavePage;

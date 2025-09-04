@@ -3,6 +3,7 @@ package io.newgrounds.utils;
 import haxe.Http;
 import haxe.PosInfos;
 import haxe.Timer;
+import io.newgrounds.debug.Logger;
 
 #if (target.threaded)
 import sys.thread.Thread;

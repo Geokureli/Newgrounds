@@ -2,19 +2,25 @@ package io.newgrounds;
 
 import haxe.PosInfos;
 import haxe.io.Bytes;
-import io.newgrounds.Call;
 import io.newgrounds.components.ComponentList;
 import io.newgrounds.crypto.Cipher;
 import io.newgrounds.crypto.EncodingFormat;
 import io.newgrounds.crypto.Encryption;
-import io.newgrounds.objects.AppData;
-import io.newgrounds.objects.Error;
-import io.newgrounds.objects.events.BaseResultData;
-import io.newgrounds.objects.events.Outcome;
-import io.newgrounds.objects.events.Response;
-import io.newgrounds.objects.events.Result;
+import io.newgrounds.debug.Logger;
+import io.newgrounds.net.Call;
+import io.newgrounds.net.data.AppData;
+import io.newgrounds.net.data.Error;
+import io.newgrounds.net.data.Response;
+import io.newgrounds.net.outcomes.CallOutcome;
+import io.newgrounds.net.outcomes.LoginOutcome;
+import io.newgrounds.net.outcomes.Outcome;
+import io.newgrounds.net.results.BaseResultData;
+import io.newgrounds.net.results.Result;
+import io.newgrounds.net.results.SessionResultData;
 import io.newgrounds.utils.Dispatcher;
-import io.newgrounds.utils.Logger;
+
+using io.newgrounds.net.outcomes.Outcome.OutcomeTools;
+using io.newgrounds.net.outcomes.Outcome.TypedOutcomeTools;
 
 #if !(js || flash || cpp || neko || hl)
 	#error "Target not supported, use: Flash, JS, cpp or maybe neko or hashlink";
@@ -29,7 +35,7 @@ import io.newgrounds.utils.Logger;
  * 
  * @author GeoKureli
  */
-class NGLite extends BaseCore {
+class NGLite extends CallableCore {
 	
 	static public var core(default, null):NGLite;
 	static public var onCoreReady(default, null):Dispatcher = new Dispatcher();
@@ -48,9 +54,6 @@ class NGLite extends BaseCore {
 		
 		return appData.sessionId = value == "" ? null : value;
 	}
-	
-	/** Components used to call the NG server directly */
-	public final calls:ComponentList;
 	
 	/**
 	 * Converts an object to an encrypted string that can be decrypted by the server.
@@ -78,9 +81,7 @@ class NGLite extends BaseCore {
 	**/
 	public function new(app:AppData, ?callback:(LoginOutcome)->Void) {
 		
-		super(app, "[Newgrounds API] :: ");
-		
-		calls = new ComponentList(this);
+		super(app, new Logger((any, ?pos)->haxe.Log.trace('[Newgrounds API] :: ${any}', pos)));
 		
 		if (this.sessionId != null) {
 			
@@ -225,7 +226,7 @@ class NGLite extends BaseCore {
 	// final _queuedCalls = new Array<ICallable>();
 	// final _pendingCalls = new Array<ICallable>();
 	
-	// @:allow(io.newgrounds.Call)
+	// @:allow(io.newgrounds.net.Call)
 	// @:generic
 	// function queueCall<T:BaseResultData>(call:Call<T>):Void {
 		
@@ -235,7 +236,7 @@ class NGLite extends BaseCore {
 	// 	checkQueue();
 	// }
 	
-	// @:allow(io.newgrounds.Call)
+	// @:allow(io.newgrounds.net.Call)
 	// @:generic
 	// function markCallPending<T:BaseResultData>(call:Call<T>):Void {
 		
@@ -273,24 +274,4 @@ class NGLite extends BaseCore {
 		
 		setupEncryption(key, cipher, format);
 	}
-}
-
-typedef LoginOutcome = Outcome<LoginFail>;
-
-enum LoginFail
-{
-	/** The login was aborted. */
-	CANCELLED(type:LoginCancel);
-	
-	/** The login attempt failed, somewhere. */
-	ERROR(error:CallError);
-}
-
-enum LoginCancel
-{
-	/** The login was cancelled in the passport web page. */
-	PASSPORT;
-	
-	/** The session was abandoned in this app. */
-	MANUAL;
 }

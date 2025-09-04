@@ -4,28 +4,28 @@ package io.newgrounds;
 typedef NG = NGLite; //TODO: test and make lite UI
 #else
 import haxe.Timer;
-import io.newgrounds.Call;
 import io.newgrounds.NGLite;
-import io.newgrounds.objects.Error;
+import io.newgrounds.lists.ExternalAppList;
+import io.newgrounds.lists.MedalList;
+import io.newgrounds.lists.SaveSlotList;
+import io.newgrounds.lists.ScoreBoardList;
+import io.newgrounds.net.Call;
+import io.newgrounds.net.data.Error;
+import io.newgrounds.net.data.Response;
+import io.newgrounds.net.data.Session;
+import io.newgrounds.net.data.User;
+import io.newgrounds.net.outcomes.CallOutcome;
+import io.newgrounds.net.outcomes.Outcome;
+import io.newgrounds.net.results.BaseResultData;
+import io.newgrounds.net.results.Result;
+import io.newgrounds.net.results.SessionResultData;
 import io.newgrounds.objects.Medal;
 import io.newgrounds.objects.SaveSlot;
 import io.newgrounds.objects.ScoreBoard;
-import io.newgrounds.objects.Session;
-import io.newgrounds.objects.User;
-import io.newgrounds.objects.events.BaseResultData;
-import io.newgrounds.objects.events.Outcome;
-import io.newgrounds.objects.events.Response;
-import io.newgrounds.objects.events.Result;
 import io.newgrounds.utils.Dispatcher;
-import io.newgrounds.utils.ExternalAppList;
-import io.newgrounds.utils.MedalList;
-import io.newgrounds.utils.SaveSlotList;
-import io.newgrounds.utils.ScoreBoardList;
-#if (openfl < "4.0.0")
-import openfl.utils.JNI;
-#elseif (lime)
-import lime.system.JNI;
-#end
+
+using io.newgrounds.net.outcomes.Outcome.OutcomeTools;
+using io.newgrounds.net.outcomes.Outcome.TypedOutcomeTools;
 
 /**
  * The Newgrounds API for Haxe.
@@ -101,12 +101,12 @@ class NG extends NGLite {
 		onLogin = new Dispatcher();
 		onLogOut = new Dispatcher();
 		
+		super(app, callback);
+		
 		medals = new MedalList(this);
 		saveSlots = new SaveSlotList(this);
 		scoreBoards = new ScoreBoardList(this);
 		externalApps = new ExternalAppList(this);
-		
-		super(app, callback);
 		
 		attemptingLogin = sessionId != null;
 	}

@@ -1,15 +1,20 @@
 package io.newgrounds.objects;
 
-import io.newgrounds.Call;
-import io.newgrounds.NGLite;
-import io.newgrounds.components.score.*;
+import io.newgrounds.net.Call;
+import io.newgrounds.net.data.Period;
+import io.newgrounds.net.data.Response;
+import io.newgrounds.net.data.Score;
+import io.newgrounds.net.data.ScoreBoardData;
+import io.newgrounds.net.outcomes.CallOutcome;
+import io.newgrounds.net.outcomes.Outcome;
+import io.newgrounds.net.results.Result;
+import io.newgrounds.net.results.score.GetScoresResultData;
 import io.newgrounds.objects.Object;
-import io.newgrounds.objects.RawScoreBoardData;
-import io.newgrounds.objects.events.Outcome;
-import io.newgrounds.objects.events.Response;
-import io.newgrounds.objects.events.Result;
 
-class ScoreBoard extends CoreObject<RawScoreBoardData> {
+using io.newgrounds.net.outcomes.Outcome.OutcomeTools;
+using io.newgrounds.net.outcomes.Outcome.TypedOutcomeTools;
+
+class ScoreBoard extends CoreObject<ScoreBoardData> {
 	
 	public var scores(default, null):Array<Score>;
 	
@@ -21,8 +26,6 @@ class ScoreBoard extends CoreObject<RawScoreBoardData> {
 	public var name(get, never):String;
 	inline function get_name() return _data.name;
 	
-	public function new(core, data) { super(core, data); }
-
 	/**
 	 * Fetches score data from the server, this removes all of the existing scores cached
 	 * 
@@ -43,7 +46,7 @@ class ScoreBoard extends CoreObject<RawScoreBoardData> {
 			.send();
 	}
 	
-	function onScoresReceived(outcome:CallOutcome<GetScoresData>, callback:Null<(Outcome<CallError>)->Void>):Void {
+	function onScoresReceived(outcome:CallOutcome<GetScoresResultData>, callback:Null<(Outcome<CallError>)->Void>):Void {
 		
 		switch(outcome) { 
 			
@@ -82,5 +85,4 @@ class ScoreBoard extends CoreObject<RawScoreBoardData> {
 		
 		return 'ScoreBoard: $id@$name';
 	}
-	
 }

@@ -1,15 +1,15 @@
 package io.newgrounds.swf;
 
-import io.newgrounds.swf.common.BaseAsset;
+import io.newgrounds.NG;
 import io.newgrounds.objects.Medal;
-
-import openfl.text.TextFieldAutoSize;
-import openfl.text.TextField;
+import io.newgrounds.swf.common.BaseAsset;
 import openfl.display.DisplayObject;
 import openfl.display.Loader;
 import openfl.display.MovieClip;
-import openfl.net.URLRequest;
 import openfl.events.Event;
+import openfl.net.URLRequest;
+import openfl.text.TextField;
+import openfl.text.TextFieldAutoSize;
 
 class MedalPopup extends BaseAsset {
 	
@@ -74,7 +74,7 @@ class MedalPopup extends BaseAsset {
 		if (requiresSession && !NG.core.loggedIn)
 			return;
 		
-		var loader = new Loader();
+		final loader = new Loader();
 		loader.contentLoaderInfo.addEventListener(Event.COMPLETE, (e)-> {
 			
 			loader.width = loader.height = 50;
@@ -109,11 +109,11 @@ class MedalPopup extends BaseAsset {
 		
 		cast(medalPoints.getChildByName("field"), TextField).text = Std.string(value);
 		
-		var field:TextField = cast medalName.getChildByName("field");
+		final field:TextField = cast medalName.getChildByName("field");
 		field.autoSize = TextFieldAutoSize.LEFT;
 		field.x = 0;
 		field.text = "";
-		var oldWidth = medalName.width;
+		final oldWidth = medalName.width;
 		field.text = name;
 		
 		_scrollSpeed = 0;

@@ -1,13 +1,17 @@
 package io.newgrounds.objects;
 
-import io.newgrounds.Call;
-import io.newgrounds.components.cloud.SaveSlotData;
+import io.newgrounds.net.Call;
+import io.newgrounds.net.data.Response;
+import io.newgrounds.net.data.SaveSlotData;
+import io.newgrounds.net.outcomes.CallOutcome;
+import io.newgrounds.net.outcomes.Outcome;
+import io.newgrounds.net.results.Result;
+import io.newgrounds.net.results.cloud.SaveSlotResultData;
 import io.newgrounds.objects.Object;
-import io.newgrounds.objects.RawSaveSlotData;
-import io.newgrounds.objects.events.Outcome;
-import io.newgrounds.objects.events.Response;
-import io.newgrounds.objects.events.Result;
 import io.newgrounds.utils.AsyncHttp;
+
+using io.newgrounds.net.outcomes.Outcome.OutcomeTools;
+using io.newgrounds.net.outcomes.Outcome.TypedOutcomeTools;
 
 /**
  * Contains information about a CloudSave slot.
@@ -15,7 +19,7 @@ import io.newgrounds.utils.AsyncHttp;
  * This is helper class that lets you call methods directly on the slot object, rather than
  * calling generic calls using the slot's id number.
 **/
-class SaveSlot extends CoreObject<RawSaveSlotData>
+class SaveSlot extends CoreObject<SaveSlotData>
 {
 	/** A date and time (in ISO 8601 format) representing when this slot was last saved. */
 	public var datetime(get, never):Null<String>;
@@ -41,14 +45,6 @@ class SaveSlot extends CoreObject<RawSaveSlotData>
 	/** The contents of this slot's save file. Will be null until `load` is called. **/
 	public var contents(default, null):Null<String>;
 	
-	var _externalAppId(default, null):String;
-	
-	public function new(core:NGLite, data:RawSaveSlotData = null, externalAppId:String = null) {
-		
-		_externalAppId = externalAppId;
-		super(core, data);
-	}
-	
 	/**
 	 * Saves the supplied data to the cloud save slot
 	 * 
@@ -63,9 +59,6 @@ class SaveSlot extends CoreObject<RawSaveSlotData>
 		if (data == null)
 			throw "cannot save null to a SaveSlot";
 		
-		if (_externalAppId != null)
-			throw "cannot save to an external app";
-		
 		_core.calls.cloudSave.setData(data, id)
 			.addOutcomeHandler(setContentsOnSlotFetch.bind(_, data, callback))
 			.send();
@@ -79,16 +72,13 @@ class SaveSlot extends CoreObject<RawSaveSlotData>
 	 */
 	public function clear(?callback:(Outcome<CallError>)->Void) {
 		
-		if (_externalAppId != null)
-			throw "cannot clear an external app's save slot";
-		
 		_core.calls.cloudSave.clearSlot(id)
 			.addOutcomeHandler((outcome)->setContentsOnSlotFetch(outcome, null, callback))
 			.send();
 	}
 	
 	function setContentsOnSlotFetch
-	( outcome:CallOutcome<SaveSlotData>
+	( outcome:CallOutcome<SaveSlotResultData>
 	, contents:Null<String>
 	, ?callback:(Outcome<CallError>)->Void
 	) {
@@ -113,13 +103,13 @@ class SaveSlot extends CoreObject<RawSaveSlotData>
 	 */
 	public function update(?callback:(Outcome<CallError>)->Void) {
 		
-		_core.calls.cloudSave.loadSlot(id, _externalAppId)
+		_core.calls.cloudSave.loadSlot(id)
 			.addOutcomeHandler(onUpdateFetch.bind(_, callback))
 			.send();
 	}
 	
 	function onUpdateFetch
-	( outcome:CallOutcome<SaveSlotData>
+	( outcome:CallOutcome<SaveSlotResultData>
 	, ?callback:(Outcome<CallError>)->Void
 	) {
 		
