@@ -3,12 +3,13 @@ package io.newgrounds.objects;
 import io.newgrounds.Call;
 import io.newgrounds.NGLite;
 import io.newgrounds.components.score.*;
+import io.newgrounds.objects.Object;
 import io.newgrounds.objects.RawScoreBoardData;
 import io.newgrounds.objects.events.Outcome;
 import io.newgrounds.objects.events.Response;
 import io.newgrounds.objects.events.Result;
 
-class ScoreBoard extends Object<RawScoreBoardData> {
+class ScoreBoard extends CoreObject<RawScoreBoardData> {
 	
 	public var scores(default, null):Array<Score>;
 	
@@ -20,7 +21,7 @@ class ScoreBoard extends Object<RawScoreBoardData> {
 	public var name(get, never):String;
 	inline function get_name() return _data.name;
 	
-	public function new(core:NGLite, data:RawScoreBoardData):Void {super(core, data); }
+	public function new(core, data) { super(core, data); }
 
 	/**
 	 * Fetches score data from the server, this removes all of the existing scores cached

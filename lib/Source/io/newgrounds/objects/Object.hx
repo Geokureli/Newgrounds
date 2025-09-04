@@ -1,27 +1,38 @@
 package io.newgrounds.objects;
 
+// import io.newgrounds.NGLite;
 import io.newgrounds.utils.Dispatcher;
-import io.newgrounds.NGLite;
 
+// @:deprecated
+class CoreObject<T> extends Object<T>
+{
+	var _core:NGLite;
+	
+	public function new(core, data:T = null) {
+		
+		_core = core;
+		super(data);
+	}
+	
+	override function destroy():Void {
+		
+		super.destroy();
+		_core = null;
+	}
+}
 class Object<T> {
 	
-	var _core:NGLite;
 	var _data:T;
 	
-	public var onUpdate(default, null):Dispatcher;
+	public final onUpdate = new Dispatcher();
 	
-	public function new(core:NGLite, data:T = null) {
-		
-		this._core = core; 
-		
-		onUpdate = new Dispatcher();
+	public function new(data:T = null) {
 		
 		if (data != null)
 			parse(data);
 	}
 	
-	@:allow(io.newgrounds.NGLite)
-	function parse(data:T):Void {
+	public function parse(data:T):Void {
 		
 		_data = data;
 		onUpdate.dispatch();
@@ -30,6 +41,6 @@ class Object<T> {
 	
 	public function destroy():Void {
 		
-		_core = null;
+		onUpdate.clear();
 	}
 }

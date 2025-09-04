@@ -5,25 +5,17 @@ import io.newgrounds.NGLite;
 import io.newgrounds.components.Component;
 import io.newgrounds.crypto.Cipher;
 import io.newgrounds.crypto.EncodingFormat;
+import io.newgrounds.crypto.Encryption;
+import io.newgrounds.objects.AppData;
 import io.newgrounds.swf.common.Button;
 import io.newgrounds.test.art.IntroScreenSwf;
-
 import openfl.display.Stage;
-import openfl.text.TextFieldType;
 import openfl.text.TextField;
-
-typedef StartCallback = 
-( appId        :String
-, sessionId    :String
-, debug        :Bool
-, encryptionKey:String
-, cipher       :Cipher
-, format       :EncodingFormat
-)->Void;
+import openfl.text.TextFieldType;
 
 class IntroPage extends Page<Component> {
 	
-	var _onStart:StartCallback;
+	var _onStart:(AppData)->Void;
 	
 	var _appId:TextField;
 	var _sessionId:TextField;
@@ -35,7 +27,7 @@ class IntroPage extends Page<Component> {
 	var _cipher:RadioGroup;
 	var _format:RadioGroup;
 	
-	public function new (target:IntroScreenSwf, onStart:StartCallback):Void {
+	public function new (target:IntroScreenSwf, onStart:(AppData)->Void):Void {
 		super(target);
 		
 		_stage = target.stage;
@@ -71,7 +63,7 @@ class IntroPage extends Page<Component> {
 		_format.selected = EncodingFormat.BASE_64;
 		
 		_cipher = new RadioGroup(target.cipher, onCipherChange);
-		_cipher.selected = Cipher.AES_128;
+		_cipher.selected = Cipher.AES_128.toString();
 	}
 	
 	function onAutoConnectToggle():Void {
@@ -94,19 +86,24 @@ class IntroPage extends Page<Component> {
 	
 	function onCipherChange():Void {
 		
-		_format.enabled = _cipher.selected != Cipher.NONE;
+		_format.enabled = _cipher.selected != Cipher.NONE.toString();
 	}
 	
 	function onStartClick():Void {
 		
-		_onStart
-			( fieldString(_appId)
-			, _autoConnect.on ? NGLite.getSessionId() : fieldString(_sessionId)
-			, _debug.on
+		final encryption = EncryptionTools.fromString
+			( _cipher.selected
 			, fieldString(_encryptionKey)
-			, cast _cipher.selected
-			, cast _format.selected
+			, _format.selected
 			);
+		
+		_onStart(
+			{ id        : fieldString(_appId)
+			, sessionId : _autoConnect.on ? NGLite.getSessionId() : fieldString(_sessionId)
+			, debug     : _debug.on
+			, encryption: encryption
+			}
+		);
 	}
 	
 	#if ng_lite

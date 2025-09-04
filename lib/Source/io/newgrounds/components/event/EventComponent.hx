@@ -4,10 +4,10 @@ class EventComponent extends Component {
 	
 	public function new (core){ super(core); }
 	
-	public function logEvent(eventName:String):Call<LogEventData> {
+	public function logEvent(eventName:String) {
 		
-		return new Call<LogEventData>(_core, "Event.logEvent")
+		return (makeCall("Event.logEvent"): Call<LogEventData>)
 			.addComponentParameter("event_name", eventName)
-			.addComponentParameter("host", _core.host);
+			.addComponentParameter("host", core.host);
 	}
 }

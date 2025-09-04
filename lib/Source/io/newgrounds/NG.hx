@@ -95,12 +95,7 @@ class NG extends NGLite {
 	 * @param appId     The unique ID of your app as found in the 'API Tools' tab of your Newgrounds.com project.
 	 * @param sessionId A unique session id used to identify the active user.
 	**/
-	public function new
-	( appId = "test"
-	, ?sessionId:String
-	, debug = false
-	, ?callback:(LoginOutcome)->Void
-	) {
+	public function new(app, ?callback) {
 		
 		host = getHost();
 		onLogin = new Dispatcher();
@@ -111,23 +106,28 @@ class NG extends NGLite {
 		scoreBoards = new ScoreBoardList(this);
 		externalApps = new ExternalAppList(this);
 		
-		attemptingLogin = sessionId != null;
+		super(app, callback);
 		
-		super(appId, sessionId, debug, callback);
+		attemptingLogin = sessionId != null;
 	}
 	
 	/**
 	 * Creates NG.core, the heart and soul of the API. This is not the only way to create an instance,
 	 * nor is NG a forced singleton, but it's the only way to set the static NG.core.
 	**/
-	static public function create
+	overload static public inline extern function create
 	( appId = "test"
 	, ?sessionId:String
 	, debug = false
-	, ?callback:(LoginOutcome)->Void
+	, ?callback
 	):Void {
 		
-		core = new NG(appId, sessionId, debug, callback);
+		create({id: appId, sessionId: sessionId, debug: debug }, callback);
+	}
+	
+	overload static public inline extern function create(app, ?callback) {
+		
+		core = new NG(app, callback);
 		
 		onCoreReady.dispatch();
 	}
@@ -139,21 +139,21 @@ class NG extends NGLite {
 	 * @param debug         Enables debug features and verbose responses from the server
 	 * @param backupSession A unique session id used to identify the active user.
 	 */
-	static public function createAndCheckSession
+	overload static public inline extern function createAndCheckSession
 	( appId = "test"
 	, debug = false
 	, ?backupSession:String
 	, ?callback:(LoginOutcome)->Void
 	):Void {
 		
-		var session = NGLite.getSessionId();
-		if (session == null)
-			session = backupSession;
+		createAndCheckSession({ id: appId, sessionId: backupSession, debug:debug }, callback);
+	}
+	
+	overload static public inline extern function createAndCheckSession(app, ?callback) {
 		
-		create(appId, session, debug, callback);
+		app.sessionId = NGLite.getSessionId() ?? app.sessionId;
 		
-		if (core.sessionId != null)
-			core.attemptingLogin = true;
+		create(app, callback);
 	}
 	
 	// -------------------------------------------------------------------------------------------
@@ -337,8 +337,12 @@ class NG extends NGLite {
 				
 			case REQUEST_LOGIN:
 				
-				var call = calls.app.checkSession()
-					.addOutcomeHandler(checkSession.bind(_, callback));
+				function sendCheckSession() {
+					
+					calls.app.checkSession()
+						.addOutcomeHandler(checkSession.bind(_, callback))
+						.send();
+				}
 				
 				// Wait 3 seconds and try again
 				timer(3.0,
@@ -348,7 +352,7 @@ class NG extends NGLite {
 						
 						// Check if cancelLoginRequest was called
 						if (!_loginCancelled)
-							call.send();
+							sendCheckSession();
 						else {
 							
 							logger.log("login cancelled via cancelLoginRequest");

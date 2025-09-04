@@ -5,13 +5,20 @@ package io.newgrounds.utils;
 **/
 class Dispatcher {
 	
-	var _list:Array<Void->Void>;
-	var _once:Array<Void->Void>;
+	final _list = new Array<Void->Void>();
+	final _once = new Array<Void->Void>();
 	
-	public function new() {
-		
-		_list = new Array<Void->Void>();
-		_once = new Array<Void->Void>();
+	public function new() {}
+	
+	public function clear()
+	{
+		_list.resize(0);
+		_once.resize(0);
+	}
+	
+	public function isEmpty()
+	{
+		return _list.length == 0;
 	}
 	
 	public function add(handler:Void->Void, once:Bool = false):Bool {
@@ -62,13 +69,24 @@ class Dispatcher {
 
 class TypedDispatcher<T> {
 	
-	var _list:Array<T->Void>;
-	var _once:Array<T->Void>;
+	final _list:Array<T->Void>;
+	final _once:Array<T->Void>;
 	
 	public function new() {
 		
 		_list = new Array<T->Void>();
 		_once = new Array<T->Void>();
+	}
+	
+	public function clear()
+	{
+		_list.resize(0);
+		_once.resize(0);
+	}
+	
+	public function isEmpty()
+	{
+		return _list.length == 0;
 	}
 	
 	public function add(handler:T->Void, once:Bool = false):Bool {

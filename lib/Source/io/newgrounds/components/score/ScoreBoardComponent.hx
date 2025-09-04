@@ -1,11 +1,8 @@
 package io.newgrounds.components.score;
 
-// import haxe.ds.IntMap;
-import io.newgrounds.NGLite;
-// import io.newgrounds.components.score.ScoreBoardCalls;
 import io.newgrounds.objects.Period;
 import io.newgrounds.objects.Score;
-import io.newgrounds.objects.ScoreBoard;
+// import io.newgrounds.objects.ScoreBoard;
 import io.newgrounds.objects.User;
 
 // import io.newgrounds.objects.events.Response;
@@ -13,7 +10,7 @@ import io.newgrounds.objects.User;
 
 class ScoreBoardComponent extends Component {
 	
-	public function new (core:NGLite){ super(core); }
+	public function new (core){ super(core); }
 	
 	// -------------------------------------------------------------------------------------------
 	//                                       GET SCORES
@@ -22,9 +19,9 @@ class ScoreBoardComponent extends Component {
 	/**
 	 * Fetches a list of available scoreboards.
 	 */
-	public function getBoards():Call<GetBoardsData> {
+	public function getBoards() {
 		
-		return new Call<GetBoardsData>(_core, "ScoreBoard.getBoards");
+		return (makeCall("ScoreBoard.getBoards"): Call<GetBoardsData>);
 	}
 	
 	// -------------------------------------------------------------------------------------------
@@ -65,7 +62,7 @@ class ScoreBoardComponent extends Component {
 		if (user != null && !Std.isOfType(user, String) && !Std.isOfType(user, Int))
 			user = user.id;
 		
-		return new Call<GetScoresData>(_core, "ScoreBoard.getScores")
+		return (makeCall("ScoreBoard.getScores"): Call<GetScoresData>)
 			.addComponentParameter("id"    , id    )
 			.addComponentParameter("limit" , limit , 10)
 			.addComponentParameter("skip"  , skip  , 0)
@@ -89,7 +86,7 @@ class ScoreBoardComponent extends Component {
 	 */
 	public function postScore(id:Int, value:Int, tag:String = null):Call<PostScoreData> {
 		
-		return new Call<PostScoreData>(_core, "ScoreBoard.postScore", true, true)
+		return (makeCall("ScoreBoard.postScore", true, true): Call<PostScoreData>)
 			.addComponentParameter("id"   , id)
 			.addComponentParameter("value", value)
 			.addComponentParameter("tag"  , tag  , null);

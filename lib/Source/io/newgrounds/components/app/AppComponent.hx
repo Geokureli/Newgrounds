@@ -6,37 +6,37 @@ class AppComponent extends Component {
 	
 	public function new (core) { super(core); }
 	
-	public function startSession(force:Bool = false):Call<SessionResultData> {
+	public function startSession(force = false) {
 		
-		return new Call<SessionResultData>(_core, "App.startSession")
+		return (makeCall("App.startSession"): Call<SessionResultData>)
 			.addComponentParameter("force", force, false);
 	}
 	
-	public function checkSession():Call<SessionResultData> {
+	public function checkSession() {
 		
-		return new Call<SessionResultData>(_core, "App.checkSession", true);
+		return (makeCall("App.checkSession", true): Call<SessionResultData>);
 	}
 	
-	public function endSession():Call<SessionResultData> {
+	public function endSession() {
 		
-		return new Call<SessionResultData>(_core, "App.endSession", true);
+		return (makeCall("App.endSession", true): Call<SessionResultData>);
 	}
 	
-	public function getCurrentVersion(version:String):Call<GetCurrentVersionData> {
+	public function getCurrentVersion(version:String) {
 	
-		return new Call<GetCurrentVersionData>(_core, "App.getCurrentVersion")
+		return (makeCall("App.getCurrentVersion"): Call<GetCurrentVersionData>)
 			.addComponentParameter("version", version);
 	}
 	
-	public function getHostLicense():Call<GetHostData> {
+	public function getHostLicense() {
 		
-		return new Call<GetHostData>(_core, "App.getHostLicense")
-			.addComponentParameter("host", _core.host);
+		return (makeCall("App.getHostLicense"): Call<GetHostData>)
+			.addComponentParameter("host", core.host);
 	}
 	
-	public function logView():Call<BaseResultData> {
+	public function logView() {
 		
-		return new Call<BaseResultData>(_core, "App.logView")
-			.addComponentParameter("host", _core.host);
+		return (makeCall("App.logView"): Call<BaseResultData>)
+			.addComponentParameter("host", core.host);
 	}
 }

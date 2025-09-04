@@ -22,19 +22,12 @@ class Main extends openfl.display.Sprite {
 		addChild(page);
 		
 		new IntroPage(page,
-			function onStart
-			( appId        :String
-			, sessionId    :String
-			, debug        :Bool
-			, encryptionKey:String
-			, cipher       :Cipher
-			, format       :EncodingFormat
-			) {
+			function onStart(app) {
 				
 				removeChild(page);
 				page = null;
 				
-				addChild(new MainScreen(appId, sessionId, debug, encryptionKey, cipher, format));
+				addChild(new MainScreen(app));
 			}
 		);
 		#end

@@ -17,9 +17,9 @@ class CloudSaveComponent extends Component {
 	 * 
 	 * @param id  The slot number
 	**/
-	public function clearSlot(id:Int):Call<SaveSlotData> {
+	public function clearSlot(id:Int) {
 		
-		return new Call<SaveSlotData>(_core, "CloudSave.clearSlot", true)
+		return (makeCall("CloudSave.clearSlot", true): Call<SaveSlotData>)
 			.addComponentParameter("id", id);
 	}
 	
@@ -29,9 +29,9 @@ class CloudSaveComponent extends Component {
 	 * @param id             The slot number
 	 * @param externalAppId  Leave blank unless you which to fetch from an separate app.
 	**/
-	public function loadSlot(id:Int, externalAppId:String = null):Call<SaveSlotData> {
+	public function loadSlot(id:Int, externalAppId:String = null) {
 		
-		return new Call<SaveSlotData>(_core, "CloudSave.loadSlot", true)
+		return (makeCall("CloudSave.loadSlot", true): Call<SaveSlotData>)
 			.addComponentParameter("id", id)
 			.addComponentParameter("app_id", externalAppId);
 	}
@@ -42,9 +42,9 @@ class CloudSaveComponent extends Component {
 	 * @param id             The slot number
 	 * @param externalAppId  Leave blank unless you which to fetch from an separate app.
 	**/
-	public function loadSlots(externalAppId:String = null):Call<LoadSlotsData> {
+	public function loadSlots(externalAppId:String = null) {
 		
-		return new Call<LoadSlotsData>(_core, "CloudSave.loadSlots", true)
+		return (makeCall("CloudSave.loadSlots", true): Call<LoadSlotsData>)
 			.addComponentParameter("app_id", externalAppId);
 	}
 	
@@ -54,9 +54,9 @@ class CloudSaveComponent extends Component {
 	 * @param data  The data you want to save
 	 * @param id    The slot number
 	**/
-	public function setData(data:String, id:Int):Call<SaveSlotData> {
+	public function setData(data:String, id:Int) {
 		
-		return new Call<SaveSlotData>(_core, "CloudSave.setData", true)
+		return (makeCall("CloudSave.setData", true): Call<SaveSlotData>)
 			.addComponentParameter("data", data, allowNull)
 			.addComponentParameter("id", id);
 	}

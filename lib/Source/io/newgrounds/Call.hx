@@ -2,12 +2,14 @@ package io.newgrounds;
 
 import haxe.Json;
 import haxe.ds.StringMap;
+import io.newgrounds.objects.AppData;
 import io.newgrounds.objects.Error;
 import io.newgrounds.objects.events.BaseResultData;
 import io.newgrounds.objects.events.Outcome;
 import io.newgrounds.objects.events.Response;
 import io.newgrounds.utils.AsyncHttp;
 import io.newgrounds.utils.Dispatcher;
+import io.newgrounds.utils.Logger;
 
 /** A generic way to handle calls agnostic to their type */
 interface ICallable {
@@ -19,37 +21,48 @@ interface ICallable {
 	public function destroy():Void;
 }
 
+enum CallStatus {
+	
+	UNSENT;
+	QUEUED;
+	SENT;
+	COMPLETE;
+}
+
 class Call<T:BaseResultData>
 	implements ICallable {
 	
-	public var component(default, null):String;
+	public final component:String;
+	public final onSend = new Dispatcher();
+	public final onQueue = new Dispatcher();
+	public final onComplete = new Dispatcher();
+	public var state(default, null):CallStatus = UNSENT;
 	
-	var _core:NGLite;
-	var _properties:StringMap<Dynamic>;
-	var _parameters:StringMap<Dynamic>;
-	var _requireSession:Bool;
-	var _isSecure:Bool;
+	final _app:AppData;
+	final _logger:Logger;
+	final _properties = new StringMap<Any>();
+	final _parameters = new StringMap<Any>();
+	final _requireSession:Bool;
+	final _isSecure:Bool;
 	
 	// --- BASICALLY SIGNALS
-	var _responseHandlers:TypedDispatcher<Response<T>>;
-	var _successHandlers:Dispatcher;
-	var _httpErrorHandlers:TypedDispatcher<Error>;
-	var _statusHandlers:TypedDispatcher<Int>;
-	var _outcomeHandlers:TypedDispatcher<CallOutcome<T>>;
+	final _responseHandlers = new TypedDispatcher<Response<T>>();
+	final _successHandlers = new Dispatcher();
+	final _httpErrorHandlers = new TypedDispatcher<Error>();
+	final _httpStatusHandlers = new TypedDispatcher<Int>();
+	final _outcomeHandlers = new TypedDispatcher<CallOutcome<T>>();
 	
-	public function new (core:NGLite, component:String, requireSession:Bool = false, isSecure:Bool = false) {
+	public function new (app:AppData, logger:Logger, component:String, requireSession:Bool = false, isSecure:Bool = false) {
 		
-		_core = core;
+		_app = app;
+		_logger = logger;
 		this.component = component;
 		_requireSession = requireSession;
-		_isSecure = isSecure && core.encryptionHandler != null;
+		_isSecure = isSecure;
 	}
 	
 	/** adds a property to the input's object. **/
-	public function addProperty(name:String, value:Dynamic):Call<T> {
-		
-		if (_properties == null)
-			_properties = new StringMap<Dynamic>();
+	public function addProperty(name:String, value:Any):Call<T> {
 		
 		_properties.set(name, value);
 		
@@ -57,13 +70,10 @@ class Call<T:BaseResultData>
 	}
 	
 	/** adds a parameter to the call's component object. **/
-	public function addComponentParameter(name:String, value:Dynamic, defaultValue:Dynamic = null):Call<T> {
+	public function addComponentParameter(name:String, value:Any, ?defaultValue:Any):Call<T> {
 		
 		if (value == defaultValue)//TODO?: allow sending null value
 			return this;
-		
-		if (_parameters == null)
-			_parameters = new StringMap<Dynamic>();
 		
 		_parameters.set(name, value);
 		
@@ -76,9 +86,6 @@ class Call<T:BaseResultData>
 	**/
 	public function addResponseHandler(handler:Response<T>->Void):Call<T> {
 		
-		if (_responseHandlers == null)
-			_responseHandlers = new TypedDispatcher<Response<T>>();
-		
 		_responseHandlers.add(handler);
 		return this;
 	}
@@ -86,30 +93,32 @@ class Call<T:BaseResultData>
 	/** Handy callback setter for chained call modifiers. Called when ng.io replies successfully */
 	public function addSuccessHandler(handler:Void->Void):Call<T> {
 		
-		if (_successHandlers == null)
-			_successHandlers = new Dispatcher();
-		
 		_successHandlers.add(handler);
 		return this;
 	}
 	
-	/** Handy callback setter for chained call modifiers. Called when ng.io does not reply for any reason */
-	public function addErrorHandler(handler:Error->Void):Call<T> {
+	@:deprecated("addErrorHandler is deprecated, use addHttpErrorHandler")
+	inline public function addErrorHandler(handler:Error->Void):Call<T> {
 		
-		if (_httpErrorHandlers == null)
-			_httpErrorHandlers = new TypedDispatcher<Error>();
+		return addHttpErrorHandler(handler);
+	}
+	
+	/** Handy callback setter for chained call modifiers. Called when ng.io does not reply for any reason */
+	public function addHttpErrorHandler(handler:Error->Void):Call<T> {
 		
 		_httpErrorHandlers.add(handler);
 		return this;
 	}
 	
+	@:deprecated("addStatusHandler is deprecated, use addHttpStatusHandler")
+	inline public function addStatusHandler(handler:Int->Void):Call<T> {
+		
+		return addHttpStatusHandler(handler);
+	}
 	/** Handy callback setter for chained call modifiers. No idea when this is called; */
-	public function addStatusHandler(handler:Int->Void):Call<T> {//TODO:learn what this is for
+	public function addHttpStatusHandler(handler:Int->Void):Call<T> {//TODO:learn what this is for
 		
-		if (_statusHandlers == null)
-			_statusHandlers = new TypedDispatcher<Int>();
-		
-		_statusHandlers.add(handler);
+		_httpStatusHandlers.add(handler);
 		return this;
 	}
 	
@@ -122,9 +131,6 @@ class Call<T:BaseResultData>
 	 * - `FAIL(RESULT(error:Error))` - There was an error executing the call.
 	**/
 	public function addOutcomeHandler(handler:(CallOutcome<T>)->Void):Call<T> {
-		
-		if (_outcomeHandlers == null)
-			_outcomeHandlers = new TypedDispatcher<CallOutcome<T>>();
 		
 		_outcomeHandlers.add(handler);
 		return this;
@@ -140,7 +146,8 @@ class Call<T:BaseResultData>
 	}
 
 	/** Sends the call to the server, do not modify this object after calling this **/
-	inline public function send() sendHelper();
+	inline public function send() sendHelper(_app);
+	
 	
 	/**
 	 * Sends the call but replaces the `app_id` property with the external app id.
@@ -151,140 +158,146 @@ class Call<T:BaseResultData>
 	 * 
 	 * @param   id  The id of the external app.
 	 */
-	inline public function sendExternalAppId(id:String) sendHelper(id);
+	inline public function sendExternalAppId(id:String) sendHelper(id == null ? _app : {id: id});
 	
-	function sendHelper(?externalAppId:String):Void {
+	function sendHelper(app:AppData):Void {
 		
-		final isExternal = externalAppId != null;
+		_logger.assert(state.match(UNSENT | QUEUED), 'Cannot send call in unexpected state: $state');
+		state = SENT;
 		
 		var data:Dynamic = {};
-		data.app_id = isExternal ? externalAppId : _core.appId;
+		data.app_id = app.id;
 		data.call = {};
-		data.call.component  = component;
+		data.call.component = component;
 		
-		if (_core.debug)
+		if (app.debug)
 			addProperty("debug", true);
 		
-		if (_properties == null || !_properties.exists("session_id")) {
+		if (false == _properties.exists("session_id")) {
 			// --- HAS NO SESSION ID
 			
-			if (_core.sessionId != null && isExternal == false) {
+			if (app.sessionId != null) {
 				// --- AUTO ADD SESSION ID
 				
-				addProperty("session_id", _core.sessionId);
+				addProperty("session_id", app.sessionId);
 				
 			} else if (_requireSession){
 				
-				if (isExternal)
-					_core.logger.logError(new Error('cannot send "$component" call to an external app'));
-				else
-					_core.logger.logError(new Error('cannot send "$component" call without a sessionId'));
-				
+				_logger.logError(new Error('Cannot send "$component" to app: "${app.id}" call without a sessionId'));
 				return;
 			}
 		}
 		
-		if (_properties != null) {
-			
-			for (field in _properties.keys())
-				Reflect.setField(data, field, _properties.get(field));
-		}
+		for (field in _properties.keys())
+			Reflect.setField(data, field, _properties.get(field));
 		
-		if (_parameters != null) {
-			
-			data.call.parameters = {};
-			
-			for (field in _parameters.keys())
-				Reflect.setField(data.call.parameters, field, _parameters.get(field));
-		}
+		final params = getParameters();
+		if (params != null)
+			data.call.parameters = params;
 		
-		_core.logger.logVerbose('Post  - ${Json.stringify(data)}');
+		_logger.logVerbose('Post  - ${Json.stringify(data)}');
 		
 		if (_isSecure) {
 			
-			if (isExternal) {
+			if (app.encryption == NONE) {
 				
-				_core.logger.logError(new Error('cannot send "$component" call to an external app that requires encryption'));
+				_logger.logError(new Error('Cannot send "$component" to app: "${app.id}" call without encryption'));
 				return;
 			}
 			
-			var secureData = _core.encryptionHandler(Json.stringify(data.call));
+			var secureData = app.encryption.encrypt(Json.stringify(data.call));
 			data.call = {};
 			data.call.secure = secureData;
 			
-			_core.logger.logVerbose('    secure - $secureData');
+			_logger.logVerbose('    secure - $secureData');
 		}
 		
-		_core.markCallPending(this);
+		onSend.dispatch();
 		
-		AsyncNGCall.send(_core, Json.stringify(data), onData, onHttpError, onStatus);
+		AsyncNGCall.send(_logger, Json.stringify(data), onData, onHttpError, onHttpStatus);
+		onSend.dispatch();
+	}
+	
+	function getParameters():Null<Any>
+	{
+		var paramsEmpty = true;
+		final params = {};
+		
+		for (field in _parameters.keys())
+		{
+			paramsEmpty = false;
+			Reflect.setField(params, field, _parameters.get(field));
+		}
+		
+		return paramsEmpty ? null : params;
 	}
 	
 	/** Adds the call to the queue */
 	public function queue():Void {
 		
-		_core.queueCall(this);
+		_logger.assert(state.match(UNSENT), 'Cannot queue call in unexpected state: $state');
+		state = QUEUED;
+		onQueue.dispatch();
 	}
 	
 	function onData(reply:String):Void {
 		
-		_core.logger.logVerbose('Reply - $reply');
+		_logger.assert(state.match(SENT), 'Unexpected state: $state');
+		state = COMPLETE;
 		
-		if (_responseHandlers == null && _successHandlers == null && _outcomeHandlers == null)
+		_logger.logVerbose('Reply - $reply');
+		
+		if (_responseHandlers.isEmpty() && _successHandlers.isEmpty() && _outcomeHandlers.isEmpty())
 			return;
 		
-		var response = new Response<T>(_core, reply);
+		var response = new Response<T>(_logger, reply);
 		
-		if (_outcomeHandlers != null)
-		{
-			if (response.success == false)
-				_outcomeHandlers.dispatch(FAIL(RESPONSE(response.error)));
-			else if (response.result.success == false)
-				_outcomeHandlers.dispatch(FAIL(RESULT(response.result.error)));
-			else
-				_outcomeHandlers.dispatch(SUCCESS(response.result.data));
-		}
+		if (response.success == false)
+			_outcomeHandlers.dispatch(FAIL(RESPONSE(response.error)));
+		else if (response.result.success == false)
+			_outcomeHandlers.dispatch(FAIL(RESULT(response.result.error)));
+		else
+			_outcomeHandlers.dispatch(SUCCESS(response.result.data));
 		
-		if (_responseHandlers != null)
-			_responseHandlers.dispatch(response);
+		_responseHandlers.dispatch(response);
+		_successHandlers.dispatch();
 		
-		if (response.success && response.result.success && _successHandlers != null)
-			_successHandlers.dispatch();
+		onComplete.dispatch();
 		
 		destroy();
 	}
 	
 	function onHttpError(message:String):Void {
 		
-		_core.logger.logError(message);
+		state = COMPLETE;
+		_logger.logError(message);
 		
-		if (_outcomeHandlers != null)
-			_outcomeHandlers.dispatch(FAIL(HTTP(message)));
+		_outcomeHandlers.dispatch(FAIL(HTTP(message)));
+		_httpErrorHandlers.dispatch(new Error(message));
 		
-		if (_httpErrorHandlers != null)
-			_httpErrorHandlers.dispatch(new Error(message));
+		onComplete.dispatch();
+		
+		destroy();
 	}
 	
-	function onStatus(status:Int):Void {
+	function onHttpStatus(status:Int):Void {
 		
-		if (_statusHandlers == null)
-			return;
-		
-		_statusHandlers.dispatch(status);
+		_httpStatusHandlers.dispatch(status);
 	}
 	
 	public function destroy():Void {
 		
-		_core = null;
+		onSend.clear();
+		onComplete.clear();
 		
-		_properties = null;
-		_parameters = null;
+		_properties.clear();
+		_parameters.clear();
 		
-		_responseHandlers = null;
-		_successHandlers = null;
-		_httpErrorHandlers = null;
-		_statusHandlers = null;
-		_outcomeHandlers = null;
+		_responseHandlers.clear();
+		_successHandlers.clear();
+		_httpErrorHandlers.clear();
+		_httpStatusHandlers.clear();
+		_outcomeHandlers.clear();
 	}
 }
 

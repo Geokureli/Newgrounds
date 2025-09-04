@@ -3,24 +3,14 @@ package io.newgrounds.objects;
 import io.newgrounds.Call;
 import io.newgrounds.NGLite;
 import io.newgrounds.components.medal.*;
+import io.newgrounds.objects.Object;
+import io.newgrounds.objects.RawMedalData;
 import io.newgrounds.objects.events.Outcome;
 import io.newgrounds.objects.events.Response;
 import io.newgrounds.objects.events.Result;
 import io.newgrounds.utils.Dispatcher;
 
-typedef RawMedalData =
-{
-	id         :Int,
-	name       :String,
-	description:String,
-	icon       :String,
-	value      :Int,
-	difficulty :Difficulty,
-	secret     :Int,
-	unlocked   :Bool
-}
-
-class Medal extends Object<RawMedalData> {
+class Medal extends CoreObject<RawMedalData> {
 	
 	inline static public var EASY        = Difficulty.EASY;
 	inline static public var MODERATE    = Difficulty.MODERATE;
@@ -40,11 +30,9 @@ class Medal extends Object<RawMedalData> {
 	// --- HELPERS
 	public var difficultyName(get, never):String;
 	
-	public var onUnlock:Dispatcher;
+	public var onUnlock = new Dispatcher();
 	
-	public function new(core:NGLite, data:RawMedalData = null):Void {
-		
-		onUnlock = new Dispatcher();
+	public function new(core, data:RawMedalData = null):Void {
 		
 		super(core, data);
 	}
@@ -62,7 +50,7 @@ class Medal extends Object<RawMedalData> {
 	
 	public function sendUnlock(?callback:(Outcome<CallError>)->Void):Void {
 		
-		if (_core.sessionId == null) {
+		if (_core.appData.sessionId == null) {
 			// --- Unlock regardless, show medal popup to encourage NG signup
 			_data.unlocked = true;
 			onUnlock.dispatch();
@@ -128,14 +116,4 @@ class Medal extends Object<RawMedalData> {
 		
 		return 'Medal: $id@$name (${unlocked ? "unlocked" : "locked"}, $value pts, $difficultyName).';
 	}
-}
-
-#if haxe4 enum #else @:enum #end
-abstract Difficulty(Int) from Int to Int {
-	
-	var EASY        = 1;
-	var MODERATE    = 2;
-	var CHALLENGING = 3;
-	var DIFFICULT   = 4;
-	var BRUTAL      = 5;
 }

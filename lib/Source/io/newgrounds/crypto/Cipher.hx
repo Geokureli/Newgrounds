@@ -2,20 +2,43 @@ package io.newgrounds.crypto;
 
 import haxe.io.Bytes;
 
-#if haxe4 enum #else @:enum #end
-abstract Cipher(String) to String{
-	var NONE    = "none";
-	var AES_128 = "aes128";
-	var RC4     = "rc4";
+@:using(io.newgrounds.crypto.Cipher.CipherTools)
+enum Cipher {
 	
-	@:allow(io.newgrounds.NGLite)
-	function generateEncrypter(key:Bytes):(Bytes)->Bytes {
+	NONE;
+	AES_128;
+	RC4;
+}
+
+class CipherTools {
+	
+	static public function toString(cipher:Cipher) {
+		
+		return switch cipher {
+			case AES_128: "aes128";
+			case RC4    : "rc4";
+			case NONE   : "none";
+		}
+	}
+	
+	static public function fromString(cipher:String) {
+		
+		return switch cipher {
+			case "aes128": AES_128;
+			case "rc4"   : RC4;
+			case "none"  : NONE;
+			case invalid:
+				throw 'Invalid cipher: $invalid';
+		}
+	}
+	
+	static public function generateEncrypter(cipher:Cipher, key:Bytes):Null<(Bytes)->Bytes> {
 		
 		#if (ng_test_decryption || ng_test_decryption_verbose)
 		// Advanced testing to make sure encryption/decryption is working
 		return generateEncrypterAndTestDecrypter(key);
 		#else
-		return switch (this) {
+		return switch (cipher) {
 			
 			case RC4    : new Rc4(key).crypt;
 			case AES_128: new Aes(key).encrypt;
@@ -24,12 +47,12 @@ abstract Cipher(String) to String{
 		#end
 	}
 	
-	function generateEncrypterAndTestDecrypter(key:Bytes):(Bytes)->Bytes {
+	function generateEncrypterAndTestDecrypter(cipher:Cipher, key:Bytes):Null<(Bytes)->Bytes> {
 		
 		var encrypter:(Bytes)->Bytes;
 		var decrypter:(Bytes)->Bytes;
 		
-		switch (this) {
+		switch (cipher) {
 			
 			case RC4    : throw "Rc4 decryption not implemented";
 			case AES_128:

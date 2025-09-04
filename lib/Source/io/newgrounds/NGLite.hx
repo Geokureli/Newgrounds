@@ -6,6 +6,8 @@ import io.newgrounds.Call;
 import io.newgrounds.components.ComponentList;
 import io.newgrounds.crypto.Cipher;
 import io.newgrounds.crypto.EncodingFormat;
+import io.newgrounds.crypto.Encryption;
+import io.newgrounds.objects.AppData;
 import io.newgrounds.objects.Error;
 import io.newgrounds.objects.events.BaseResultData;
 import io.newgrounds.objects.events.Outcome;
@@ -27,35 +29,42 @@ import io.newgrounds.utils.Logger;
  * 
  * @author GeoKureli
  */
-class NGLite {
+class NGLite extends BaseCore {
 	
 	static public var core(default, null):NGLite;
 	static public var onCoreReady(default, null):Dispatcher = new Dispatcher();
 	
-	public var debug:Bool;
-	/** The unique ID of your app as found in the 'API Tools' tab of your Newgrounds.com project. */
-	public var appId(default, null):String;
-	/** The name of the host the game is being played on */
-	public var host:String;
+	public var debug(get, set):Bool;
+	inline function get_debug() return appData.debug;
+	inline function set_debug(value:Bool) return appData.debug = value;
 	
-	@:isVar
-	public var sessionId(default, set):String;
+	/** The unique ID of your app as found in the 'API Tools' tab of your Newgrounds.com project. */
+	public var appId(get, never):String;
+	inline function get_appId() return appData.id;
+	
+	public var sessionId(get, set):String;
+	function get_sessionId():String return appData.sessionId;
 	function set_sessionId(value:String):String {
 		
-		return this.sessionId = value == "" ? null : value;
+		return appData.sessionId = value == "" ? null : value;
 	}
 	
 	/** Components used to call the NG server directly */
-	public var calls(default, null):ComponentList;
+	public final calls:ComponentList;
 	
 	/**
 	 * Converts an object to an encrypted string that can be decrypted by the server.
 	 * Set your preffered encrypter here,
 	 * or just call setDefaultEcryptionHandler with your app's encryption settings
 	**/
-	public var encryptionHandler:String->String;
+	public var encryptionHandler(get, set):(String)->String;
+	function get_encryptionHandler():(String)->String return appData.encryption.encrypt;
+	function set_encryptionHandler(value:(String)->String) {
+		
+		appData.encryption = FUNC(value);
+		return value;
+	}
 	
-	public final logger:Logger;
 	
 	/** 
 	 * Iniitializes the API, call before utilizing any other component.
@@ -67,23 +76,15 @@ class NGLite {
 	 * @param callback   If a sessionId was given, this will be called with the outcome of that
 	 *                   login attempt.
 	**/
-	public function new
-	( appId = "test"
-	, ?sessionId:String
-	, debug = false
-	, ?callback:(LoginOutcome)->Void
-	) {
+	public function new(app:AppData, ?callback:(LoginOutcome)->Void) {
 		
-		this.appId = appId;
-		this.sessionId = sessionId;
-		this.debug = debug;
-		logger = new Logger((any, ?pos)->haxe.Log.trace('[Newgrounds API] :: ${any}', pos));
+		super(app, "[Newgrounds API] :: ");
 		
 		calls = new ComponentList(this);
 		
 		if (this.sessionId != null) {
 			
-			calls.app.checkSession()
+			callList.add(calls.app.checkSession())
 				.addOutcomeHandler(checkInitialSession.bind(callback))
 				.send();
 		}
@@ -119,14 +120,14 @@ class NGLite {
 	 * 
 	 * @see createAndCheckSession
 	**/
-	static public function create
-	( appId            = "test"
-	, sessionId:String = null
-	, ?callback:(LoginOutcome)->Void
-	):Void {
+	overload static public inline extern function create(appId = "test", ?sessionId:String, ?callback):Void {
 		
-		core = new NGLite(appId, sessionId, false, callback);
+		createHelper({id: appId, sessionId: sessionId, debug: appId == "test" }, callback);
+	}
+	
+	overload static public inline extern function createHelper(app:AppData, ?callback):Void {
 		
+		core = new NGLite(app, callback);
 		onCoreReady.dispatch();
 	}
 	
@@ -143,17 +144,24 @@ class NGLite {
 	 * @param callback         If a sessionId was given or found, this will be called with the
 	 *                         outcome of that login attempt.
 	**/
-	static public function createAndCheckSession
+	overload static public inline extern function createAndCheckSession
 	( appId = "test"
 	, backupSessionId:String = null
 	, ?callback:(LoginOutcome)->Void
 	):Void {
 		
-		var session = getSessionId();
-		if (session == null)
-			session = backupSessionId;
+		createAndCheckSessionHelper({ id: appId, sessionId: backupSessionId }, callback);
+	}
+	
+	overload static public inline extern function createAndCheckSession(app:AppData, callback) {
 		
-		create(appId, session, callback);
+		createAndCheckSessionHelper(app, callback);
+	}
+	
+	static public function createAndCheckSessionHelper(app:AppData, ?callback):Void {
+		
+		app.sessionId = getSessionId() ?? app.sessionId;
+		createHelper(app, callback);
 	}
 	
 	inline static public function getUrl():String {
@@ -214,37 +222,37 @@ class NGLite {
 	//                                   CALLS
 	// -------------------------------------------------------------------------------------------
 	
-	var _queuedCalls:Array<ICallable> = new Array<ICallable>();
-	var _pendingCalls:Array<ICallable> = new Array<ICallable>();
+	// final _queuedCalls = new Array<ICallable>();
+	// final _pendingCalls = new Array<ICallable>();
 	
-	@:allow(io.newgrounds.Call)
-	@:generic
-	function queueCall<T:BaseResultData>(call:Call<T>):Void {
+	// @:allow(io.newgrounds.Call)
+	// @:generic
+	// function queueCall<T:BaseResultData>(call:Call<T>):Void {
 		
-		logger.logVerbose('queued - ${call.component}');
+	// 	logger.logVerbose('queued - ${call.component}');
 		
-		_queuedCalls.push(call);
-		checkQueue();
-	}
+	// 	_queuedCalls.push(call);
+	// 	checkQueue();
+	// }
 	
-	@:allow(io.newgrounds.Call)
-	@:generic
-	function markCallPending<T:BaseResultData>(call:Call<T>):Void {
+	// @:allow(io.newgrounds.Call)
+	// @:generic
+	// function markCallPending<T:BaseResultData>(call:Call<T>):Void {
 		
-		_pendingCalls.push(call);
+	// 	_pendingCalls.push(call);
 		
-		call.addOutcomeHandler((_)->{ 
+	// 	call.addOutcomeHandler((_)->{ 
 			
-			_pendingCalls.remove(call);
-			checkQueue();
-		});
-	}
+	// 		_pendingCalls.remove(call);
+	// 		checkQueue();
+	// 	});
+	// }
 	
-	function checkQueue():Void {
+	// function checkQueue():Void {
 		
-		if (_pendingCalls.length == 0 && _queuedCalls.length > 0)
-			_queuedCalls.shift().send();
-	}
+	// 	if (_pendingCalls.length == 0 && _queuedCalls.length > 0)
+	// 		_queuedCalls.shift().send();
+	// }
 	
 	// -------------------------------------------------------------------------------------------
 	//                                       ENCRYPTION
@@ -257,20 +265,11 @@ class NGLite {
 	, format:EncodingFormat = BASE_64
 	) {
 		
-		encryptionHandler = null;
-		
-		var encrypt = cipher.generateEncrypter(format.decode(key));
-		if (encrypt != null) {
-			
-			encryptionHandler = function (data) {
-				
-				return format.encode(encrypt(Bytes.ofString(data)));
-			}
-		}
+		appData.encryption = EncryptionTools.create(cipher, key, format);
 	}
 	
 	@:deprecated("initEncryption is deprecated, use `setupEncryption`, now that AES-128 is the default")
-	inline public function initEncryption(key, cipher = RC4, format = BASE_64) {
+	inline public function initEncryption(key, cipher = Cipher.RC4, format = BASE_64) {
 		
 		setupEncryption(key, cipher, format);
 	}

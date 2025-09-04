@@ -10,8 +10,6 @@ import io.newgrounds.components.score.ScoreBoardComponent;
 
 class ComponentList {
 	
-	var _core:NGLite;
-	
 	/** Used to get and validate information associated with your app, including user sessions. */
 	public final app       : AppComponent;
 	/** Handles loading and saving of game states. */
@@ -27,16 +25,14 @@ class ComponentList {
 	/** Handles loading and posting of high scores and scoreboards. */
 	public final scoreBoard: ScoreBoardComponent;
 	
-	public function new(core:NGLite) {
+	public function new(core:BaseCore) {
 		
-		_core = core;
-		
-		app        = new AppComponent       (_core);
-		cloudSave  = new CloudSaveComponent (_core);
-		event      = new EventComponent     (_core);
-		gateway    = new GatewayComponent   (_core);
-		loader     = new LoaderComponent    (_core);
-		medal      = new MedalComponent     (_core);
-		scoreBoard = new ScoreBoardComponent(_core);
+		app        = new AppComponent       (core);
+		cloudSave  = new CloudSaveComponent (core);
+		event      = new EventComponent     (core);
+		gateway    = new GatewayComponent   (core);
+		loader     = new LoaderComponent    (core);
+		medal      = new MedalComponent     (core);
+		scoreBoard = new ScoreBoardComponent(core);
 	}
 }

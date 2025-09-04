@@ -3,6 +3,7 @@ package io.newgrounds.objects.events;
 import haxe.Json;
 import io.newgrounds.objects.Error;
 import io.newgrounds.objects.events.BaseResultData;
+import io.newgrounds.utils.Logger;
 
 typedef DebugResponse = {
 	
@@ -28,7 +29,7 @@ abstract Response<T:BaseResultData>(RawResponse<T>) {
 	public var result (get, never):Null<Result<T>>    ; inline function get_result  () return this.result;
 	public var appId  (get, never):String             ; inline function get_appId   () return this.app_id;
 	
-	public function new (core:NGLite, reply:String) {
+	public function new (logger:Logger, reply:String) {
 		
 		try { this = Json.parse(reply); }
 		catch (e:Dynamic) {
@@ -37,9 +38,9 @@ abstract Response<T:BaseResultData>(RawResponse<T>) {
 		}
 		
 		if (!success)
-			core.logger.logError('Call unseccessful: $error');
+			logger.logError('Call unseccessful: $error');
 		else if(!result.success)
-			core.logger.logError('${result.component} fail: ${result.error}');
+			logger.logError('${result.component} fail: ${result.error}');
 	}
 	
 	inline public function hasError() {

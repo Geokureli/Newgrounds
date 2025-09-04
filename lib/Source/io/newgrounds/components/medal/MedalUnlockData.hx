@@ -1,6 +1,6 @@
 package io.newgrounds.components.medal;
 
-import io.newgrounds.objects.Medal;
+import io.newgrounds.objects.RawMedalData;
 import io.newgrounds.objects.events.BaseResultData;
 
 @:noCompletion

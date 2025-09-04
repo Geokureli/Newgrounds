@@ -13,36 +13,36 @@ class LoaderComponent extends Component {
 	
 	public function loadAuthorUrl(redirect = false) {
 		
-		return new Call<UrlData>(_core, "Loader.loadAuthorUrl")
-			.addComponentParameter("host", _core.host)
+		return (makeCall("Loader.loadAuthorUrl"): Call<UrlData>)
+			.addComponentParameter("host", core.host)
 			.addComponentParameter("redirect", redirect, true);
 	}
 	
 	public function loadMoreGames(redirect = false) {
 		
-		return new Call<UrlData>(_core, "Loader.loadMoreGames")
-			.addComponentParameter("host", _core.host)
+		return (makeCall("Loader.loadMoreGames"): Call<UrlData>)
+			.addComponentParameter("host", core.host)
 			.addComponentParameter("redirect", redirect, true);
 	}
 	
 	public function loadNewgrounds(redirect = false) {
 		
-		return new Call<UrlData>(_core, "Loader.loadNewgrounds")
-			.addComponentParameter("host", _core.host)
+		return (makeCall("Loader.loadNewgrounds"): Call<UrlData>)
+			.addComponentParameter("host", core.host)
 			.addComponentParameter("redirect", redirect, true);
 	}
 	
 	public function loadOfficialUrl(redirect = false) {
 		
-		return new Call<UrlData>(_core, "Loader.loadOfficialUrl")
-			.addComponentParameter("host", _core.host)
+		return (makeCall("Loader.loadOfficialUrl"): Call<UrlData>)
+			.addComponentParameter("host", core.host)
 			.addComponentParameter("redirect", redirect, true);
 	}
 	
 	public function loadReferral(redirect = false) {
 		
-		return new Call<UrlData>(_core, "Loader.loadReferral")
-			.addComponentParameter("host", _core.host)
+		return (makeCall("Loader.loadReferral"): Call<UrlData>)
+			.addComponentParameter("host", core.host)
 			.addComponentParameter("redirect", redirect, true);
 	}
 }

@@ -3,9 +3,7 @@ package io.newgrounds.test.ui;
 import haxe.PosInfos;
 import haxe.ds.StringMap;
 import io.newgrounds.NG;
-import io.newgrounds.NGLite;
-import io.newgrounds.crypto.Cipher;
-import io.newgrounds.crypto.EncodingFormat;
+import io.newgrounds.objects.AppData;
 import io.newgrounds.swf.common.Button;
 import io.newgrounds.test.art.MainScreenSwf;
 import io.newgrounds.test.ui.CloudSavePage;
@@ -37,14 +35,7 @@ class MainScreen extends Sprite {
 	var _clear:Button;
 	var _queue:CheckBox;
 	
-	public function new
-	( appId        :String
-	, sessionId    :Null<String>
-	, debug        :Bool
-	, encryptionKey:String
-	, cipher       :Cipher
-	, format       :EncodingFormat
-	) {
+	public function new(app:AppData) {
 		
 		super();
 		
@@ -61,9 +52,7 @@ class MainScreen extends Sprite {
 		];
 		
 		
-		NG.create(appId, sessionId, debug);
-		if (cipher != Cipher.NONE)
-			NG.core.setupEncryption(encryptionKey, cipher, format);
+		NG.create(app);
 		
 		NG.core.logger.verbose = true;
 		

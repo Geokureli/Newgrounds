@@ -3,7 +3,6 @@ package io.newgrounds.utils;
 import haxe.Http;
 import haxe.PosInfos;
 import haxe.Timer;
-import io.newgrounds.NGLite;
 
 #if (target.threaded)
 import sys.thread.Thread;
@@ -25,17 +24,17 @@ class AsyncNGCall {
 	inline static var PATH:String = "https://newgrounds.io/gateway_v3.php";
 	
 	static public function send
-	( core:NGLite
+	( logger:Logger
 	, data:String
 	, onData:String->Void
 	, onError:String->Void
 	, onStatus:Int->Void
 	) {
 		
-		core.logger.logVerbose('sending: $data');
+		logger.logVerbose('sending: $data');
 		
 		#if (target.threaded || neko || java || cpp)
-		AsyncHttp.sendAsync(PATH, data, onData, onError, onStatus, core.logVerbose);
+		AsyncHttp.sendAsync(PATH, data, onData, onError, onStatus, logger.logVerbose);
 		#else
 		AsyncHttp.sendSync(PATH, data, onData, onError, onStatus);
 		#end

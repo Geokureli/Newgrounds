@@ -2,6 +2,8 @@ package io.newgrounds.objects;
 
 import io.newgrounds.Call;
 import io.newgrounds.components.cloud.SaveSlotData;
+import io.newgrounds.objects.Object;
+import io.newgrounds.objects.RawSaveSlotData;
 import io.newgrounds.objects.events.Outcome;
 import io.newgrounds.objects.events.Response;
 import io.newgrounds.objects.events.Result;
@@ -9,28 +11,11 @@ import io.newgrounds.utils.AsyncHttp;
 
 /**
  * Contains information about a CloudSave slot.
-**/
-typedef RawSaveSlot = {
-	
-	/** A date and time (in ISO 8601 format) representing when this slot was last saved. */
-	var datetime :Null<String>;
-	/** The slot number. */
-	var id       :Int;
-	/** The size of the save data in bytes. */
-	var size     :Int;
-	/** A unix timestamp representing when this slot was last saved. */
-	var timestamp:Int;
-	/** The URL containing the actual save data for this slot, or null if this slot has no data. */
-	var url      :Null<String>;
-}
-
-/**
- * Contains information about a CloudSave slot.
  * 
  * This is helper class that lets you call methods directly on the slot object, rather than
  * calling generic calls using the slot's id number.
 **/
-class SaveSlot extends Object<RawSaveSlot>
+class SaveSlot extends CoreObject<RawSaveSlotData>
 {
 	/** A date and time (in ISO 8601 format) representing when this slot was last saved. */
 	public var datetime(get, never):Null<String>;
@@ -58,7 +43,7 @@ class SaveSlot extends Object<RawSaveSlot>
 	
 	var _externalAppId(default, null):String;
 	
-	public function new(core:NGLite, data:RawSaveSlot = null, externalAppId:String = null) {
+	public function new(core:NGLite, data:RawSaveSlotData = null, externalAppId:String = null) {
 		
 		_externalAppId = externalAppId;
 		super(core, data);

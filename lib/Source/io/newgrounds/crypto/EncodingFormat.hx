@@ -1,7 +1,7 @@
 package io.newgrounds.crypto;
 
-import haxe.io.Bytes;
 import haxe.crypto.Base64;
+import haxe.io.Bytes;
 
 #if haxe4 enum #else @:enum #end
 abstract EncodingFormat(String) to String {
@@ -26,5 +26,13 @@ abstract EncodingFormat(String) to String {
 			case HEX    : Bytes.ofHex(data);
 			default     : null;
 		}
+	}
+	
+	static public function fromString(format:String)
+	{
+		if (format != BASE_64 && format != HEX)
+			throw 'Invalid encoding format: $format';
+		
+		return cast format;
 	}
 }

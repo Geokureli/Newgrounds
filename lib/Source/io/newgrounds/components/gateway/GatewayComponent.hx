@@ -6,16 +6,16 @@ class GatewayComponent extends Component {
 	
 	public function getDatetime():Call<GetDateTimeData> {
 		
-		return new Call<GetDateTimeData>(_core, "Gateway.getDatetime");
+		return makeCall("Gateway.getDatetime");
 	}
 	
 	public function getVersion():Call<GetVersionData> {
 		
-		return new Call<GetVersionData>(_core, "Gateway.getVersion");
+		return makeCall("Gateway.getVersion");
 	}
 	
 	public function ping():Call<PingData> {
 		
-		return new Call<PingData>(_core, "Gateway.ping");
+		return makeCall("Gateway.ping");
 	}
 }

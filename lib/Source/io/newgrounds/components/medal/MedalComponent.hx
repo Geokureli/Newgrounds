@@ -13,7 +13,7 @@ class MedalComponent extends Component {
 	**/
 	public function unlock(id:Int) {
 		
-		return new Call<MedalUnlockData>(_core, "Medal.unlock", true, true)
+		return (makeCall("Medal.unlock", true, true): Call<MedalUnlockData>)
 			.addComponentParameter("id", id);
 	}
 	
@@ -24,7 +24,7 @@ class MedalComponent extends Component {
 	**/
 	public function getList(?externalAppId:String) {
 		
-		return new Call<MedalListData>(_core, "Medal.getList")
+		return (makeCall("Medal.getList"): Call<MedalListData>)
 			.addComponentParameter("app_id", externalAppId);
 	}
 	
@@ -33,6 +33,6 @@ class MedalComponent extends Component {
 	**/
 	public function getMedalScore() {
 		
-		return new Call<MedalScoreData>(_core, "Medal.getMedalScore");
+		return (makeCall("Medal.getMedalScore"): Call<MedalScoreData>);
 	}
 }
