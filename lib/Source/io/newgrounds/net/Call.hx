@@ -159,6 +159,7 @@ class Call<T:BaseResultData>
 	 * 
 	 * @param   id  The id of the external app.
 	 */
+	@:deprecated("sendExternalAppId is deprecated, use externalApps[id].calls")
 	inline public function sendExternalAppId(id:String) sendHelper(id == null ? _app : {id: id});
 	
 	function sendHelper(app:AppData):Void {
