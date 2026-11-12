@@ -2,6 +2,7 @@ package io.newgrounds;
 
 import io.newgrounds.components.ComponentList;
 
+@:nullSafety(Strict)
 class CallableCore extends BaseCore {
 	
 	/** Components used to call the NG server directly */

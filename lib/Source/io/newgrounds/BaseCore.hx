@@ -4,6 +4,7 @@ import io.newgrounds.debug.Logger;
 import io.newgrounds.net.CallList;
 import io.newgrounds.net.data.AppData;
 
+@:nullSafety(Strict)
 class BaseCore {
 	
 	public final appData:AppData;

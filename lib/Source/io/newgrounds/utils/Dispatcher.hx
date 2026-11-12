@@ -3,6 +3,7 @@ package io.newgrounds.utils;
 /**
  * Basically shitty signals, but I didn't want to have external references.
 **/
+@:nullSafety(Strict)
 class Dispatcher {
 	
 	final _list = new Array<Void->Void>();
@@ -67,6 +68,7 @@ class Dispatcher {
 	}
 }
 
+@:nullSafety(Strict)
 class TypedDispatcher<T> {
 	
 	final _list:Array<T->Void>;
