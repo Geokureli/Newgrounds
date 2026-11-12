@@ -150,7 +150,7 @@ class NGLite extends CallableCore {
 	, ?callback:(LoginOutcome)->Void
 	):Void {
 		
-		createAndCheckSessionHelper({ id: appId, sessionId: backupSessionId }, callback);
+		createAndCheckSession({ id: appId, sessionId: backupSessionId }, callback);
 	}
 	
 	/**
