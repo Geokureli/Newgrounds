@@ -8,7 +8,7 @@ typedef MedalData =
 	icon       :String,
 	value      :Int,
 	difficulty :Difficulty,
-	secret     :Int,
+	secret     :IntBool,
 	unlocked   :Bool
 }
 

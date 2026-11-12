@@ -33,7 +33,7 @@ class Medal extends Object<MedalData> {
 	public var icon       (get, never):String; inline function get_icon       () return _data.icon;
 	public var value      (get, never):Int   ; inline function get_value      () return _data.value;
 	public var difficulty (get, never):Int   ; inline function get_difficulty () return _data.difficulty;
-	public var secret     (get, never):Bool  ; inline function get_secret     () return _data.secret == 1;
+	public var secret     (get, never):Bool  ; inline function get_secret     () return _data.secret;
 	public var unlocked   (get, never):Bool  ; inline function get_unlocked   () return _data.unlocked;
 	// --- HELPERS
 	public var difficultyName(get, never):String;
