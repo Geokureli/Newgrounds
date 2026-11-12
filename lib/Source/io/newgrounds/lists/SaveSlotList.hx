@@ -3,6 +3,7 @@ package io.newgrounds.lists;
 import io.newgrounds.net.Call;
 import io.newgrounds.net.data.Error;
 import io.newgrounds.net.data.Response;
+import io.newgrounds.net.data.SaveSlotData;
 import io.newgrounds.net.outcomes.CallOutcome;
 import io.newgrounds.net.outcomes.Outcome;
 import io.newgrounds.net.results.cloud.LoadSlotsResultData;
@@ -73,33 +74,29 @@ private class RawSaveSlotList extends ObjectList<Int, SaveSlot> {
 			case FAIL(error): fireCallbacks(FAIL(error));
 			case SUCCESS(data):
 				
-				var idList:Array<Int> = new Array<Int>();
+				for (slotData in data.slots) 
+					parse(slotData);
 				
-				if (_map == null) {
-					
-					_map = new Map();
-					_ordered = [];
-				}
-				
-				for (slotData in data.slots) {
-					
-					var id = slotData.id;
-					if (_map.exists(id) == false) {
-						
-						var slot = new SaveSlot(_core, slotData);
-						_map.set(id, slot);
-						_ordered.push(slot);
-						
-					} else
-						_map[id].parse(slotData);
-					
-					idList.push(id);
-				}
-				
-				_core.logger.logVerbose('${idList.length} SaveSlots received [${idList.join(", ")}]');
+				_core.logger.logVerbose('${data.slots.length} SaveSlots received ${data.slots.map(s->s.id)}');
 				
 				fireCallbacks(SUCCESS);
 		}
+	}
+	
+	function parse(data:SaveSlotData) {
+		
+		if (_map.exists(data.id))
+			_map[data.id].parse(data);
+		else {
+			
+			add(new SaveSlot(_core, data));
+		}
+	}
+	
+	function add(slot:SaveSlot) {
+		
+		_map[slot.id] = slot;
+		_ordered.push(slot);
 	}
 	
 	/**

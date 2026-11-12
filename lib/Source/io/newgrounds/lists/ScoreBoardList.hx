@@ -56,21 +56,15 @@ private class RawScoreBoardList extends ObjectList<Int, ScoreBoard> {
 			case FAIL(error): fireCallbacks(FAIL(error));
 			case SUCCESS(data):
 				
-				var idList:Array<Int> = new Array<Int>();
-				
-				if (_map == null) {
+				for (boardData in data.scoreboards) {
 					
-					_map = new Map();
-					
-					for (boardData in data.scoreboards) {
-						
-						var board = new ScoreBoard(_core, boardData);
-						_map.set(board.id, board);
-						idList.push(board.id);
-					}
+					if (_map.exists(boardData.id))
+						_map[boardData.id].parse(boardData);
+					else
+						_map[boardData.id] = new ScoreBoard(_core, boardData);
 				}
 				
-				_core.logger.logVerbose('${data.scoreboards.length} ScoreBoards received [${idList.join(", ")}]');
+				_core.logger.logVerbose('${data.scoreboards.length} ScoreBoards received ${data.scoreboards.map(b->b.id)}');
 				
 				fireCallbacks(SUCCESS);
 		}

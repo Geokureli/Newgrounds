@@ -37,7 +37,7 @@ using io.newgrounds.net.outcomes.Outcome.TypedOutcomeTools;
 class NG extends NGLite {
 	
 	static public var core(default, null):NG;
-	static public var onCoreReady(default, null):Dispatcher = new Dispatcher();
+	static public final onCoreReady:Dispatcher = new Dispatcher();
 	
 	// --- DATA
 	
@@ -494,7 +494,7 @@ class NG extends NGLite {
 	
 	function timer(delay:Float, callback:Void->Void):Void {
 		
-		var timer = new Timer(Std.int(delay * 1000));
+		final timer = new Timer(Std.int(delay * 1000));
 		timer.run = function func():Void {
 			
 			timer.stop();
@@ -506,7 +506,7 @@ class NG extends NGLite {
 	/** Used to get the current web host of your game. */
 	static public function getHost():String {
 		
-		var url = NGLite.getUrl();
+		final url = NGLite.getUrl();
 		
 		if (url == null || url == "")
 			return "AppView";

@@ -10,7 +10,7 @@ import io.newgrounds.net.results.Result;
 import io.newgrounds.objects.SaveSlot;
 import io.newgrounds.utils.Dispatcher;
 
-class ObjectList<K, V> {
+class ObjectList<K:Int, V> {
 	
 	public var state(default, null):ListState = Empty;
 	
@@ -20,13 +20,19 @@ class ObjectList<K, V> {
 	public var onLoad(default, null) = new Dispatcher();
 	
 	final _core:CallableCore;
-	var _map:Map<K, V>;
+	final _map = new Map<K, V>();
 	
-	var _callbacks = new TypedDispatcher<Outcome<CallError>>();
+	final _callbacks = new TypedDispatcher<Outcome<CallError>>();
 	
 	public function new (core:CallableCore) {
 		
 		_core = core;
+	}
+	
+	public function clear() {
+		
+		_map.clear();
+		_callbacks.clear();
 	}
 	
 	inline public function get(id:K):V return _map.get(id);
@@ -69,7 +75,7 @@ class ObjectList<K, V> {
 	
 	function fireCallbacks(outcome:Outcome<CallError>) {
 		
-		var firstFire = state != Loaded;
+		final firstFire = state != Loaded;
 		
 		if (firstFire && outcome.match(FAIL(_)))
 			state = Empty;

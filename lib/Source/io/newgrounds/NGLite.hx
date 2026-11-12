@@ -37,8 +37,8 @@ using io.newgrounds.net.outcomes.Outcome.TypedOutcomeTools;
  */
 class NGLite extends CallableCore {
 	
-	static public var core(default, null):NGLite;
-	static public var onCoreReady(default, null):Dispatcher = new Dispatcher();
+	static public var core(default, null):Null<NGLite>;
+	static public final onCoreReady = new Dispatcher();
 	
 	public var debug(get, set):Bool;
 	inline function get_debug() return appData.debug;

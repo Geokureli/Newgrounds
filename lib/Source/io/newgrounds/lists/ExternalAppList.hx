@@ -37,12 +37,17 @@ abstract ExternalAppList (RawExternalAppList) {
 @:allow(io.newgrounds.lists.ExternalAppList)
 class RawExternalAppList {
 	
-	var _core:BaseCore;
-	var _map = new Map<String, ExternalApp>();
+	final _core:BaseCore;
+	final _map = new Map<String, ExternalApp>();
 	
 	public function new (core) {
 		
 		_core = core;
+	}
+	
+	public function clear () {
+		
+		_map.clear();
 	}
 	
 	public function add(appId:String) {

@@ -2,6 +2,7 @@ package io.newgrounds.lists;
 
 import io.newgrounds.net.Call;
 import io.newgrounds.net.data.Error;
+import io.newgrounds.net.data.MedalData;
 import io.newgrounds.net.data.Response;
 import io.newgrounds.net.outcomes.CallOutcome;
 import io.newgrounds.net.outcomes.Outcome;
@@ -65,39 +66,34 @@ class RawMedalList extends ObjectList<Int, Medal> {
 			
 			case FAIL(error): fireCallbacks(FAIL(error));
 			case SUCCESS(data):
-				
-				final idList:Array<Int> = new Array<Int>();
-				
-				if (_map == null) {
 					
-					_map = new Map();
-					
-					for (medalData in data.medals) {
-						
-						final medal = new Medal(medalData);
-						_map.set(medal.id, medal);
-						idList.push(medal.id);
-						
-						medal.onUnlockCalled.add(function (callback)
-						{
-							_core.calls.medal.unlock(medal.id)
-								.addOutcomeHandler(callback)
-								.send();
-						});
-					}
-				} else {
-					
-					for (medalData in data.medals) {
-						
-						_map.get(medalData.id).parse(medalData);
-						idList.push(medalData.id);
-					}
-				}
+				for (medalData in data.medals)
+					parse(medalData);
 				
-				_core.logger.logVerbose('${data.medals.length} Medals received [${idList.join(", ")}]');
+				_core.logger.logVerbose('${data.medals.length} Medals received ${data.medals.map(m->m.id)}');
 				
 				fireCallbacks(SUCCESS);
 		}
+	}
+	
+	function parse(data:MedalData) {
+		
+		if (_map.exists(data.id))
+			_map[data.id].parse(data);
+		else
+			add(new Medal(data));
+	}
+	
+	function add(medal:Medal) {
+		
+		_map[medal.id] = medal;
+		
+		medal.onUnlockCalled.add(function (callback) {
+			
+			_core.calls.medal.unlock(medal.id)
+				.addOutcomeHandler(callback)
+				.send();
+		});
 	}
 }
 
