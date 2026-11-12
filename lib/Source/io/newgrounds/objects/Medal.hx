@@ -13,18 +13,21 @@ import io.newgrounds.utils.Dispatcher;
 using io.newgrounds.net.outcomes.Outcome.OutcomeTools;
 using io.newgrounds.net.outcomes.Outcome.TypedOutcomeTools;
 
+@:deprecated("io.newgrounds.objects.Difficulty is deprecated, use io.newgrounds.net.data.MedalData.Difficulty, instead")
+typedef Difficulty = io.newgrounds.net.data.MedalData.Difficulty;
+
 class Medal extends Object<MedalData> {
 	
 	@:depracated("Medal.EASY is deprecated, use Difficulty.EASY, instead")
-	inline static public var EASY        = Difficulty.EASY;
+	inline static public var EASY        = io.newgrounds.net.data.MedalData.Difficulty.EASY;
 	@:depracated("Medal.MODERATE is deprecated, use Difficulty.MODERATE, instead")
-	inline static public var MODERATE    = Difficulty.MODERATE;
+	inline static public var MODERATE    = io.newgrounds.net.data.MedalData.Difficulty.MODERATE;
 	@:depracated("Medal.CHALLENGING is deprecated, use Difficulty.CHALLENGING, instead")
-	inline static public var CHALLENGING = Difficulty.CHALLENGING;
+	inline static public var CHALLENGING = io.newgrounds.net.data.MedalData.Difficulty.CHALLENGING;
 	@:depracated("Medal.DIFFICULT is deprecated, use Difficulty.DIFFICULT, instead")
-	inline static public var DIFFICULT   = Difficulty.DIFFICULT;
+	inline static public var DIFFICULT   = io.newgrounds.net.data.MedalData.Difficulty.DIFFICULT;
 	@:depracated("Medal.BRUTAL is deprecated, use Difficulty.BRUTAL, instead")
-	inline static public var BRUTAL      = Difficulty.BRUTAL;
+	inline static public var BRUTAL      = io.newgrounds.net.data.MedalData.Difficulty.BRUTAL;
 	
 	// --- FROM SERVER
 	public var id         (get, never):Int   ; inline function get_id         () return _data.id;
@@ -102,11 +105,11 @@ class Medal extends Object<MedalData> {
 		
 		return switch(difficulty)
 		{
-			case Difficulty.EASY       : "Easy";
-			case Difficulty.MODERATE   : "Moderate";
-			case Difficulty.CHALLENGING: "Challenging";
-			case Difficulty.DIFFICULT  : "Difficult";
-			case Difficulty.BRUTAL     : "Brutal";
+			case io.newgrounds.net.data.MedalData.Difficulty.EASY       : "Easy";
+			case io.newgrounds.net.data.MedalData.Difficulty.MODERATE   : "Moderate";
+			case io.newgrounds.net.data.MedalData.Difficulty.CHALLENGING: "Challenging";
+			case io.newgrounds.net.data.MedalData.Difficulty.DIFFICULT  : "Difficult";
+			case io.newgrounds.net.data.MedalData.Difficulty.BRUTAL     : "Brutal";
 			case _:
 				throw 'invalid difficulty: $difficulty';
 		}

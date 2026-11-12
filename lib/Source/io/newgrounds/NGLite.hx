@@ -12,7 +12,6 @@ import io.newgrounds.net.data.AppData;
 import io.newgrounds.net.data.Error;
 import io.newgrounds.net.data.Response;
 import io.newgrounds.net.outcomes.CallOutcome;
-import io.newgrounds.net.outcomes.LoginOutcome;
 import io.newgrounds.net.outcomes.Outcome;
 import io.newgrounds.net.results.BaseResultData;
 import io.newgrounds.net.results.Result;
@@ -84,7 +83,7 @@ class NGLite extends CallableCore {
 	 * @param callback  If a sessionId was given, this will be called with the outcome of that
 	 *                  login attempt.
 	**/
-	public function new(app:AppData, ?callback:(LoginOutcome)->Void) {
+	public function new(app:AppData, ?callback:(io.newgrounds.net.outcomes.LoginOutcome)->Void) {
 		
 		super(app, new Logger((any, ?pos)->haxe.Log.trace('[Newgrounds API] :: ${any}', pos)));
 		
@@ -96,7 +95,7 @@ class NGLite extends CallableCore {
 		}
 	}
 	
-	function checkInitialSession(callback:Null<(LoginOutcome)->Void>, outcome:CallOutcome<SessionResultData>) {
+	function checkInitialSession(callback:Null<(io.newgrounds.net.outcomes.LoginOutcome)->Void>, outcome:CallOutcome<SessionResultData>) {
 		
 		switch(outcome)
 		{
@@ -105,7 +104,7 @@ class NGLite extends CallableCore {
 		}
 	}
 	
-	function initialSessionFail(callback:Null<(LoginOutcome)->Void>, error:CallError) {
+	function initialSessionFail(callback:Null<(io.newgrounds.net.outcomes.LoginOutcome)->Void>, error:CallError) {
 		
 		appData.sessionId = null;
 		
@@ -147,7 +146,7 @@ class NGLite extends CallableCore {
 	overload static public inline extern function createAndCheckSession
 	( appId = "test"
 	, backupSessionId:String = null
-	, ?callback:(LoginOutcome)->Void
+	, ?callback:(io.newgrounds.net.outcomes.LoginOutcome)->Void
 	):Void {
 		
 		createAndCheckSession({ id: appId, sessionId: backupSessionId }, callback);
@@ -220,3 +219,12 @@ class NGLite extends CallableCore {
 		setupEncryption(key, cipher, format);
 	}
 }
+
+@:deprecated("io.newgrounds.NGLite.LoginOutcome is deprecated, use io.newgrounds.net.outcomes.LoginOutcome, instead")
+typedef LoginOutcome = io.newgrounds.net.outcomes.LoginOutcome;
+
+@:deprecated("io.newgrounds.NGLite.LoginOutcome.LoginFail is deprecated, use io.newgrounds.net.outcomes.LoginOutcome.LoginFail, instead")
+typedef LoginFail = io.newgrounds.net.outcomes.LoginOutcome.LoginFail;
+
+@:deprecated("io.newgrounds.NGLite.LoginOutcome.LoginCancel is deprecated, use io.newgrounds.net.outcomes.LoginOutcome.LoginCancel, instead")
+typedef LoginCancel = io.newgrounds.net.outcomes.LoginOutcome.LoginCancel;
