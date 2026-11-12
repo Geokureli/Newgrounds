@@ -6,6 +6,7 @@ import io.newgrounds.NG;
 import io.newgrounds.NGLite;
 import io.newgrounds.components.Component;
 import io.newgrounds.net.data.Error;
+import io.newgrounds.net.outcomes.LoginOutcome;
 import io.newgrounds.net.outcomes.Outcome;
 import io.newgrounds.objects.Medal;
 import io.newgrounds.objects.SaveSlot;

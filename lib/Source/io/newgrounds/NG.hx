@@ -15,6 +15,7 @@ import io.newgrounds.net.data.Response;
 import io.newgrounds.net.data.Session;
 import io.newgrounds.net.data.User;
 import io.newgrounds.net.outcomes.CallOutcome;
+import io.newgrounds.net.outcomes.LoginOutcome;
 import io.newgrounds.net.outcomes.Outcome;
 import io.newgrounds.net.results.BaseResultData;
 import io.newgrounds.net.results.Result;
