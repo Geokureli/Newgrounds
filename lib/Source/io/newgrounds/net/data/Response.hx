@@ -25,7 +25,7 @@ typedef RawResponse<T:BaseResultData> =
 abstract Response<T:BaseResultData>(RawResponse<T>) {
 	
 	public var success(get, never):Bool               ; inline function get_success () return this.success;
-	public var error  (get, never):Null<Error>    ; inline function get_error   () return this.error;
+	public var error  (get, never):Null<Error>        ; inline function get_error   () return this.error;
 	public var debug  (get, never):Null<DebugResponse>; inline function get_debug   () return this.debug;
 	public var result (get, never):Null<Result<T>>    ; inline function get_result  () return this.result;
 	public var appId  (get, never):String             ; inline function get_appId   () return this.app_id;

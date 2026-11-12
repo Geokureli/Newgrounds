@@ -219,13 +219,13 @@ class Call<T:BaseResultData>
 		onSend.dispatch();
 	}
 	
-	function getParameters():Null<Any>
-	{
+	function getParameters():Null<Any> {
+		
 		var paramsEmpty = true;
 		final params = {};
 		
-		for (field in _parameters.keys())
-		{
+		for (field in _parameters.keys()) {
+			
 			paramsEmpty = false;
 			Reflect.setField(params, field, _parameters.get(field));
 		}
