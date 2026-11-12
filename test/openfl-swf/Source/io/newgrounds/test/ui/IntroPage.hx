@@ -50,7 +50,7 @@ class IntroPage extends Page<Component> {
 		_autoConnect = new CheckBox(target.autoConnect, onAutoConnectToggle);
 		_debug = new CheckBox(target.debug);
 		_debug.on = true;
-		if (NGLite.getSessionId() != null){
+		if (NG.web.getSessionId() != null){
 			
 			_autoConnect.on = true;
 			onAutoConnectToggle();
@@ -99,7 +99,7 @@ class IntroPage extends Page<Component> {
 		
 		_onStart(
 			{ id        : fieldString(_appId)
-			, sessionId : _autoConnect.on ? NGLite.getSessionId() : fieldString(_sessionId)
+			, sessionId : _autoConnect.on ? NG.web.getSessionId() : fieldString(_sessionId)
 			, debug     : _debug.on
 			, encryption: encryption
 			}

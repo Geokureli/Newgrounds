@@ -18,6 +18,7 @@ import io.newgrounds.net.results.BaseResultData;
 import io.newgrounds.net.results.Result;
 import io.newgrounds.net.results.SessionResultData;
 import io.newgrounds.utils.Dispatcher;
+import io.newgrounds.utils.WebTools;
 
 using io.newgrounds.net.outcomes.Outcome.OutcomeTools;
 using io.newgrounds.net.outcomes.Outcome.TypedOutcomeTools;
@@ -39,6 +40,10 @@ class NGLite extends CallableCore {
 	
 	static public var core(default, null):Null<NGLite>;
 	static public final onCoreReady = new Dispatcher();
+	
+	#if (js || flash)
+	static public final web = new WebTools();
+	#end
 	
 	@:deprecated("debug is deprecated, use appData.debug, instead")
 	public var debug(get, set):Bool;
@@ -161,99 +166,39 @@ class NGLite extends CallableCore {
 	**/
 	overload static public inline extern function createAndCheckSession(app:AppData, ?callback) {
 		
-		app.sessionId = getSessionId() ?? app.sessionId;
+		app.sessionId = web.getSessionId() ?? app.sessionId;
 		create(app, callback);
 	}
 	
+	#if (js || flash)
+	/** Get the current URL */
+	@:deprecated("getUrl is deprecated, use web.getUrl, instead")
 	inline static public function getUrl():String {
 		
-		#if js
-			return js.Browser.document.location.href;
-		#elseif flash
-			return flash.Lib.current.stage.loaderInfo != null
-				? flash.Lib.current.stage.loaderInfo.url
-				: null;
-		#else
-			return null;
-		#end
+		return web.getUrl();
 	}
 	
+	/** Look for a NG.io session ID, if available */
+	@:deprecated("getSessionId is deprecated, use web.getSessionId, instead")
 	static public function getSessionId():String {
 		
-		#if js
-			
-			var url = getUrl();
-			
-			// Check for URL params
-			var index = url.indexOf("?");
-			if (index != -1) {
-				
-				// Check for session ID in params
-				for (param in url.substr(index + 1).split("&")) {
-					
-					index = param.indexOf("=");
-					if (index != -1 && param.substr(0, index) == "ngio_session_id")
-						return param.substr(index + 1);
-				}
-			}
-			
-		#elseif flash
-			
-			if (flash.Lib.current.stage.loaderInfo != null
-			&&  Reflect.hasField(flash.Lib.current.stage.loaderInfo.parameters, "ngio_session_id"))
-				return Reflect.field(flash.Lib.current.stage.loaderInfo.parameters, "ngio_session_id");
-			
-		#end
+		return web.getSessionId();
+	}
+	#else
+	/** Get the current URL */
+	@:deprecated("getUrl will not be available on non web targets")
+	inline static public function getUrl():Null<String> {
 		
 		return null;
-		
-		// --- EXAMPLE LOADER PARAMS
-		//{ "1517703669"                : ""
-		//, "ng_username"               : "GeoKureli"
-		//, "NewgroundsAPI_SessionID"   : "F1LusbG6P8Qf91w7zeUE37c1752563f366688ac6153996d12eeb111a2f60w2xn"
-		//, "NewgroundsAPI_PublisherID" : 1
-		//, "NewgroundsAPI_UserID"      : 488329
-		//, "NewgroundsAPI_SandboxID"   : "5a76520e4ae1e"
-		//, "ngio_session_id"           : "0c6c4e02567a5116734ba1a0cd841dac28a42e79302290"
-		//, "NewgroundsAPI_UserName"    : "GeoKureli"
-		//}
 	}
 	
-	// -------------------------------------------------------------------------------------------
-	//                                   CALLS
-	// -------------------------------------------------------------------------------------------
-	
-	// final _queuedCalls = new Array<ICallable>();
-	// final _pendingCalls = new Array<ICallable>();
-	
-	// @:allow(io.newgrounds.net.Call)
-	// @:generic
-	// function queueCall<T:BaseResultData>(call:Call<T>):Void {
+	/** Look for a NG.io session ID, if available */
+	@:deprecated("getSessionId will not be available on non web targets")
+	static public function getSessionId():Null<String> {
 		
-	// 	logger.logVerbose('queued - ${call.component}');
-		
-	// 	_queuedCalls.push(call);
-	// 	checkQueue();
-	// }
-	
-	// @:allow(io.newgrounds.net.Call)
-	// @:generic
-	// function markCallPending<T:BaseResultData>(call:Call<T>):Void {
-		
-	// 	_pendingCalls.push(call);
-		
-	// 	call.addOutcomeHandler((_)->{ 
-			
-	// 		_pendingCalls.remove(call);
-	// 		checkQueue();
-	// 	});
-	// }
-	
-	// function checkQueue():Void {
-		
-	// 	if (_pendingCalls.length == 0 && _queuedCalls.length > 0)
-	// 		_queuedCalls.shift().send();
-	// }
+		return null;
+	}
+	#end
 	
 	// -------------------------------------------------------------------------------------------
 	//                                       ENCRYPTION

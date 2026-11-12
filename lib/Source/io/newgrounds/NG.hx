@@ -24,6 +24,7 @@ import io.newgrounds.objects.Medal;
 import io.newgrounds.objects.SaveSlot;
 import io.newgrounds.objects.ScoreBoard;
 import io.newgrounds.utils.Dispatcher;
+import io.newgrounds.utils.WebTools;
 
 using io.newgrounds.net.outcomes.Outcome.OutcomeTools;
 using io.newgrounds.net.outcomes.Outcome.TypedOutcomeTools;
@@ -38,6 +39,8 @@ class NG extends NGLite {
 	
 	static public var core(default, null):NG;
 	static public final onCoreReady:Dispatcher = new Dispatcher();
+	
+	static public final web = new WebTools();
 	
 	// --- DATA
 	
@@ -152,7 +155,7 @@ class NG extends NGLite {
 	
 	overload static public inline extern function createAndCheckSession(app, ?callback) {
 		
-		app.sessionId = NGLite.getSessionId() ?? app.sessionId;
+		app.sessionId = web.getSessionId() ?? app.sessionId;
 		
 		create(app, callback);
 	}
@@ -506,7 +509,7 @@ class NG extends NGLite {
 	/** Used to get the current web host of your game. */
 	static public function getHost():String {
 		
-		final url = NGLite.getUrl();
+		final url = web.getUrl();
 		
 		if (url == null || url == "")
 			return "AppView";
