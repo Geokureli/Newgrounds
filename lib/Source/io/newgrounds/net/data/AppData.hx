@@ -2,6 +2,9 @@ package io.newgrounds.net.data;
 
 import io.newgrounds.crypto.Encryption;
 
+/**
+ * Info needed to connect with the NG.io server for a specific project
+ */
 @:structInit
 class AppData
 {

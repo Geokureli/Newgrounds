@@ -109,7 +109,7 @@ class NG extends NGLite {
 		scoreBoards = new ScoreBoardList(this);
 		externalApps = new ExternalAppList(this);
 		
-		attemptingLogin = sessionId != null;
+		attemptingLogin = appData.sessionId != null;
 	}
 	
 	/**
@@ -216,14 +216,14 @@ class NG extends NGLite {
 			case SUCCESS(data): _session = data.session;
 			case FAIL(error):
 				
-				sessionId = null;
+				appData.sessionId = null;
 				endLogin();
 				
 				callback.safe(FAIL(ERROR(error)));
 				return;
 		}
 		
-		sessionId = _session.id;
+		appData.sessionId = _session.id;
 		
 		logger.logVerbose('session started - status: ${_session.status}');
 		
@@ -409,7 +409,7 @@ class NG extends NGLite {
 	function onLogOutSuccessful():Void {
 		
 		_session = null;
-		sessionId = null;
+		appData.sessionId = null;
 		loggedIn = false;
 	}
 	

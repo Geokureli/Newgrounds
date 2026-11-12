@@ -112,7 +112,7 @@ class CorePage extends CorePageLite {
 		_openPassport.enabled = false;
 		_passportLink.text = "";
 		
-		_sessionId.text = NG.core.sessionId;
+		_sessionId.text = NG.core.appData.sessionId;
 		
 		var user = NG.core.user;
 		if (user != null){
@@ -337,7 +337,7 @@ class CorePageLite extends Page<Component> {
 	
 	function onSessionIdChange(value:String):Void {
 		
-		NG.core.sessionId = value;
+		NG.core.appData.sessionId = value;
 	}
 }
 

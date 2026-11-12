@@ -40,14 +40,17 @@ class NGLite extends CallableCore {
 	static public var core(default, null):Null<NGLite>;
 	static public final onCoreReady = new Dispatcher();
 	
+	@:deprecated("debug is deprecated, use appData.debug, instead")
 	public var debug(get, set):Bool;
 	inline function get_debug() return appData.debug;
 	inline function set_debug(value:Bool) return appData.debug = value;
 	
+	@:deprecated("appId is deprecated, use appData.appId, instead")
 	/** The unique ID of your app as found in the 'API Tools' tab of your Newgrounds.com project. */
 	public var appId(get, never):String;
 	inline function get_appId() return appData.id;
 	
+	@:deprecated("sessionId is deprecated, use appData.sessionId, instead")
 	public var sessionId(get, set):String;
 	function get_sessionId():String return appData.sessionId;
 	function set_sessionId(value:String):String {
@@ -60,6 +63,7 @@ class NGLite extends CallableCore {
 	 * Set your preffered encrypter here,
 	 * or just call setDefaultEcryptionHandler with your app's encryption settings
 	**/
+	@:deprecated("encryptionHandler is deprecated, use appData.encryptionHandler, instead")
 	public var encryptionHandler(get, set):(String)->String;
 	function get_encryptionHandler():(String)->String return appData.encryption.encrypt;
 	function set_encryptionHandler(value:(String)->String) {
@@ -68,22 +72,18 @@ class NGLite extends CallableCore {
 		return value;
 	}
 	
-	
 	/** 
 	 * Iniitializes the API, call before utilizing any other component.
 	 * 
-	 * @param appId      The unique ID of your app as found in the 'API Tools' tab of your
-	 *                   Newgrounds.com project.
-	 * @param sessionId  A unique session id used to identify the active user.
-	 * @param debug      Enables debug features and verbose responses from the server
-	 * @param callback   If a sessionId was given, this will be called with the outcome of that
-	 *                   login attempt.
+	 * @param app       Info needed to connect with the NG.io server for a specific project
+	 * @param callback  If a sessionId was given, this will be called with the outcome of that
+	 *                  login attempt.
 	**/
 	public function new(app:AppData, ?callback:(LoginOutcome)->Void) {
 		
 		super(app, new Logger((any, ?pos)->haxe.Log.trace('[Newgrounds API] :: ${any}', pos)));
 		
-		if (this.sessionId != null) {
+		if (appData.sessionId != null) {
 			
 			callList.add(calls.app.checkSession())
 				.addOutcomeHandler(checkInitialSession.bind(callback))
@@ -91,7 +91,7 @@ class NGLite extends CallableCore {
 		}
 	}
 	
-	function checkInitialSession(callback:Null<(LoginOutcome)->Void>, outcome:CallOutcome<SessionResultData>):Void {
+	function checkInitialSession(callback:Null<(LoginOutcome)->Void>, outcome:CallOutcome<SessionResultData>) {
 		
 		switch(outcome)
 		{
@@ -100,9 +100,9 @@ class NGLite extends CallableCore {
 		}
 	}
 	
-	function initialSessionFail(callback:Null<(LoginOutcome)->Void>, error:CallError):Void {
+	function initialSessionFail(callback:Null<(LoginOutcome)->Void>, error:CallError) {
 		
-		sessionId = null;
+		appData.sessionId = null;
 		
 		callback.safe(FAIL(ERROR(error)));
 	}
@@ -113,20 +113,13 @@ class NGLite extends CallableCore {
 	 * This is not the only way to create an instance, nor is NG a forced singleton, but it's the
 	 * only way to set the static NG.core.
 	 * 
-	 * @param appId      The unique ID of your app as found in the 'API Tools' tab of your
-	 *                   Newgrounds.com project.
-	 * @param sessionId  A unique session id used to identify the active user.
-	 * @param callback   If a sessionId was given, this will be called with the outcome of that
+	 * @param app       The unique ID of your app as found in the 'API Tools' tab of your
+	 *                  Newgrounds.com project.
+	 * @param callback  If a sessionId was given, this will be called with the outcome of that
 	 *                   login attempt.
 	 * 
 	 * @see createAndCheckSession
-	**/
-	overload static public inline extern function create(appId = "test", ?sessionId:String, ?callback):Void {
-		
-		createHelper({id: appId, sessionId: sessionId, debug: appId == "test" }, callback);
-	}
-	
-	overload static public inline extern function createHelper(app:AppData, ?callback):Void {
+	**/	inline static public function create(app:AppData, ?callback) {
 		
 		core = new NGLite(app, callback);
 		onCoreReady.dispatch();
@@ -145,6 +138,7 @@ class NGLite extends CallableCore {
 	 * @param callback         If a sessionId was given or found, this will be called with the
 	 *                         outcome of that login attempt.
 	**/
+	@:deprecated("createAndCheckSession(myAppId, mySessionId) is deprecated, use AppData to define these args")
 	overload static public inline extern function createAndCheckSession
 	( appId = "test"
 	, backupSessionId:String = null
@@ -154,15 +148,21 @@ class NGLite extends CallableCore {
 		createAndCheckSessionHelper({ id: appId, sessionId: backupSessionId }, callback);
 	}
 	
-	overload static public inline extern function createAndCheckSession(app:AppData, callback) {
-		
-		createAndCheckSessionHelper(app, callback);
-	}
-	
-	static public function createAndCheckSessionHelper(app:AppData, ?callback):Void {
+	/**
+	 * Creates NG.core, looks in loader vars for a session (only works when playing on Newgrounds).
+	 * If a session is not found, the backup session is used.
+	 * 
+	 * This is not the only way to create an instance, nor is NG a forced singleton, but it's the
+	 * only way to set the static NG.core.
+	 * 
+	 * @param app       Info needed to connect with the NG.io server for a specific project
+	 * @param callback  If a sessionId was given or found, this will be called with the
+	 *                  outcome of that login attempt.
+	**/
+	overload static public inline extern function createAndCheckSession(app:AppData, ?callback) {
 		
 		app.sessionId = getSessionId() ?? app.sessionId;
-		createHelper(app, callback);
+		create(app, callback);
 	}
 	
 	inline static public function getUrl():String {
@@ -259,7 +259,7 @@ class NGLite extends CallableCore {
 	//                                       ENCRYPTION
 	// -------------------------------------------------------------------------------------------
 	
-	
+	@:deprecated("setupEncryption is deprecated, use appData.encryption, instead")
 	public function setupEncryption
 	( key   :String
 	, cipher:Cipher         = AES_128
@@ -269,7 +269,7 @@ class NGLite extends CallableCore {
 		appData.encryption = EncryptionTools.create(cipher, key, format);
 	}
 	
-	@:deprecated("initEncryption is deprecated, use `setupEncryption`, now that AES-128 is the default")
+	@:deprecated("initEncryption is deprecated, use `appData.encryption`, instead")
 	inline public function initEncryption(key, cipher = Cipher.RC4, format = BASE_64) {
 		
 		setupEncryption(key, cipher, format);
