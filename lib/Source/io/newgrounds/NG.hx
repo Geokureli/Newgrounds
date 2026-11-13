@@ -45,43 +45,44 @@ class NG extends NGLite {
 	// --- DATA
 	
 	/** The logged in user */
-	public var user(get, never):User;
-	function get_user():User {
+	public var user(get, never):Null<User>;
+	function get_user():Null<User> {
 		
 		if (_session == null)
 			return null;
 		
 		return _session.user;
 	}
-	public var passportUrl(get, never):String;
-	function get_passportUrl():String {
+	public var passportUrl(get, never):Null<String>;
+	function get_passportUrl():Null<String> {
 		
 		if (_session == null || _session.status != SessionStatus.REQUEST_LOGIN)
 			return null;
 		
 		return _session.passportUrl;
 	}
-	public var medals(default, null):MedalList;
-	public var scoreBoards(default, null):ScoreBoardList;
-	public var saveSlots(default, null):SaveSlotList;
-	public var externalApps(default, null):ExternalAppList;
+	
+	public final medals:MedalList;
+	public final scoreBoards:ScoreBoardList;
+	public final saveSlots:SaveSlotList;
+	public final externalApps:ExternalAppList;
 	
 	// --- EVENTS
 	
-	public var onLogin(default, null):Dispatcher;
-	public var onLogOut(default, null):Dispatcher;
+	public final onLogin:Dispatcher;
+	public final onLogOut:Dispatcher;
 	
 	@:deprecated("Use medals.onLoad")
 	public var onMedalsLoaded(get, never):Dispatcher;
-	inline function get_onMedalsLoaded()  return medals.onLoad;
+	inline function get_onMedalsLoaded() return medals.onLoad;
 	
 	@:deprecated("Use scoreBoards.onLoad")
 	public var onScoreBoardsLoaded(get, never):Dispatcher;
-	inline function get_onScoreBoardsLoaded()  return scoreBoards.onLoad;
+	inline function get_onScoreBoardsLoaded() return scoreBoards.onLoad;
 	
 	@:deprecated("Use saveSlots.onLoad")
 	public var onSaveSlotsLoaded(get, never):Dispatcher;
-	inline function get_onSaveSlotsLoaded()  return saveSlots.onLoad;
+	inline function get_onSaveSlotsLoaded() return saveSlots.onLoad;
 	
 	// --- MISC
 	

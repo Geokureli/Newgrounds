@@ -1,7 +1,6 @@
 package io.newgrounds.components;
 
 import io.newgrounds.net.Call;
-import io.newgrounds.net.data.Period;
 import io.newgrounds.net.data.Score;
 import io.newgrounds.net.data.User;
 import io.newgrounds.net.results.score.*;
@@ -50,7 +49,7 @@ class ScoreBoardComponent extends Component {
 	( id           :Int
 	, limit        :Int     = 10
 	, skip         :Int     = 0
-	, period       :Period  = DAY
+	, period       :io.newgrounds.net.data.Period = DAY
 	, social       :Bool    = false
 	, tag          :String  = null
 	, user         :Dynamic = null
@@ -64,7 +63,7 @@ class ScoreBoardComponent extends Component {
 			.addComponentParameter("id"    , id    )
 			.addComponentParameter("limit" , limit , 10)
 			.addComponentParameter("skip"  , skip  , 0)
-			.addComponentParameter("period", period, Period.DAY)
+			.addComponentParameter("period", period, io.newgrounds.net.data.Period.DAY)
 			.addComponentParameter("social", social, false)
 			.addComponentParameter("tag"   , tag   , null)
 			.addComponentParameter("user"  , user  , null)
@@ -93,3 +92,6 @@ class ScoreBoardComponent extends Component {
 
 @:forward(getBoards, getScores)
 abstract ExternalScoreBoardComponent(ScoreBoardComponent) from ScoreBoardComponent {}
+
+@:deprecated("io.newgrounds.components.ScoreBoardComponent.Period is deprecated, use io.newgrounds.net.data.Period, instead")
+typedef Period =  io.newgrounds.net.data.Period;
