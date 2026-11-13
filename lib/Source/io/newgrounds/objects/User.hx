@@ -1,4 +1,4 @@
 package io.newgrounds.objects;
 
-@:deprecated("io.newgrounds.objects.User is deprecated, use io.newgrounds.net.data.User, instead")
-typedef User = io.newgrounds.net.data.User;
+@:deprecated("User has moved to ngio.data.UserData")
+typedef User = ngio.data.UserData;

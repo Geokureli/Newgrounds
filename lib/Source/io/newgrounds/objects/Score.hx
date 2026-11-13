@@ -1,4 +1,4 @@
 package io.newgrounds.objects;
 
-@:deprecated("io.newgrounds.objects.Score is deprecated, use io.newgrounds.net.data.Score, instead")
-typedef Score = io.newgrounds.net.data.Score;
+@:deprecated("Score has moved to ngio.data.Score")
+typedef Score = ngio.data.Score;

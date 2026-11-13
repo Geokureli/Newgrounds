@@ -1,7 +1,7 @@
 package io.newgrounds.utils;
 
-@:deprecated("io.newgrounds.utils.ExternalAppList is deprecated, use io.newgrounds.lists.ExternalAppList, instead")
-typedef ExternalAppList = io.newgrounds.lists.ExternalAppList;
+@:deprecated("ExternalAppList has moved to ngio.objects.ExternalAppList")
+typedef ExternalAppList = ngio.objects.ExternalAppList;
 
-@:deprecated("io.newgrounds.utils.ExternalAppList.ExternalApp is deprecated, use io.newgrounds.lists.ExternalAppList.ExternalApp, instead")
-typedef ExternalApp = io.newgrounds.lists.ExternalAppList.ExternalApp;
+@:deprecated("ExternalApp has moved to ngio.objects.ExternalAppList.ExternalApp")
+typedef ExternalApp = ngio.objects.ExternalAppList.ExternalApp;

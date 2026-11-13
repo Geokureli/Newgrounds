@@ -1,13 +1,13 @@
 package io.newgrounds.objects.events;
 
-@:deprecated("io.newgrounds.objects.Outcome is deprecated, use io.newgrounds.net.outcomes.Outcome, instead")
-typedef Outcome<E> = io.newgrounds.net.outcomes.Outcome<E>;
+@:deprecated("Outcome has moved to ngio.net.Outcome")
+typedef Outcome<E> = ngio.net.Outcome<E>;
 
-@:deprecated("io.newgrounds.objects.Outcome.OutcomeTools is deprecated, use io.newgrounds.net.outcomes.Outcome.OutcomeTools, instead")
-typedef OutcomeTools = io.newgrounds.net.outcomes.Outcome.OutcomeTools;
+@:deprecated("OutcomeTools has moved to ngio.net.Outcome.OutcomeTools")
+typedef OutcomeTools = ngio.net.Outcome.OutcomeTools;
 
-@:deprecated("io.newgrounds.objects.Outcome.TypedOutcome is deprecated, use io.newgrounds.net.outcomes.Outcome.TypedOutcome, instead")
-typedef TypedOutcome<T, E> = io.newgrounds.net.outcomes.Outcome.TypedOutcome<T, E>;
+@:deprecated("TypedOutcome has moved to ngio.net.Outcome.TypedOutcome")
+typedef TypedOutcome<T, E> = ngio.net.Outcome.TypedOutcome<T, E>;
 
-@:deprecated("io.newgrounds.objects.Outcome.TypedOutcomeTools is deprecated, use io.newgrounds.net.outcomes.Outcome.TypedOutcomeTools, instead")
-typedef TypedOutcomeTools = io.newgrounds.net.outcomes.Outcome.TypedOutcomeTools;
+@:deprecated("TypedOutcomeTools has moved to ngio.net.Outcome.TypedOutcomeTools")
+typedef TypedOutcomeTools = ngio.net.Outcome.TypedOutcomeTools;

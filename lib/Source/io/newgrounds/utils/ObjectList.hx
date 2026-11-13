@@ -1,7 +1,7 @@
 package io.newgrounds.utils;
 
-@:deprecated("io.newgrounds.utils.ObjectList is deprecated, use io.newgrounds.lists.ObjectList, instead")
-typedef ObjectList = io.newgrounds.lists.ObjectList;
+@:deprecated("ObjectList has moved to ngio.objects.ObjectList")
+typedef ObjectList = ngio.objects.ObjectList;
 
-@:deprecated("io.newgrounds.utils.ObjectList.ListState is deprecated, use io.newgrounds.lists.ObjectList.ListState, instead")
-typedef ListState = io.newgrounds.lists.ObjectList.ListState;
+@:deprecated("ListState has moved to ngio.objects.ObjectList.ListState")
+typedef ListState = ngio.objects.ObjectList.ListState;

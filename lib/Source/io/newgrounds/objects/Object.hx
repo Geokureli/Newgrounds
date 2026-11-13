@@ -1,45 +1,7 @@
 package io.newgrounds.objects;
 
-import io.newgrounds.utils.Dispatcher;
+@:deprecated("CoreObject has moved to ngio.data.Object.CoreObject")
+typedef CoreObject = ngio.data.Object.CoreObject;
 
-class CoreObject<T> extends Object<T>
-{
-	var _core:CallableCore;
-	
-	public function new(core, data:T = null) {
-		
-		_core = core;
-		super(data);
-	}
-	
-	override function destroy():Void {
-		
-		super.destroy();
-		_core = null;
-	}
-}
-
-class Object<T> {
-	
-	var _data:T;
-	
-	public final onUpdate = new Dispatcher();
-	
-	public function new(data:T = null) {
-		
-		if (data != null)
-			parse(data);
-	}
-	
-	public function parse(data:T):Void {
-		
-		_data = data;
-		onUpdate.dispatch();
-	}
-	
-	
-	public function destroy():Void {
-		
-		onUpdate.clear();
-	}
-}
+@:deprecated("Object has moved to ngio.objects.Object")
+typedef Object = ngio.objects.Object;

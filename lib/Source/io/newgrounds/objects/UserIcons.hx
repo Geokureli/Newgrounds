@@ -1,4 +1,4 @@
 package io.newgrounds.objects;
 
-@:deprecated("io.newgrounds.objects.UserIcons is deprecated, use io.newgrounds.net.data.UserIcons, instead")
-typedef UserIcons = io.newgrounds.net.data.UserIcons;
+@:deprecated("User has moved to ngio.data.UserIconsData")
+typedef UserIcons = ngio.data.UserIconsData;

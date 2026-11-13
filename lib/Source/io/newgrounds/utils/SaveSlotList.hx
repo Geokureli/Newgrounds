@@ -1,10 +1,10 @@
 package io.newgrounds.utils;
 
-@:deprecated("io.newgrounds.utils.SaveSlotList is deprecated, use io.newgrounds.lists.SaveSlotList, instead")
-typedef SaveSlotList = io.newgrounds.lists.SaveSlotList;
+@:deprecated("SaveSlotList has moved to ngio.objects.SaveSlotList")
+typedef SaveSlotList = ngio.objects.SaveSlotList;
 
-@:deprecated("io.newgrounds.utils.SaveSlotList.ExternalSaveSlotList is deprecated, use io.newgrounds.lists.SaveSlotList.ExternalSaveSlotList, instead")
-typedef ExternalSaveSlotList = io.newgrounds.lists.SaveSlotList.ExternalSaveSlotList;
+@:deprecated("ExternalSaveSlotList has moved to ngio.objects.SaveSlotList.ExternalSaveSlotList")
+typedef ExternalSaveSlotList = ngio.objects.SaveSlotList.ExternalSaveSlotList;
 
-@:deprecated("io.newgrounds.utils.SaveSlotList.ExternalSaveSlot is deprecated, use io.newgrounds.lists.SaveSlotList.ExternalSaveSlot, instead")
-typedef ExternalSaveSlot = io.newgrounds.lists.SaveSlotList.ExternalSaveSlot;
+@:deprecated("ExternalSaveSlot has moved to ngio.objects.SaveSlotList.ExternalSaveSlot")
+typedef ExternalSaveSlot = ngio.objects.SaveSlotList.ExternalSaveSlot;
