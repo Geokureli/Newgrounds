@@ -82,7 +82,7 @@ class Medal extends Object<MedalData>
 	@:deprecated("sendDebugUnlock is deprecated, there is no replacement")
 	public function sendDebugUnlock(?callback:Null<(Outcome<CallError>)->Void>):Void {
 		
-		if (NG.core.sessionId == null) {
+		if (NG.core.appData.sessionId == null) {
 			
 			callback.safe(SUCCESS);
 			onUnlock.dispatch();
