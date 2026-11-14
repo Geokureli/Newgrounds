@@ -33,10 +33,15 @@ class ObjectList<K:Int, V>
 		_core = core;
 	}
 	
-	public function clear()
+	/**
+	 * Clears the loaded data and reverts the state back to empty.
+	 * Useful for resetting or clearing memory
+	 */
+	function unload()
 	{
 		_map.clear();
 		_callbacks.clear();
+		state = Empty;
 	}
 	
 	inline public function get(id:K):V return _map.get(id);

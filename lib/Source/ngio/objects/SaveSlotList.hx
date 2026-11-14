@@ -42,9 +42,16 @@ abstract SaveSlotList (RawSaveSlotList)
 private class RawSaveSlotList extends ObjectList<Int, SaveSlot>
 {
 	public var length(get, never):Int;
-	inline function get_length() return _ordered == null ? 0 : _ordered.length;
+	inline function get_length() return _ordered.length;
 	
-	var _ordered:Array<SaveSlot>;
+	final _ordered:Array<SaveSlot> = [];
+	var loaded = false;
+	
+	override function unload()
+	{
+		super.unload();
+		_ordered.resize(0);
+	}
 	
 	/** return the slot with the specified 0-based order that was sent from the server. */
 	inline public function getOrdered(i:Int)
@@ -108,13 +115,16 @@ private class RawSaveSlotList extends ObjectList<Int, SaveSlot>
 	**/
 	public function loadAllFiles(?callback:(Outcome<CallError>)->Void)
 	{
-		if (_map == null) {
-			
+		if (loaded == false)
+		{
 			// populate the save slots first
 			loadList((outcome)->switch (outcome)
 			{
-				case SUCCESS    : loadAllFiles(callback);
-				case FAIL(error): callback.safe(FAIL(error));
+				case SUCCESS:
+					loaded = true;
+					loadAllFiles(callback);
+				case FAIL(error):
+					callback.safe(FAIL(error));
 			});
 			return;
 		}
