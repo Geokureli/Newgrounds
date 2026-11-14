@@ -44,6 +44,12 @@ class NGLite extends ngio.cores.CallableCore
 	static public final web = new WebTools();
 	#end
 	
+	/** Enables verbose logging */
+	@:deprecated("verbose is deprecated use logger.verbose, instead")
+	public var verbose(get, set):Bool;
+	inline function get_verbose() return logger.verbose;
+	inline function set_verbose(value:Bool) return logger.verbose = value;
+	
 	@:deprecated("debug is deprecated, use appData.debug, instead")
 	public var debug(get, set):Bool;
 	inline function get_debug() return appData.debug;
@@ -198,6 +204,37 @@ class NGLite extends ngio.cores.CallableCore
 		return null;
 	}
 	#end
+	
+	// -------------------------------------------------------------------------------------------
+	//                                   LOGGING / ERRORS
+	// -------------------------------------------------------------------------------------------
+	
+	/** Called internally, set this to your preferred logging method */
+	@:deprecated("log is deprecated, use logger.log, instead")
+	public var log(get, set):(any:Dynamic, ?pos:PosInfos)->Void;
+	inline function get_log() return logger.log;
+	inline function set_log(value) return logger.log = value;
+	
+	/** used internally, logs if verbose is true */
+	@:deprecated("logVerbose is deprecated, use logger.logVerbose, instead")
+	inline public function logVerbose(any:Dynamic, ?pos:PosInfos)
+	{
+		logger.logVerbose(any, pos);
+	}
+	
+	/** Used internally. Logs by default, set this to your preferred error handling method */
+	@:deprecated("logError is deprecated, use logger.logError, instead")
+	dynamic public function logError(any:Dynamic, ?pos:PosInfos)
+	{
+		logger.logError(any, pos);
+	}
+	
+	/** used internally, calls log error if the condition is false. EX: if (assert(data != null, "null data")) */
+	@:deprecated("assert is deprecated, use logger.assert, instead")
+	inline public function assert(condition:Bool, msg:Dynamic, ?pos:PosInfos):Bool
+	{
+		return logger.assert(msg, pos);
+	}
 	
 	// -------------------------------------------------------------------------------------------
 	//                                       ENCRYPTION

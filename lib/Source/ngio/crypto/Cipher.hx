@@ -2,45 +2,30 @@ package ngio.crypto;
 
 import haxe.io.Bytes;
 
-@:using(ngio.crypto.Cipher.CipherTools)
-enum Cipher
+enum abstract Cipher(String) to String
 {
-	NONE;
-	AES_128;
-	RC4;
-}
-
-class CipherTools
-{
-	static public function toString(cipher:Cipher)
+	var NONE    = "none";
+	var AES_128 = "aes128";
+	var RC4     = "rc4";
+	
+	public function toString()
 	{
-		return switch cipher
-		{
-			case AES_128: "aes128";
-			case RC4    : "rc4";
-			case NONE   : "none";
-		}
+		return this;
 	}
 	
-	static public function fromString(cipher:String)
+	static public function fromString(cipher:String):Cipher
 	{
-		return switch cipher
-		{
-			case "aes128": AES_128;
-			case "rc4"   : RC4;
-			case "none"  : NONE;
-			case invalid:
-				throw 'Invalid cipher: $invalid';
-		}
+		return cast cipher;
 	}
 	
-	static public function generateEncrypter(cipher:Cipher, key:Bytes):Null<(Bytes)->Bytes>
+	@:allow(ngio.crypto.EncryptionTools)
+	function generateEncrypter(key:Bytes):Null<(Bytes)->Bytes>
 	{
 		#if (ng_test_decryption || ng_test_decryption_verbose)
 		// Advanced testing to make sure encryption/decryption is working
 		return generateEncrypterAndTestDecrypter(key);
 		#else
-		return switch (cipher)
+		return switch (abstract)
 		{
 			case RC4    : new Rc4(key).crypt;
 			case AES_128: new Aes(key).encrypt;
@@ -49,12 +34,12 @@ class CipherTools
 		#end
 	}
 	
-	function generateEncrypterAndTestDecrypter(cipher:Cipher, key:Bytes):Null<(Bytes)->Bytes>
+	function generateEncrypterAndTestDecrypter(key:Bytes):Null<(Bytes)->Bytes>
 	{
 		var encrypter:(Bytes)->Bytes;
 		var decrypter:(Bytes)->Bytes;
 		
-		switch (cipher)
+		switch (abstract)
 		{
 			case RC4    : throw "Rc4 decryption not implemented";
 			case AES_128:

@@ -78,6 +78,23 @@ class Medal extends Object<MedalData>
 		}
 	}
 	
+	/** Locks the medal on the client and sends an unlock request, Server responds the same either way. */ 
+	@:deprecated("sendDebugUnlock is deprecated, there is no replacement")
+	public function sendDebugUnlock(?callback:Null<(Outcome<CallError>)->Void>):Void {
+		
+		if (NG.core.sessionId == null) {
+			
+			callback.safe(SUCCESS);
+			onUnlock.dispatch();
+			
+		} else {
+			
+			_data.unlocked = false;
+			
+			sendUnlock(callback);
+		}
+	}
+	
 	public function toString():String
 	{
 		return 'Medal: $id@$name (${unlocked ? "unlocked" : "locked"}, $value pts, $difficultyName).';

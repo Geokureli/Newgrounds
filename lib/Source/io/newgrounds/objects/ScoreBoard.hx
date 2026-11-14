@@ -1,4 +1,4 @@
 package io.newgrounds.objects;
 
-@:deprecated("Score has moved to ngio.data.ScoreBoard")
-typedef Score = ngio.data.ScoreBoard;
+@:deprecated("ScoreBoard has moved to ngio.objects.ScoreBoard")
+typedef ScoreBoard = ngio.objects.ScoreBoard;

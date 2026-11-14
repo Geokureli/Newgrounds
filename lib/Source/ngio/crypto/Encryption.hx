@@ -1,7 +1,7 @@
 package ngio.crypto;
 
 import haxe.io.Bytes;
-import ngio.crypto.Cipher.CipherTools;
+import ngio.crypto.Cipher;
 
 @:using(ngio.crypto.Encryption.EncryptionTools)
 enum Encryption
@@ -53,6 +53,6 @@ class EncryptionTools
 	
 	static public function fromString(cipher, key, format)
 	{
-		return create(CipherTools.fromString(cipher), key, EncodingFormat.fromString(format));
+		return create(Cipher.fromString(cipher), key, EncodingFormat.fromString(format));
 	}
 }
