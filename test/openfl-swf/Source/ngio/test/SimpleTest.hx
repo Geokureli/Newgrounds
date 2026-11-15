@@ -1,40 +1,47 @@
 package ngio.test;
 
 import ngio.NG;
+import ngio.crypto.Encryption;
 import ngio.net.Call;
+import ngio.net.CallOutcome;
 import ngio.net.Error;
 import ngio.net.Outcome;
 import ngio.net.results.cloud.SaveSlotResultData;
 import ngio.objects.SaveSlot;
 
-class SimpleTest {
-	
-	public function new() {
-		
+class SimpleTest
+{
+	public function new()
+	{
 		trace("connecting to newgrounds");
 		
-		// Use debug so medal unlocks and scoreboards reset after this session
-		var debug = true;
-		NG.createAndCheckSession("47215:Ip8uDj9v", debug);
-		NG.core.verbose = true;
+		NG.createAndCheckSession
+		(
+			{ id: "47215:Ip8uDj9v"
+			, encryption:// Found in your NG project view
+				AES_128("LrnXpr/ogBf+GmU97IzF7Q==")
+				// AES_128("LrnXpr/ogBf+GmU97IzF7Q==", HEX)
+				// NONE;
+				// RC4("LUp0Zg4f1lukgKgSwchZnQ==", BASE_64)
+				// RC4("2d4a74660e1fd65ba480a812c1c8599d", HEX)
+			// Use debug so medal unlocks and scoreboards reset after this session
+			// , debug: true
+			}
+		);
+		NG.core.logger.verbose = true;
 		// Set the encryption cipher/format to RC4/Base64. AES128 and Hex are not implemented yet
 		// Found in your NG project view
-		NG.core.setupEncryption("LrnXpr/ogBf+GmU97IzF7Q==");
-		// NG.core.setupEncryption("LrnXpr/ogBf+GmU97IzF7Q==", HEX);
-		// NG.core.setupEncryption("LrnXpr/ogBf+GmU97IzF7Q==", NONE);
-		// NG.core.setupEncryption("LUp0Zg4f1lukgKgSwchZnQ==", RC4, BASE_64);
-		// NG.core.setupEncryption("2d4a74660e1fd65ba480a812c1c8599d", RC4, HEX);// Found in your NG project view
 		
-		if (NG.core.attemptingLogin) {
-			
+		if (NG.core.attemptingLogin)
+		{
 			/* a session_id was found in the loadervars, this means the user is playing on newgrounds.com
 			 * and we should login shortly. lets wait for that to happen
 			 */
 			
 			NG.core.onLogin.add(onNGLogin);
-			
-		} else {
-			
+		}
+		else
+		{
 			/* They are NOT playing on newgrounds.com, no session id was found. We must start one manually, if we want to.
 			 * Note: This will cause a new browser window to pop up where they can log in to newgrounds
 			 */
@@ -42,8 +49,8 @@ class SimpleTest {
 		}
 	}
 	
-	function onNGLogin() {
-		
+	function onNGLogin()
+	{
 		trace ('logged in! user:${NG.core.user.name}');
 		
 		// Load medals then call onNGMedalFetch()
@@ -58,16 +65,17 @@ class SimpleTest {
 	}
 	
 	// --- MEDALS
-	function onNGMedalFetch(outcome:Outcome<CallError>) {
-		
-		switch (outcome) {
+	function onNGMedalFetch(outcome:Outcome<CallError>)
+	{
+		switch (outcome)
+		{
 			case FAIL(error): throw 'Error loading medals: $error';
 			case SUCCESS:
 		}
 		
 		// Reading medal info
-		for (id in NG.core.medals.keys()) {
-			
+		for (id in NG.core.medals.keys())
+		{
 			var medal = NG.core.medals[id];
 			trace('loaded medal id:$id, name:${medal.name}, description:${medal.description}');
 		}
@@ -79,13 +87,13 @@ class SimpleTest {
 	}
 	
 	// --- SCOREBOARDS
-	function onNGBoardsFetch(outcome:Outcome<CallError>) {
-		
+	function onNGBoardsFetch(outcome:Outcome<CallError>)
+	{
 		outcome.assert('Error loading score boards:');
 		
 		// Reading medal info
-		for (id in NG.core.scoreBoards.keys()) {
-			
+		for (id in NG.core.scoreBoards.keys())
+		{
 			var board = NG.core.scoreBoards[id];
 			trace('loaded scoreboard id:$id, name:${board.name}');
 		}
@@ -103,14 +111,14 @@ class SimpleTest {
 		// more info on scores --- http://www.newgrounds.io/help/components/#scoreboard-getscores
 	}
 	
-	function onNGScoresFetch() {
-		
+	function onNGScoresFetch()
+	{
 		for (score in NG.core.scoreBoards[7971].scores)
 			trace('score loaded user:${score.user.name}, score:${score.formattedValue}');
 	}
 	
-	function onNGSlotsFetch(outcome:Outcome<CallError>) {
-		
+	function onNGSlotsFetch(outcome:Outcome<CallError>)
+	{
 		outcome.assert('Error getting saveSlots:');
 		
 		for (k=>slot in NG.core.saveSlots)
@@ -119,44 +127,44 @@ class SimpleTest {
 		advanceSong(waitForClick);
 	}
 	
-	function advanceSong(callback) {
-		
-		var slot = NG.core.saveSlots[1];
-		if (slot.url == null) {
-			
+	function advanceSong(callback)
+	{
+		final slot = NG.core.saveSlots[1];
+		if (slot.contents == null)
+		{
 			trace("Saving default value to slot 1");
 			buySomeMore(slot, callback);
-			
-		} else
+		}
+		else
 			takeOneDown(slot, callback);
 	}
 	
-	function waitForClick(slot:SaveSlotResultData) {
-		
+	function waitForClick()
+	{
 		#if openfl
 		openfl.Lib.current.stage.addEventListener(openfl.events.MouseEvent.CLICK, onClick);
 		#end
 	}
 	
 	#if openfl
-	function onClick(e:openfl.events.MouseEvent) {
-		
+	function onClick(e:openfl.events.MouseEvent)
+	{
 		openfl.Lib.current.stage.removeEventListener(openfl.events.MouseEvent.CLICK, onClick);
 		
 		advanceSong(waitForClick);
 	}
 	#end
 	
-	function buySomeMore(slot:SaveSlot, callback:(SaveSlotResultData)->Void) {
-		
+	function buySomeMore(slot:SaveSlot, callback:()->Void)
+	{
 		saveSlot(slot, "99 bottles of beer", callback);
 	}
 	
-	function takeOneDown(slot:SaveSlot, callback:(SaveSlotResultData)->Void) {
-		
+	function takeOneDown(slot:SaveSlot, callback:()->Void)
+	{
 		var bottles = Std.parseInt(slot.contents.split(" ")[0]);
-		switch(slot.contents) {
-			
+		switch(slot.contents)
+		{
 			case "0 bottles of beer":
 				// no more
 				clearSlot(slot, callback);
@@ -169,28 +177,31 @@ class SimpleTest {
 		}
 	}
 	
-	function saveSlot(slot:SaveSlot, value:String, callback:(SaveSlotResultData)->Void) {
-		
+	function saveSlot(slot:SaveSlot, value:String, callback:()->Void)
+	{
 		trace('Saving slot[${slot.id}]: "${slot.contents}"->"$value"');
-		slot.save(value, (r)->{
-			switch(r) {
-				
+		slot.save(value, (result)->
+		{
+			switch(result)
+			{
 				case SUCCESS: trace('data saved: "$value"');
 				case FAIL(e): trace('Error saving data: "$e"');
 			}
-			callback(slot);
+			callback();
 		});
 	}
 	
-	function clearSlot(slot:SaveSlot, callback:(SaveSlotResultData)->Void) {
-		
+	function clearSlot(slot:SaveSlot, callback:()->Void)
+	{
 		trace('Clearing slot[${slot.id}]: "${slot.contents}"');
-		slot.clear((r)->{
-			switch(r) {
+		slot.clear((outcome)->
+		{
+			switch(outcome)
+			{
 				case SUCCESS: trace('data cleared');
 				case FAIL(e): trace('Error clearing data: $e');
 			}
-			callback(slot);
+			callback();
 		});
 	}
 }
