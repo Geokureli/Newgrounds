@@ -3,12 +3,20 @@ package ngio.crypto;
 import haxe.io.Bytes;
 import ngio.crypto.Cipher;
 
+abstract EncryptionKey(String) from String to String
+{
+	@:to inline function toEncryption():Encryption
+	{
+		return AES_128(abstract);
+	}
+}
+
 @:using(ngio.crypto.Encryption.EncryptionTools)
 enum Encryption
 {
 	FUNC(func:(String)->String);
-	AES_128(key:String, ?format:EncodingFormat);
-	RC4(key:String, ?format:EncodingFormat);
+	AES_128(key:EncryptionKey, ?format:EncodingFormat);
+	RC4(key:EncryptionKey, ?format:EncodingFormat);
 	NONE;
 }
 
@@ -29,7 +37,7 @@ class EncryptionTools
 		}
 	}
 	
-	static function getCached(cipher:Cipher, key:String, format = EncodingFormat.BASE_64)
+	static function getCached(cipher:Cipher, key:EncryptionKey, format = EncodingFormat.BASE_64)
 	{
 		final lookup = '$cipher-$key-$format';
 		if (false == cache.exists(lookup))
@@ -41,7 +49,7 @@ class EncryptionTools
 		return cache[lookup];
 	}
 	
-	static public function create(cipher:Cipher, key:String, format = EncodingFormat.BASE_64):Encryption
+	static public function create(cipher:Cipher, key:EncryptionKey, format = EncodingFormat.BASE_64):Encryption
 	{
 		return switch cipher
 		{

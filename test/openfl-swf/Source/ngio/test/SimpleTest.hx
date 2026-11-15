@@ -19,13 +19,15 @@ class SimpleTest
 		(
 			{ id: "47215:Ip8uDj9v"
 			, encryption:// Found in your NG project view
-				AES_128("LrnXpr/ogBf+GmU97IzF7Q==")
+				("LrnXpr/ogBf+GmU97IzF7Q==": EncryptionKey)
+				// "LrnXpr/ogBf+GmU97IzF7Q=="
+				// AES_128("LrnXpr/ogBf+GmU97IzF7Q==")
 				// AES_128("LrnXpr/ogBf+GmU97IzF7Q==", HEX)
 				// NONE;
 				// RC4("LUp0Zg4f1lukgKgSwchZnQ==", BASE_64)
 				// RC4("2d4a74660e1fd65ba480a812c1c8599d", HEX)
 			// Use debug so medal unlocks and scoreboards reset after this session
-			// , debug: true
+			, debug: true
 			}
 		);
 		NG.core.logger.verbose = true;
