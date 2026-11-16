@@ -1,60 +1,8 @@
-package io.newgrounds.objects.events;
 
-import haxe.Json;
-import io.newgrounds.objects.Error;
-import io.newgrounds.objects.events.Result;
+package io.newgrounds.objects;
 
-typedef DebugResponse = {
-	
-	var exec_time:Int;
-	var input:Dynamic;
-}
+@:deprecated("Response has move to ngio.net.Response")
+typedef Response = ngio.net.Response;
 
-@:noCompletion
-typedef RawResponse<T:BaseData> =
-{
-	success:Bool,
-	?error :Error,
-	?debug :DebugResponse,
-	?result:Result<T>,
-	app_id :String
-}
-
-abstract Response<T:BaseData>(RawResponse<T>) {
-	
-	public var success(get, never):Bool               ; inline function get_success () return this.success;
-	public var error  (get, never):Null<Error>        ; inline function get_error   () return this.error;
-	public var debug  (get, never):Null<DebugResponse>; inline function get_debug   () return this.debug;
-	public var result (get, never):Null<Result<T>>    ; inline function get_result  () return this.result;
-	public var appId  (get, never):String             ; inline function get_appId   () return this.app_id;
-	
-	public function new (core:NGLite, reply:String) {
-		
-		try { this = Json.parse(reply); }
-		catch (e:Dynamic) {
-			
-			this = Json.parse('{"success":false,"error":{"message":"Error parsing reply:\'$reply\' error:\'$e\'","code":0}}');
-		}
-		
-		if (!success)
-			core.logError('Call unseccessful: $error');
-		else if(!result.success)
-			core.logError('${result.component} fail: ${result.error}');
-	}
-	
-	inline public function hasError() {
-		
-		return success == false || result.success == false;
-	}
-	
-	public function getError() {
-		
-		if (success == false)
-			return error;
-		
-		if (result.success == false)
-			return result.error;
-		
-		return null;
-	}
-}
+@:deprecated("DebugResponse has move to ngio.net.Response.DebugResponse")
+typedef DebugResponse = ngio.net.Response.DebugResponse;

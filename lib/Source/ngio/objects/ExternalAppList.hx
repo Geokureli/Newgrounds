@@ -1,0 +1,94 @@
+package ngio.objects;
+
+import ngio.cores.BaseCore;
+import ngio.data.AppData;
+import ngio.debug.Logger;
+import ngio.events.Dispatcher;
+import ngio.net.Outcome;
+import ngio.net.Response;
+import ngio.net.results.Result;
+import ngio.objects.MedalList;
+import ngio.objects.SaveSlotList;
+import ngio.objects.ScoreBoardList;
+
+/**
+ * A list of external apps. In the NG project manager you can give other apps access to certain
+ * calls:
+ * - Medal.getList
+ * - ScoreBoard.getScores
+ * - CloudSave.loadSlot
+ * - CloudSave.loadSlots
+**/
+@:forward
+abstract ExternalAppList (RawExternalAppList)
+{
+	inline public function new (core)
+	{
+		this = new RawExternalAppList(core);
+	}
+	
+	@:arrayAccess
+	inline public function get(appId:String) return this._map.get(appId);
+}
+
+/**
+ * Note: `ExternalAppList` is just an abstract wrapper of `RawExternalAppList`, to allow array access.
+ * Be sure to add any actual behavior to this class
+**/
+@:allow(ngio.objects.ExternalAppList)
+class RawExternalAppList
+{
+	final _core:BaseCore;
+	final _map = new Map<String, ExternalApp>();
+	
+	public function new (core)
+	{
+		_core = core;
+	}
+	
+	public function clear ()
+	{
+		_map.clear();
+	}
+	
+	public function add(appId:String)
+	{
+		return _map[appId] = new ExternalApp(_core, appId);
+	}
+	
+	/**
+	 * Returns an Iterator over the ids of `this` list.
+	 * 
+	 * The order of ids is undefined.
+	**/
+	public inline function keys() return _map.keys();
+	
+	/**
+	 * Returns an Iterator over the ids and values of `this` list.
+	 * 
+	 * The order is undefined.
+	**/
+	public inline function keyValueIterator() return _map.keyValueIterator();
+}
+
+class ExternalApp extends ngio.cores.CallableCore
+{
+	public var appId(get, never):String;
+	inline function get_appId() return appData.id;
+	
+	public final saveSlots:ExternalSaveSlotList;
+	public final medals:ExternalMedalList;
+	public final scoreBoard:ExternalScoreBoardList;
+	
+	public function new (core:BaseCore, appId:String)
+	{
+		super
+			( { id: appId, debug: core.appData.debug }
+			, new Logger((any, ?pos)->core.logger.log('app[$appId] :: ${any}', pos))
+			);
+		
+		saveSlots = new ExternalSaveSlotList(this);
+		medals = new ExternalMedalList(this);
+		scoreBoard = new ExternalScoreBoardList(this);
+	}
+}

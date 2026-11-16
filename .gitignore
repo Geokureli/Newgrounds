@@ -5,6 +5,7 @@ RECOVER_*.fla
 # Build and Release Folders
 Export/
 bin/
+dump/
 
 # Other files and folders
 .settings/

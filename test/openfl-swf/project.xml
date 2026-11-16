@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <project>
 	
-	<meta title="Newgrounds.io" package="io.newgrounds.test.Main" version="1.1.0" company="GeoKureli" />
-	<app main="io.newgrounds.test.Main" path="Export" file="Newgrounds" />
-	<app preloader="io.newgrounds.test.TestPreloader" />
+	<meta title="Newgrounds.io" package="ngio.test.Main" version="1.1.0" company="GeoKureli" />
+	<app main="ngio.test.Main" path="Export" file="Newgrounds" />
+	<app preloader="ngio.test.TestPreloader" />
 	
 	<window width="800" height="800" fps="30" background="#4C4848" />
 	

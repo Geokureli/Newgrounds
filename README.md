@@ -14,7 +14,7 @@ If you're confused by anything be sure to
 **using haxelib:**
 `haxelib install newgrounds`
 
-## Implement an instance of io.newgrounds.core into your game:
+## Implement an instance of ngio.core into your game:
 
 Add `<haxelib name="newgrounds" />` to your project.xml.
 You can also just include the local library in your xml
@@ -27,7 +27,7 @@ functionality to basic component calls and responses.
 ### Creating the core
 
 ```haxe
-NG.create("app id here", "session id, here, if you know it");
+NG.create({ id: myAppId, encryption:AES_128("encryption key"), session: myOptionallySavedSession });
 ```
 
 Once the core is created you can access it via NG.core but 
@@ -38,7 +38,7 @@ find the sessionId in the loaderVars, or you can have the
 API find it automatically with
 
 ```haxe
-NG.createAndCheckSession("app id here", "backup session id, if none is found");
+NG.createAndCheckSession({ id: myAppId, session: myBackupSession, encryption:AES_128(myEncryptionKey) });
 ```
 
 
@@ -53,9 +53,12 @@ to NG.io.
 If no session ID was found, you will need to start one.
 
 ```haxe
-if (NG.core.loggedIn == false) {
-    NG.core.requestLogin(
-        function(outcome:LoginOutcome):Void {
+if (NG.core.loggedIn == false)
+{
+    NG.core.requestLogin
+    (
+        function(outcome:LoginOutcome)
+        {
             if (outcome.match(SUCCESS))
                 trace("logged on");
         }
@@ -65,34 +68,19 @@ if (NG.core.loggedIn == false) {
 
 ### Encryption
 
-Setting the encryption method is easy, just call:
-
-```haxe
-NG.core.setupEncryption("encryption key", AES_128, BASE_64);
-```
-
 Encryption Ciphers:
-- **io.newgrounds.crypto.Cipher.NONE**
-- **io.newgrounds.crypto.Cipher.AES-128**(default)
-- **io.newgrounds.crypto.Cipher.RC4**
+- **NONE**: No encryption, not recommended
+- **AES-128**: The default and strongest security
+- **RC4**: Less secure, but simpler
+- **FUNC**: Use your own encryption method - if you're some kind of crypto-god from The Matrix
 
-Encryption Ciphers:
-- **io.newgrounds.crypto.EncryptionFormat.BASE_64** (default)
-- **io.newgrounds.crypto.EncryptionFormat.HEX**
-
-You can also use your own encryption method - if you're some kind of crypto-god from The Matrix -
-by directly setting NG.core.encryptionHandler
+Encryption Formats:
+- **BASE_64**: The default, creates more compact strings
+- **HEX**: Not Recommended
 
 #### Example
 ```haxe
-NG.core.encryptionHandler = myEncryptionHandler;
-
-function myEncryptionHandler(data:String):String {
-    
-    var encrytedData:String;
-    // stuff
-    return encrytedData;
-}
+NG.create({ id: myAppId, encryption:AES_128(myKey, BASE_64) });// BASE_64 can be omitted
 ```
 
 ## Using fla assets
@@ -128,8 +116,8 @@ you can interface with them directly. For instance:
 var medal =  NG.core.medals.get(id);
 trace('${medal.name} is worth ${medal.value}');
 
-if (!medal.unlocked) {
-    
+if (!medal.unlocked)
+{
     medal.onUnlock.add(function ():Void { trace('${medal.name} unlocked:${medal.unlocked}'); });
     medal.unlock();
 }
@@ -169,20 +157,23 @@ call.send();
 ```
 
 The various calls types result in different response data structures. For instance medal.unlock 
-responds with a `CallOutcome<io.newgrounds.objects.events.Data>` object. The outcome type determines the data 
+responds with a `CallOutcome<ngio.net.medal.MedalUnlockResultData>` object. The outcome type determines the data 
 contained in the `SUCCESS(data)`. 
 
 #### Example Usage:
 
 ```haxe
 var call = NG.core.calls.medal.unlock(medalId);
-call.addOutcomeHandler(
-    function(outcome:CallOutcome<MedalUnlockData>):Void {
-        
-        switch(outcome) {
-            
-            case SUCCESS(data): trace('Medal unlocked, [name=${data.medal.name}]');
-            case FAIL(error): trace('Error unlocking medal: ' + error.toString());
+call.addOutcomeHandler
+(
+    function(outcome:CallOutcome<MedalUnlockResultData>)
+    {
+        switch(outcome)
+        {
+            case SUCCESS(data):
+                trace('Medal unlocked, [name=${data.medal.name}]');
+            case FAIL(error):
+                trace('Error unlocking medal: ' + error.toString());
         }
     }
 );
@@ -196,9 +187,10 @@ You can also use myCall.addErrorHandler to listen for errors thrown by NG server
 resulting from general Http remoting
 
 ```haxe
-myCall.addErrorHandler(
-    function(e:io.newgrounds.objects.Error):Void {
-        
+myCall.addErrorHandler
+(
+    function(e:ngio.net.Error)
+    {
         trace('Error: $e');
     }
 );
